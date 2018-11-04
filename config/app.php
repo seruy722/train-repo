@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Cargo007'),
 
     /*
     |--------------------------------------------------------------------------
@@ -83,6 +83,7 @@ return [
     'locale' => 'en',
 
     'locales' => [
+        'ru'=> 'RU',
         'en' => 'EN',
         'zh-CN' => '中文',
         'es' => 'ES',

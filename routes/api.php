@@ -21,7 +21,16 @@ Route::group(['middleware' => 'auth:api'], function () {
     });
 
     Route::patch('settings/profile', 'Settings\ProfileController@update');
+    Route::post('settings/profile', 'Settings\ProfileController@updateProfileFoto');
     Route::patch('settings/password', 'Settings\PasswordController@update');
+
+    Route::get('blacklist', 'BlackListController@index');
+    Route::post('blacklist/saveUpdate', 'BlackListController@store');
+    Route::post('blacklist/delete', 'BlackListController@destroy');
+    Route::post('blacklist/deleteFoto', 'BlackListController@deleteFoto');
+
+    Route::post('blacklist/saveLog', 'LogController@store');
+    Route::get('getLogList', 'LogController@index');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

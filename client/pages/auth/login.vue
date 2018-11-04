@@ -1,92 +1,75 @@
 <template>
-  <div class="row">
-    <div class="col-lg-8 m-auto">
-      <card :title="$t('login')">
-        <form @submit.prevent="login" @keydown="form.onKeydown($event)">
-          <!-- Email -->
-          <div class="form-group row">
-            <label class="col-md-3 col-form-label text-md-right">{{ $t('email') }}</label>
-            <div class="col-md-7">
-              <input v-model="form.email" :class="{ 'is-invalid': form.errors.has('email') }" type="email" name="email"
-                     class="form-control">
-              <has-error :form="form" field="email"/>
-            </div>
-          </div>
-
-          <!-- Password -->
-          <div class="form-group row">
-            <label class="col-md-3 col-form-label text-md-right">{{ $t('password') }}</label>
-            <div class="col-md-7">
-              <input v-model="form.password" :class="{ 'is-invalid': form.errors.has('password') }" type="password" name="password"
-                     class="form-control">
-              <has-error :form="form" field="password"/>
-            </div>
-          </div>
-
-          <!-- Remember Me -->
-          <div class="form-group row">
-            <div class="col-md-3"/>
-            <div class="col-md-7 d-flex">
-              <checkbox v-model="remember" name="remember">
-                {{ $t('remember_me') }}
-              </checkbox>
-
-              <router-link :to="{ name: 'password.request' }" class="small ml-auto my-auto">
-                {{ $t('forgot_password') }}
-              </router-link>
-            </div>
-          </div>
-
-          <div class="form-group row">
-            <div class="col-md-7 offset-md-3 d-flex">
-              <!-- Submit Button -->
-              <v-button :loading="form.busy">
-                {{ $t('login') }}
-              </v-button>
-
-              <!-- GitHub Login Button -->
-              <login-with-github/>
-            </div>
-          </div>
-        </form>
-      </card>
-    </div>
-  </div>
+    <v-app id="inspire">
+        <v-container fluid fill-height>
+            <v-layout align-center justify-center>
+                <v-flex xs12 sm8 md4>
+                    <v-card class="elevation-12">
+                        <v-toolbar dark color="primary">
+                            <v-toolbar-title>Вход</v-toolbar-title>
+                            <v-spacer></v-spacer>
+                        </v-toolbar>
+                        <v-card-text>
+                            <v-form>
+                                <v-text-field v-model="data.email" prepend-icon="person" name="email" label="E-mail"
+                                              type="text" :error-messages="checkError('email')"></v-text-field>
+                                <v-text-field v-model="data.password" id="password" prepend-icon="lock" name="password"
+                                              label="Пароль" type="password" :error-messages="checkError('password')"
+                                              @keyup="onKeyup">
+                                </v-text-field>
+                            </v-form>
+                        </v-card-text>
+                        <v-card-actions align-center justify-space-around>
+                            <v-btn color="primary" @click="login">Войти</v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn flat color="orange" to="/register">Регистрация</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-flex>
+            </v-layout>
+        </v-container>
+    </v-app>
 </template>
 
 <script>
-import Form from 'vform'
+    import axios from 'axios';
 
-export default {
-  head () {
-    return { title: this.$t('login') }
-  },
+    export default {
+        middleware: 'authed',
+        data: () => ({
+            data: {
+                email: null,
+                password: null
+            },
+            errors: {},
+        }),
+        methods: {
+            async login () {
+                this.errors = {};
 
-  data: () => ({
-    form: new Form({
-      email: '',
-      password: ''
-    }),
-    remember: false
-  }),
+                await axios.post('/login', this.data).then((response) => {
+                    // Save the token.
+                    this.$store.dispatch('auth/saveToken', {
+                        token: response.data.token,
+                        remember: this.remember,
+                    });
+                    // Fetch the user.
+                    this.$store.dispatch('auth/fetchUser');
 
-  methods: {
-    async login () {
-      // Submit the form.
-      const { data } = await this.form.post('/login')
-
-      // Save the token.
-      this.$store.dispatch('auth/saveToken', {
-        token: data.token,
-        remember: this.remember
-      })
-
-      // Fetch the user.
-      await this.$store.dispatch('auth/fetchUser')
-
-      // Redirect home.
-      this.$router.push({ name: 'home' })
+                    // Redirect home.
+                    this.$router.push('/');
+                }).catch(error => {
+                    this.errors = error.response.data.errors;
+                });
+            },
+            checkError (field) {
+                return this.errors.hasOwnProperty(field) ? this.errors[field] : [];
+            },
+            onKeyup (e) {
+                if (e.code === "Enter" || e.code === 'NumpadEnter') {
+                    this.login();
+                }
+            }
+        }
     }
-  }
-}
 </script>
+
