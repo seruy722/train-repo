@@ -18,11 +18,14 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         $this->validate($request, [
-            'name' => 'required|max:255',
+            'name' => 'required|max:255|unique:users,name,' . $user->id,
             'email' => 'required||max:255|email|unique:users,email,' . $user->id,
         ]);
 
-        return tap($user)->update($request->only('name', 'email'));
+        $array = (array)$request->only('name', 'email');
+        $array = $this->cleanData($array);
+
+        return tap($user)->update($array);
     }
 
     public function updateProfileFoto(Request $request)

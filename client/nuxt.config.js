@@ -67,8 +67,7 @@ module.exports = {
         '~plugins/nuxt-client-init',
         '~plugins/vuetify',
         {src: '~plugins/bootstrap', ssr: false},
-        '~/plugins/vue-notification',
-        // '~/plugins/vue-notifications'
+        '~/plugins/vue-snotify',
     ],
 
     modules: [
@@ -78,7 +77,5 @@ module.exports = {
 
     build: {
         extractCSS: true,
-        // vendor: ['vuetify'],
-        // transpile: [/^vuetify/],
     }
 };

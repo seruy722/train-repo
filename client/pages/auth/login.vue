@@ -7,6 +7,23 @@
                         <v-toolbar dark color="primary">
                             <v-toolbar-title>Вход</v-toolbar-title>
                             <v-spacer></v-spacer>
+                            <v-img
+                                :src="`/logo.png`"
+                                :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`"
+                                aspect-ratio="1.7"
+                                contain
+                                height="40px"
+                            >
+                                <v-layout
+                                    slot="placeholder"
+                                    fill-height
+                                    align-center
+                                    justify-center
+                                    ma-0
+                                >
+                                    <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                </v-layout>
+                            </v-img>
                         </v-toolbar>
                         <v-card-text>
                             <v-form>
@@ -32,6 +49,7 @@
 
 <script>
     import axios from 'axios';
+    import {MapActions} from 'vuex';
 
     export default {
         middleware: 'authed',
@@ -57,8 +75,8 @@
 
                     // Redirect home.
                     this.$router.push('/');
-                }).catch(error => {
-                    this.errors = error.response.data.errors;
+                }).catch((errors) => {
+                    this.errors = errors.response.data.errors;
                 });
             },
             checkError (field) {

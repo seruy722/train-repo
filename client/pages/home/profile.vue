@@ -4,8 +4,9 @@
             <v-layout row class="mb-3" justify-center>
                 <v-flex xs12 sm12 xs12>
                     <v-card>
-                        <v-toolbar color="white" dark>
-                            <v-toolbar-title class="text-xs-center headline blue--text" >Профиль пользователя</v-toolbar-title>
+                        <v-toolbar color="white" dark evaluation-1>
+                            <v-toolbar-title class="text-xs-center headline blue--text">Профиль пользователя
+                            </v-toolbar-title>
                         </v-toolbar>
                     </v-card>
                 </v-flex>
@@ -37,10 +38,18 @@
                                 </v-card-text>
                                 <v-layout row>
                                     <v-flex xs12 class="text-xs-center">
-                                        <v-btn color="orange" @click="onSelectImage">
-                                            <v-icon class="mr-2" dark>add_photo_alternate</v-icon>
-                                            Обновить фото
-                                        </v-btn>
+                                        <v-tooltip
+                                            top
+                                            class="text-xs-center text-sm-center text-md-center"
+                                        >
+                                            <v-btn color="orange"
+                                                   @click="onSelectImage"
+                                                   slot="activator"
+                                            >
+                                                <v-icon dark>add_photo_alternate</v-icon>
+                                            </v-btn>
+                                            <span>Заменить фото</span>
+                                        </v-tooltip>
                                     </v-flex>
                                 </v-layout>
                             </v-card>
@@ -56,7 +65,7 @@
                                     <v-layout row>
                                         <v-text-field
                                             label="Имя"
-                                            v-model="form.name"
+                                            v-model="data.name"
                                             :error-messages="checkError('name')"
                                             class="pl-2 pr-2"
                                         ></v-text-field>
@@ -65,7 +74,7 @@
                                     <v-layout row>
                                         <v-text-field
                                             label="Email"
-                                            v-model="form.email"
+                                            v-model="data.email"
                                             :error-messages="checkError('email')"
                                             class="pl-2 pr-2"
                                         ></v-text-field>
@@ -91,7 +100,7 @@
                                     <v-layout row>
                                         <v-text-field
                                             label="Новый пароль"
-                                            v-model="form.password"
+                                            v-model="data.password"
                                             :error-messages="checkError('password')"
                                             type="password"
                                             class="pl-2 pr-2"
@@ -101,7 +110,7 @@
                                     <v-layout row>
                                         <v-text-field
                                             label="Повторите пароль"
-                                            v-model="form.password_confirmation"
+                                            v-model="data.password_confirmation"
                                             :error-messages="checkError('password')"
                                             type="password"
                                             class="pl-2 pr-2"
@@ -134,96 +143,97 @@
         middleware: 'auth',
         data () {
             return {
-                form: {},
+                data: {},
                 errors: {},
-                properties: {
-                    password: null,
-                    password_confirmation: null,
-                    action: null,
-                },
             };
         },
         head () {
             return {title: `Профиль ${this.user.name}`};
         },
         created () {
-            this.form = _.clone(this.user);
-            this.addProperties(this.properties);
+            this.init();
         },
         computed: {
             ...mapGetters({
                 user: 'auth/user',
                 profileImage: 'auth/userProfileImg',
             }),
+
         },
         methods: {
-            // Дополнительные  свойства
-            addProperties (props) {
-                _.forEach(props, (item, index) => {
-                    this.form[index] = item;
+            init () {
+                // Формирование данных профиля пользователя
+                this.data = _.assign({}, {
+                    name: this.user.name,
+                    email: this.user.email,
+                    password: null,
+                    password_confirmation: null,
+                    action: null
                 });
             },
             async updateData () {
-                this.form.action = 'profile';
+                this.changeErrors({});
+                this.data.action = 'profile';
 
-                await axios.patch('/settings/profile', this.form).then((response)=>{
-                    const { data }= response;
+                await axios.patch('/settings/profile', this.data).then((response) => {
+                    const {data} = response;
                     this.$store.dispatch('auth/updateUser', {user: data});
+                    this.init();
 
-                    this.$notify({
-                        group: 'profile',
-                        type: 'success',
-                        title: 'ОБНОВЛЕНИЕ',
-                        text: 'Данные успешно обновлены!'
+                    this.$snotify.success('Данные успешно обновлены', {
+                        timeout: 3000,
+                        showProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true
                     });
-                }).catch((errors)=>{
-                    this.errors = errors.response.data.errors;
+                }).catch((errors) => {
+                    this.changeErrors(errors.response.data.errors);
                 });
-
-
-
             },
             async updatePassword () {
-                this.errors = {};
-                await axios.patch('/settings/password', this.form).then(() => {
-                    this.$notify({
-                        group: 'profile',
-                        type: 'success',
-                        title: 'ОБНОВЛЕНИЕ',
-                        text: 'Пароль успешно изменен!'
+                this.changeErrors({});
+                await axios.patch('/settings/password', this.data).then(() => {
+                    this.$snotify.success('Пароль успешно изменен', {
+                        timeout: 3000,
+                        showProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true
                     });
-                }).catch((error) => {
-                    this.errors = error.response.data.errors;
+                }).catch((errors) => {
+                    this.changeErrors(errors.response.data.errors);
                 });
             },
             checkError (field) {
                 return this.errors.hasOwnProperty(field) ? this.errors[field] : [];
             },
+            changeErrors (value) {
+                this.errors = value;
+            },
             onSelectImage () {
                 this.$refs.profileimage.click();
             },
-            async updatePhoto (e) {
-                if (e.target.files && e.target.files.length) {
-                    const file = e.target.files[0];
+            async updatePhoto (event) {
+                if (event.target.files && event.target.files.length) {
+                    const file = event.target.files[0];
                     let dataFile = new FormData();
 
                     dataFile.append('profilephoto', file);
 
-                    await axios.post('/settings/profile', dataFile).then((response)=>{
-                        const { data } = response;
+                    await axios.post('/settings/profile', dataFile).then((response) => {
+                        const {data} = response;
                         this.$store.dispatch('auth/updateUser', {user: data});
-                        this.$notify({
-                            group: 'profile',
-                            type: 'success',
-                            title: 'ОБНОВЛЕНИЕ',
-                            text: 'Фото успешно обновлено!'
+                        this.$snotify.success('Фото успешно обновлено', {
+                            timeout: 3000,
+                            showProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true
                         });
                     }).catch(() => {
-                        this.$notify({
-                            group: 'profile',
-                            type: 'error',
-                            title: 'ОБНОВЛЕНИЕ',
-                            text: 'Неправильный формат изображения'
+                        this.$snotify.success('Неправильный формат изображения', {
+                            timeout: 3000,
+                            showProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true
                         });
                     });
                     // Очистка input

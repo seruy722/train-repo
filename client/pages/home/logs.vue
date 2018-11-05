@@ -75,13 +75,7 @@
         },
         computed: {
             getLogsList () {
-                if (this.logList.length) {
-                    _.forEach(this.logList, (item) => {
-                        console.log(item.created_at);
-                        item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY HH:mm:ss');
-                    });
-                    return this.logList;
-                }
+                return this.logList;
             }
         },
         created () {
@@ -91,11 +85,15 @@
             async fetchLogList () {
                 this.isLoad = true;
                 await axios.get('getLogList').then((response) => {
-                    const { data } = response;
-                    this.logList = data.list;
+                    const {data} = response;
+                    const {list} = data;
+                    _.forEach(list, (item) => {
+                        item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
+                    });
+                    this.logList = list;
                     this.isLoad = false;
                 }).catch(() => {
-                    console.error('Ошыбка при сохранении логов!');
+                    console.error('Ошибка при сохранении логов!');
                 });
             }
         }

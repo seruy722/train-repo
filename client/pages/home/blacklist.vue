@@ -130,16 +130,16 @@
                                 </v-layout>
                             </v-flex>
                             <v-flex
-                            xs12 sm4 md4
+                                xs12 sm4 md4
                             >
-                            <v-text-field
-                            v-model="editedItem.phone_1"
-                            :error-messages="checkError('phone_1')"
-                            type="tel"
-                            prepend-icon="phone"
-                            placeholder="(000) 000 - 0000"
-                            mask="phone"
-                            ></v-text-field>
+                                <v-text-field
+                                    v-model="editedItem.phone_1"
+                                    :error-messages="checkError('phone_1')"
+                                    type="tel"
+                                    prepend-icon="phone"
+                                    placeholder="(000) 000 - 0000"
+                                    mask="phone"
+                                ></v-text-field>
                             </v-flex>
                             <v-flex
                                 xs12 sm4 md4
@@ -182,7 +182,13 @@
                             Отмена
                             <v-icon dark right>block</v-icon>
                         </v-btn>
-                        <v-btn color="primary" @click="save">
+                        <v-btn
+                            :disabled="loadOnBtn"
+                            :loading="loadOnBtn"
+                            class="white--text"
+                            color="primary"
+                            @click="save"
+                        >
                             Сохранить
                             <v-icon dark right>check_circle</v-icon>
                         </v-btn>
@@ -258,21 +264,22 @@
     </div>
 </template>
 <script>
-    import {mapGetters, mapActions, mapMutations} from 'vuex';
+    import {mapGetters, mapMutations} from 'vuex';
+    import moment from 'moment';
     import axios from 'axios';
 
     export default {
         data: () => ({
             dialog: false,
             search: '',
-            isLoad: false,
-            errors: {},
-            phones: [1, 2],
-            imageName: null,
-            previewImgSrc: null,
-            headers: [
+            isLoad: false, // Индикатор загрузки списка на таблице
+            errors: {}, // Обьект ошибок возращаемый с сервера
+            imageName: null, // Имя загружаемого изображения
+            previewImgSrc: null, // Код загружаемого изображения для предосмотра
+            loadOnBtn: false, // Оверлей для кнопки
+            headers: [ // Заголовки таблицы
                 {
-                    text: 'Дата',
+                    text: 'Дата добавления',
                     align: 'center',
                     value: 'created_at'
                 },
@@ -293,7 +300,7 @@
                 {text: 'Примечание', align: 'center', value: 'notation'},
                 {text: 'Actions', align: 'center', sortable: false}
             ],
-            editedIndex: -1,
+            editedIndex: -1, // Для определения (добавление или сохранение)
             editedItem: {
                 type: null,
                 fio: null,
@@ -347,7 +354,6 @@
                 val || this.close();
             }
         },
-
         created () {
             this.initialize();
         },
@@ -361,17 +367,19 @@
                 deleteItemFromServer: 'blacklist/DELETE_ITEM'
             }),
             initialize () {
-                this.isLoad = true;
+                this.changeLoad();
                 this.getListFromServer();
-                this.isLoad = false;
+                this.changeLoad();
             },
             editItem (item) {
-                this.errors = {};
-                this.editedIndex = this.list.indexOf(item);
-                this.editedItem = Object.assign({}, item);
+                this.changeErrors({});
+                this.editedIndex = _.indexOf(this.list, item);
+                this.editedItem = _.assign({}, item);
                 this.dialog = true;
             },
-
+            changeErrors (value) {
+                this.errors = value;
+            },
             async deleteItem (item) {
                 const index = this.list.indexOf(item);
                 const answer = confirm('Удалить запись?');
@@ -382,19 +390,19 @@
                         if (status) {
                             this.deleteItemFromStorage(index);
                             this.saveLog(item, 'delete');
-                            this.$notify({
-                                group: 'blackList',
-                                type: 'warning',
-                                title: 'УДАЛЕНИЕ',
-                                text: 'Запись успешно удалена!'
+                            this.$snotify.success('Запись успешно удалена', {
+                                timeout: 2000,
+                                showProgressBar: true,
+                                closeOnClick: true,
+                                pauseOnHover: true
                             });
                         }
                     }).catch(() => {
-                        this.$notify({
-                            group: 'blackList',
-                            type: 'warning',
-                            title: 'УДАЛЕНИЕ',
-                            text: 'Произошла ошыбка при удалении записи! Перезагрузите пожалуйста страницу.'
+                        this.$snotify.warning('Произошла ошибка при удалении записи! Перезагрузите пожалуйста страницу', {
+                            timeout: 2000,
+                            showProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true
                         });
                     });
                 }
@@ -402,6 +410,7 @@
 
             close () {
                 this.dialog = false;
+                this.loadOnBtn = false;
                 setTimeout(() => {
                     this.editedItem = Object.assign({}, this.defaultItem);
                     this.editedIndex = -1;
@@ -409,11 +418,17 @@
                 // ИСПРАВИТЬ
                 this.imageName = null;
                 this.previewImgSrc = null;
-                this.errors = {};
+                this.changeErrors({});
             },
-
+            changeLoad () {
+                this.isLoad = !this.isLoad;
+            },
+            changeLoadBtn () {
+                this.loadOnBtn = !this.loadOnBtn;
+            },
             async save () {
-                this.errors = {};
+                this.changeLoadBtn();
+                this.changeErrors({});
                 // Если удалено название изображения значит не отправляем изображение на сервер
                 if (!this.imageName) {
                     this.editedItem.file = null;
@@ -426,9 +441,9 @@
                     // ОБОВЛЕНИЕ ДАННЫХ
                     this.editedItem.type = 'update';
                 }
-                // Для отправки файлов помещаем свойства обьекта editedItem в FormData
+                // Очищаем обьект от ложных данных
                 const cleanedEditItem = _.pickBy(this.editedItem, _.identity);
-
+                // Для отправки файлов помещаем свойства обьекта editedItem в FormData
                 const data = new FormData();
 
                 _.forEach(cleanedEditItem, (value, key) => {
@@ -451,24 +466,25 @@
                         if (type === 'update') {
                             const data = {item, index: this.editedIndex};
                             this.updateItemInStorage(data);
-                            this.$notify({
-                                group: 'blackList',
-                                type: 'success',
-                                title: 'ОБНОВЛЕНИЕ',
-                                text: 'Запись успешно обновлена!'
+                            this.$snotify.success('Запись успешно обновлена', {
+                                timeout: 3000,
+                                showProgressBar: true,
+                                closeOnClick: true,
+                                pauseOnHover: true
                             });
                         } else if (type === 'save') {
                             this.addItemToStorage(item);
-                            this.$notify({
-                                group: 'blackList',
-                                type: 'success',
-                                title: 'СОХРАНЕНИЕ',
-                                text: 'Запись успешно сохранена!'
+                            this.$snotify.success('Запись успешно добавлена!', {
+                                timeout: 3000,
+                                showProgressBar: true,
+                                closeOnClick: true,
+                                pauseOnHover: true
                             });
                         }
                     }
                 }).catch((errors) => {
-                    this.errors = errors.response.data.errors;
+                    this.changeLoadBtn();
+                    this.changeErrors(errors.response.data.errors);
                 });
             },
             async saveItemToServer (item) {
@@ -511,11 +527,12 @@
                     const {item} = response.data;
                     const data = {item, index: this.editedIndex};
                     this.updateItemInStorage(data);
-                    this.$notify({
-                        group: 'blackList',
-                        type: 'success',
-                        title: 'УДАЛЕНИЕ',
-                        text: 'Иображение успешно удалено'
+
+                    this.$snotify.success('Изображение успешно удалено', {
+                        timeout: 3000,
+                        showProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true
                     });
                     this.editedItem.foto = item.foto;
                 }).catch((error) => {
@@ -524,13 +541,17 @@
             },
             async getListFromServer () {
                 const {data} = await axios.get('/blacklist');
-                this.setList(data.data);
+                const list = data.data;
+                _.forEach(list, (item) => {
+                    item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
+                });
+                this.setList(list);
             }
         }
     }
 </script>
 
-<style>
+<style lang="scss">
     .main {
         width: 95%;
     }
