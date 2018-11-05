@@ -59,7 +59,7 @@ module.exports = {
     ],
 
     plugins: [
-        '~components/global',
+        // '~components/global',
         '~plugins/i18n',
         '~plugins/vform',
         '~plugins/axios',
