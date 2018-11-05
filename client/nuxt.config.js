@@ -19,7 +19,7 @@ module.exports = {
 
     env: {
         apiUrl: process.env.APP_URL || 'http://api.laravel-nuxt.test',
-        appName: process.env.APP_NAME || 'Laravel-Nuxt',
+        appName: process.env.APP_NAME || 'Cargo007',
         appLocale: process.env.APP_LOCALE || 'en',
         githubAuth: !!process.env.GITHUB_CLIENT_ID,
     },
