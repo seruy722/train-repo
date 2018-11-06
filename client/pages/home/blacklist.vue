@@ -200,7 +200,6 @@
             :headers="headers"
             :items="list"
             :search="search"
-            :loading="isLoad"
             disable-initial-sort
             class="elevation-1"
         >
@@ -255,10 +254,9 @@
                 </v-alert>
             </template>
             <template slot="no-data">
-                <v-btn color="primary" @click="initialize">
-                    <v-icon left>refresh</v-icon>
-                    Обновить
-                </v-btn>
+                <v-alert :value="true" color="error" icon="warning">
+                    Таблица пустая
+                </v-alert>
             </template>
         </v-data-table>
     </div>
@@ -269,10 +267,17 @@
     import axios from 'axios';
 
     export default {
+        async fetch ({store}) {
+            const {data} = await axios.get('/blacklist');
+            const list = data.data;
+            _.forEach(list, (item) => {
+                item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
+            });
+            store.commit('blacklist/SET_LIST', list);
+        },
         data: () => ({
             dialog: false,
             search: '',
-            isLoad: false, // Индикатор загрузки списка на таблице
             errors: {}, // Обьект ошибок возращаемый с сервера
             imageName: null, // Имя загружаемого изображения
             previewImgSrc: null, // Код загружаемого изображения для предосмотра
@@ -354,10 +359,6 @@
                 val || this.close();
             }
         },
-        created () {
-            this.initialize();
-        },
-
         methods: {
             ...mapMutations({
                 setList: 'blacklist/SET_LIST',
@@ -366,11 +367,6 @@
                 deleteItemFromStorage: 'blacklist/DELETE_ITEM',
                 deleteItemFromServer: 'blacklist/DELETE_ITEM'
             }),
-            initialize () {
-                this.changeLoad();
-                this.getListFromServer();
-                this.changeLoad();
-            },
             editItem (item) {
                 this.changeErrors({});
                 this.editedIndex = _.indexOf(this.list, item);
@@ -419,9 +415,6 @@
                 this.imageName = null;
                 this.previewImgSrc = null;
                 this.changeErrors({});
-            },
-            changeLoad () {
-                this.isLoad = !this.isLoad;
             },
             changeLoadBtn () {
                 this.loadOnBtn = !this.loadOnBtn;
@@ -538,14 +531,6 @@
                 }).catch((error) => {
                     console.error(error);
                 });
-            },
-            async getListFromServer () {
-                const {data} = await axios.get('/blacklist');
-                const list = data.data;
-                _.forEach(list, (item) => {
-                    item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
-                });
-                this.setList(list);
             }
         }
     }

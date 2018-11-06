@@ -79,11 +79,12 @@
             }
         },
         created () {
+            this.isLoad = true;
             this.fetchLogList();
+            this.isLoad = false;
         },
         methods: {
             async fetchLogList () {
-                this.isLoad = true;
                 await axios.get('getLogList').then((response) => {
                     const {data} = response;
                     const {list} = data;
@@ -91,7 +92,6 @@
                         item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
                     });
                     this.logList = list;
-                    this.isLoad = false;
                 }).catch(() => {
                     console.error('Ошибка при сохранении логов!');
                 });

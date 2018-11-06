@@ -18,10 +18,9 @@ module.exports = {
     srcDir: __dirname,
 
     env: {
-        apiUrl: process.env.APP_URL || 'http://api.laravel-nuxt.test',
-        appName: process.env.APP_NAME || 'Cargo007',
+        apiUrl: process.env.APP_URL,
+        appName:  'Cargo007' ||  process.env.APP_NAME,
         appLocale: process.env.APP_LOCALE || 'en',
-        githubAuth: !!process.env.GITHUB_CLIENT_ID,
     },
 
     head: {
@@ -30,7 +29,7 @@ module.exports = {
         meta: [
             {charset: 'utf-8'},
             {name: 'viewport', content: 'width=device-width, initial-scale=1'},
-            {hid: 'description', name: 'description', content: 'Nuxt.js project'}
+            {hid: 'description', name: 'description', content: 'Cargo007'}
         ],
         link: [
             {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'},
@@ -49,7 +48,7 @@ module.exports = {
     loading: {color: '#007bff'},
 
     router: {
-        middleware: ['locale', 'check-auth'],
+        middleware: ['check-auth'],
     },
 
     css: [
@@ -59,7 +58,6 @@ module.exports = {
     ],
 
     plugins: [
-        // '~components/global',
         '~plugins/i18n',
         '~plugins/vform',
         '~plugins/axios',
