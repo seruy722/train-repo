@@ -244,14 +244,9 @@
     };
 </script>
 
-<style>
+<style scoped>
     .main_profile_block {
         width: 70%;
-    }
-
-    .card_title_bg {
-        color: #fff;
-        background-color: #1565C0;
     }
 
     .profile-image-input {

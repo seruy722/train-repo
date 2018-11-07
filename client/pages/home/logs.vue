@@ -83,7 +83,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     .main {
         width: 95%;
     }

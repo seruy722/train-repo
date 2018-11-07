@@ -64,7 +64,3 @@
         }
     }
 </script>
-
-<style lang="scss">
-    @import "~vue-snotify/styles/material"; // Стили для оповещений
-</style>
