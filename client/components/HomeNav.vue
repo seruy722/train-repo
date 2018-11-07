@@ -1,5 +1,6 @@
 <template>
     <v-menu offset-y>
+        <span data-component-name="HomeNav"></span>
         <v-btn flat slot="activator">
             {{user.name}}
         </v-btn>

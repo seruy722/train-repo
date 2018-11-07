@@ -9,13 +9,10 @@
                 vertical
             ></v-divider>
             <v-spacer></v-spacer>
-            <v-text-field
-                v-model="search"
-                append-icon="search"
-                label="Поиск"
-                single-line
-                hide-details
-            ></v-text-field>
+
+            <!--ПОИСК-->
+            <search :value.sync="search"></search>
+
             <v-spacer></v-spacer>
             <v-dialog v-model="dialog" width="800px">
                 <v-btn slot="activator" dark class="mb-2 main_color-bg">
@@ -264,6 +261,7 @@
     import {mapGetters, mapMutations} from 'vuex';
     import moment from 'moment';
     import axios from 'axios';
+    import Search from '~/components/Search';
 
     export default {
         async fetch ({store}) {
@@ -273,6 +271,12 @@
                 item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
             });
             store.commit('blacklist/SET_LIST', list);
+        },
+        head () {
+            return {title: `Черный список`};
+        },
+        components:{
+            Search
         },
         data: () => ({
             dialog: false,

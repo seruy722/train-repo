@@ -8,13 +8,10 @@
                 vertical
             ></v-divider>
             <v-spacer></v-spacer>
-            <v-text-field
-                v-model="search"
-                append-icon="search"
-                label="Поиск"
-                single-line
-                hide-details
-            ></v-text-field>
+
+            <!--ПОИСК-->
+            <search :value.sync="search"></search>
+
         </v-toolbar>
         <v-data-table
             :headers="headers"
@@ -45,8 +42,12 @@
 <script>
     import axios from 'axios';
     import moment from 'moment';
+    import Search from '~/components/Search';
 
     export default {
+        components: {
+            Search
+        },
         async asyncData (context) {
             const { data } = await axios.get('getLogList').catch(() => {
                 console.error('Ошибка при сохранении логов!');
@@ -56,6 +57,9 @@
                 item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
             });
             return { list };
+        },
+        head () {
+            return {title: `Логи`};
         },
         data () {
             return {
