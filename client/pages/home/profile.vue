@@ -42,7 +42,7 @@
                                             top
                                             class="text-xs-center text-sm-center text-md-center"
                                         >
-                                            <v-btn color="orange"
+                                            <v-btn class="btn-bg-color"
                                                    @click="onSelectImage"
                                                    slot="activator"
                                             >
@@ -56,7 +56,7 @@
                         </v-flex>
                         <v-flex sm8>
                             <v-card>
-                                <v-card-title primary-title class="card_title_bg elevation-7">
+                                <v-card-title primary-title class="main_color-bg elevation-7">
                                     <span class="mr-2"><v-icon color="orange" size="35">settings</v-icon></span>
                                     <h3 class="title mb-0">Обновить профайл</h3>
                                 </v-card-title>
@@ -82,7 +82,7 @@
 
                                     <v-layout row>
                                         <v-flex xs12 class="text-xs-center">
-                                            <v-btn @click="updateData()" color="orange">
+                                            <v-btn @click="updateData()" class="btn-bg-color">
                                                 <v-icon class="mr-2" dark>update</v-icon>
                                                 Обновить
                                             </v-btn>
@@ -92,7 +92,7 @@
                             </v-card>
 
                             <v-card class="mt-3">
-                                <v-card-title primary-title class="card_title_bg elevation-7">
+                                <v-card-title primary-title class="main_color-bg elevation-7">
                                     <span class="mr-2"><v-icon color="orange" size="35">lock</v-icon></span>
                                     <h3 class="title mb-0">Обновить пароль</h3>
                                 </v-card-title>
@@ -119,7 +119,7 @@
 
                                     <v-layout row>
                                         <v-flex xs12 class="text-xs-center">
-                                            <v-btn @click="updatePassword()" color="orange">
+                                            <v-btn @click="updatePassword()" class="btn-bg-color">
                                                 <v-icon class="mr-2" dark>update</v-icon>
                                                 Обновить
                                             </v-btn>

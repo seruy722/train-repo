@@ -18,7 +18,7 @@
             ></v-text-field>
             <v-spacer></v-spacer>
             <v-dialog v-model="dialog" width="800px">
-                <v-btn slot="activator" color="primary" dark class="mb-2">
+                <v-btn slot="activator" dark class="mb-2 main_color-bg">
                     <v-icon class="mr-2" dark>person_add</v-icon>
                     Добавить
                 </v-btn>
@@ -92,7 +92,7 @@
                                                             top
                                                             class="text-xs-center text-sm-center text-md-center"
                                                         >
-                                                            <v-btn color="orange"
+                                                            <v-btn class="btn-bg-color"
                                                                    @click="onSelectImage"
                                                                    slot="activator"
                                                             >
@@ -105,7 +105,7 @@
                                                             top
                                                             class="text-xs-center text-sm-center text-md-center"
                                                         >
-                                                            <v-btn @click="deleteClientFoto" color="orange"
+                                                            <v-btn @click="deleteClientFoto" class="btn-bg-color"
                                                                    slot="activator">
                                                                 <v-icon>delete_forever</v-icon>
                                                             </v-btn>
@@ -185,8 +185,7 @@
                         <v-btn
                             :disabled="loadOnBtn"
                             :loading="loadOnBtn"
-                            class="white--text"
-                            color="primary"
+                            class="white--text main_color-bg"
                             @click="save"
                         >
                             Сохранить

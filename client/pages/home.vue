@@ -3,7 +3,7 @@
         <v-app id="inspire">
             <v-toolbar
                 :clipped-left="$vuetify.breakpoint.lgAndUp"
-                color="blue darken-3"
+                color="main_color-bg darken-3"
                 dark
                 app
                 fixed

@@ -7,3 +7,13 @@
 @import 'elements/navbar';
 @import 'elements/buttons';
 @import 'elements/transitions';
+
+
+.main_color-bg {
+    background-color: $main-color-bg;
+    color: $text-color;
+}
+
+.btn-bg-color {
+    background-color: $btn-bg-color;
+}
