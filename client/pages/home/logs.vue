@@ -41,22 +41,21 @@
 
 <script>
     import axios from 'axios';
-    import moment from 'moment';
     import Search from '~/components/Search';
+    import { formatDate } from '~/utils';
 
     export default {
         components: {
             Search
         },
-        async asyncData (context) {
+        async asyncData () {
             const { data } = await axios.get('getLogList').catch(() => {
                 console.error('Ошибка при сохранении логов!');
             });
             const { list } = data;
-            _.forEach(list, (item) => {
-                item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
-            });
-            return { list };
+            const formatList = formatDate(list, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
+
+            return { list: formatList };
         },
         head () {
             return {title: `Логи`};

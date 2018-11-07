@@ -259,21 +259,20 @@
 </template>
 <script>
     import {mapGetters, mapMutations} from 'vuex';
-    import moment from 'moment';
     import axios from 'axios';
     import Search from '~/components/Search';
+    import { formatDate } from '~/utils';
 
     export default {
         async fetch ({store}) {
-            const {data} = await axios.get('/blacklist');
+            const { data } = await axios.get('/blacklist');
             const list = data.data;
-            _.forEach(list, (item) => {
-                item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
-            });
-            store.commit('blacklist/SET_LIST', list);
+            const formatList = formatDate(list, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
+
+            store.commit('blacklist/SET_LIST', formatList);
         },
         head () {
-            return {title: `Черный список`};
+            return {title: `Главная`};
         },
         components:{
             Search

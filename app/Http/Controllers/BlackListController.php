@@ -48,6 +48,16 @@ class BlackListController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $fileName = Storage::disk('images')->put('/client', $file);
+            // Сжатие изображений
+//            $name = substr($fileName, strpos($fileName, '/') + 1);
+//            $filePath = base_path('client/static/images/client/'.$name);
+//            try {
+//                \Tinify\setKey("zcGcy2cl3HKLQ4q2Ls4F2TxZ6FWKxGfg");
+//                $source = \Tinify\fromFile($filePath);
+//                $source->toFile($filePath);
+//            } catch (\Tinify\AccountException $e) {
+//
+//            }
             $array['foto'] = $fileName;
         }
 

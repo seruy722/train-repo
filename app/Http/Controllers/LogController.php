@@ -14,7 +14,7 @@ class LogController extends Controller
      */
     public function index()
     {
-        $list = Logs::all();
+        $list = Logs::orderBy('created_at', 'desc')->get();
         return response()->json(['status' => true, 'list' => $list]);
     }
 

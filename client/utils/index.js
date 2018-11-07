@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 /**
  * Get cookie from request.
  *
@@ -39,4 +41,20 @@ export function scrollBehavior (to, from, savedPosition) {
     }
 
     return position;
+}
+
+/**
+ * Format date from database
+ *
+ * @param  {Array} array
+ * @param  {String} needFormat
+ * @param  {String} enterFormat
+ * @return {Array}
+ */
+
+export function formatDate (array, enterFormat, needFormat) {
+    _.forEach(array, (item) => {
+        item.created_at = moment(item.created_at, enterFormat).format(needFormat);
+    });
+    return array;
 }
