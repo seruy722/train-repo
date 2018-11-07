@@ -45,6 +45,7 @@
     import { formatDate } from '~/utils';
 
     export default {
+        middleware: 'untried',
         components: {
             Search
         },
