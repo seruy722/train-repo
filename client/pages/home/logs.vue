@@ -18,8 +18,7 @@
         </v-toolbar>
         <v-data-table
             :headers="headers"
-            :items="getLogsList"
-            :loading="isLoad"
+            :items="list"
             :search="search"
             class="elevation-1"
         >
@@ -48,6 +47,16 @@
     import moment from 'moment';
 
     export default {
+        async asyncData (context) {
+            const { data } = await axios.get('getLogList').catch(() => {
+                console.error('Ошибка при сохранении логов!');
+            });
+            const { list } = data;
+            _.forEach(list, (item) => {
+                item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
+            });
+            return { list };
+        },
         data () {
             return {
                 search: '',
@@ -68,33 +77,7 @@
                     {text: 'Примечание', align: 'center', value: 'notation'},
                     {text: 'Действие', align: 'center', value: 'action'},
                     {text: 'Пользователь', align: 'center', value: 'user_fio_id'},
-                ],
-                logList: [],
-                isLoad: false,
-            }
-        },
-        computed: {
-            getLogsList () {
-                return this.logList;
-            }
-        },
-        created () {
-            this.isLoad = true;
-            this.fetchLogList();
-            this.isLoad = false;
-        },
-        methods: {
-            async fetchLogList () {
-                await axios.get('getLogList').then((response) => {
-                    const {data} = response;
-                    const {list} = data;
-                    _.forEach(list, (item) => {
-                        item.created_at = moment(item.created_at, 'YYYY-MM-DD HH:mm:ss').format('DD-MM-YYYY');
-                    });
-                    this.logList = list;
-                }).catch(() => {
-                    console.error('Ошибка при сохранении логов!');
-                });
+                ]
             }
         }
     }
