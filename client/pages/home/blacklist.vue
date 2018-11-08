@@ -261,11 +261,12 @@
     import {mapGetters, mapMutations} from 'vuex';
     import axios from 'axios';
     import Search from '~/components/Search';
-    import { formatDate } from '~/utils';
+    import {formatDate} from '~/utils';
+    import checkErrorMixin from '~/mixins/checkError';
 
     export default {
         async fetch ({store}) {
-            const { data } = await axios.get('/blacklist');
+            const {data} = await axios.get('/blacklist');
             const list = data.data;
             const formatList = formatDate(list, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
 
@@ -274,13 +275,13 @@
         head () {
             return {title: `Главная`};
         },
-        components:{
+        components: {
             Search
         },
+        mixins: [checkErrorMixin],
         data: () => ({
             dialog: false,
             search: '',
-            errors: {}, // Обьект ошибок возращаемый с сервера
             imageName: null, // Имя загружаемого изображения
             previewImgSrc: null, // Код загружаемого изображения для предосмотра
             loadOnBtn: false, // Оверлей для кнопки
@@ -374,9 +375,6 @@
                 this.editedIndex = _.indexOf(this.list, item);
                 this.editedItem = _.assign({}, item);
                 this.dialog = true;
-            },
-            changeErrors (value) {
-                this.errors = value;
             },
             async deleteItem (item) {
                 const index = this.list.indexOf(item);
@@ -487,9 +485,6 @@
             },
             async deleteItemFromServer (id) {
                 return await axios.post('blacklist/delete', {id});
-            },
-            checkError (field) {
-                return this.errors.hasOwnProperty(field) ? this.errors[field] : [];
             },
             onSelectImage () {
                 this.$refs.profileimage.click();

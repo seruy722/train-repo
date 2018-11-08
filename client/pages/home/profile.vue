@@ -138,15 +138,14 @@
 <script>
     import {mapGetters} from 'vuex';
     import axios from 'axios';
+    import checkErrorMixin from '~/mixins/checkError';
 
     export default {
         middleware: 'auth',
-        data () {
-            return {
-                data: {},
-                errors: {},
-            };
-        },
+        mixins: [checkErrorMixin],
+        data: () => ({
+            data: {},
+        }),
         head () {
             return {title: `Профиль ${this.user.name}`};
         },
@@ -202,12 +201,6 @@
                 }).catch((errors) => {
                     this.changeErrors(errors.response.data.errors);
                 });
-            },
-            checkError (field) {
-                return this.errors.hasOwnProperty(field) ? this.errors[field] : [];
-            },
-            changeErrors (value) {
-                this.errors = value;
             },
             onSelectImage () {
                 this.$refs.profileimage.click();
