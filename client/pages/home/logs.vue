@@ -32,9 +32,16 @@
                     <td class="text-xs-center">{{ props.item.user_fio_id }}</td>
                 </tr>
             </template>
-            <v-alert slot="no-results" :value="true" color="error" icon="warning">
-                Ваш поиск по "{{ search }}" не дал результатов.
-            </v-alert>
+            <template>
+                <v-alert slot="no-results" :value="true" color="error" icon="warning">
+                    Ваш поиск по "{{ search }}" не дал результатов.
+                </v-alert>
+            </template>
+            <template slot="no-data">
+                <v-alert :value="true" color="error" icon="warning">
+                    Таблица пустая
+                </v-alert>
+            </template>
         </v-data-table>
     </div>
 </template>
@@ -45,7 +52,7 @@
     import { formatDate } from '~/utils';
 
     export default {
-        middleware: 'untried',
+        middleware: 'auth',
         components: {
             Search
         },

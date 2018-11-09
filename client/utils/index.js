@@ -46,15 +46,20 @@ export function scrollBehavior (to, from, savedPosition) {
 /**
  * Format date from database
  *
- * @param  {Array} array
+ * @param  {Array|Object} data
  * @param  {String} needFormat
  * @param  {String} enterFormat
  * @return {Array}
  */
 
-export function formatDate (array, enterFormat, needFormat) {
-    _.forEach(array, (item) => {
-        item.created_at = moment(item.created_at, enterFormat).format(needFormat);
-    });
-    return array;
+export function formatDate (data, enterFormat, needFormat) {
+    if (_.isArray(data)) {
+        _.forEach(data, (item) => {
+            item.created_at = moment(item.created_at, enterFormat).format(needFormat);
+        });
+    } else {
+        data.created_at = moment(data.created_at, enterFormat).format(needFormat);
+    }
+
+    return data;
 }

@@ -19,7 +19,7 @@ module.exports = {
 
     env: {
         apiUrl: process.env.APP_URL,
-        appName:  'Cargo007' ||  process.env.APP_NAME,
+        appName:  'Cargo_007' ||  process.env.APP_NAME,
         appLocale: process.env.APP_LOCALE || 'en',
     },
 

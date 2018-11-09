@@ -177,7 +177,7 @@
                         <v-spacer></v-spacer>
                         <v-btn color="error" @click="dialog = false">
                             Отмена
-                            <v-icon dark right>block</v-icon>
+                            <!--<v-icon dark right>block</v-icon>-->
                         </v-btn>
                         <v-btn
                             :disabled="loadOnBtn"
@@ -186,7 +186,7 @@
                             @click="save"
                         >
                             Сохранить
-                            <v-icon dark right>check_circle</v-icon>
+                            <!--<v-icon dark right>check_circle</v-icon>-->
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -278,6 +278,7 @@
         components: {
             Search
         },
+        middleware: 'auth',
         mixins: [checkErrorMixin],
         data: () => ({
             dialog: false,
@@ -457,7 +458,7 @@
                         this.saveLog(item, type);
 
                         if (type === 'update') {
-                            const data = {item, index: this.editedIndex};
+                            const data = {item: formatDate(item), index: this.editedIndex};
                             this.updateItemInStorage(data);
                             this.$snotify.success('Запись успешно обновлена', {
                                 timeout: 3000,

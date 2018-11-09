@@ -50,7 +50,7 @@
                 await this.$store.dispatch('auth/logout');
 
                 // Redirect to login.
-                this.$router.push('/');
+                setTimeout(() => this.$router.push('/'), 500);
             }
         }
     }
