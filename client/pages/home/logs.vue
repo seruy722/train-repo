@@ -1,13 +1,10 @@
 <template>
     <div class="main" data-component-name="Logs">
+        <v-toolbar color="white" dark>
+            <v-toolbar-title class="text-xs-center title blue--text">Логи
+            </v-toolbar-title>
+        </v-toolbar>
         <v-toolbar flat color="white">
-            <v-toolbar-title class="blue--text headline">Логирование действий пользователей</v-toolbar-title>
-            <v-divider
-                class="mx-2"
-                inset
-                vertical
-            ></v-divider>
-            <v-spacer></v-spacer>
 
             <!--ПОИСК-->
             <search :value.sync="search"></search>

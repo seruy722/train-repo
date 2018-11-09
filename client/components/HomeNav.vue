@@ -42,15 +42,16 @@
             navClick (item) {
                 if (item.path === '/logout') {
                     this.logout();
+                } else {
+                    this.$router.push(item.path);
                 }
-                this.$router.push(item.path);
             },
             async logout () {
                 // Log out the user.
                 await this.$store.dispatch('auth/logout');
 
                 // Redirect to login.
-                setTimeout(() => this.$router.push('/'), 500);
+                this.$router.push('/login');
             }
         }
     }

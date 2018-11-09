@@ -1,21 +1,19 @@
 <template>
     <div class="main_profile_block" data-component-name="Profile">
         <v-container fluid>
-            <v-layout row class="mb-3" justify-center>
-                <v-flex xs12 sm12 xs12>
-                    <v-card>
-                        <v-toolbar color="white" dark evaluation-1>
-                            <v-toolbar-title class="text-xs-center headline blue--text">Профиль пользователя
-                            </v-toolbar-title>
-                        </v-toolbar>
-                    </v-card>
+            <v-layout row class="mb-3">
+                <v-flex xs12 sm12 xs12 justify-center>
+                    <v-toolbar color="white" dark evaluation-1>
+                        <v-toolbar-title class="text-xs-center title blue--text">Профиль
+                        </v-toolbar-title>
+                    </v-toolbar>
                 </v-flex>
             </v-layout>
             <v-layout>
                 <v-flex sm12 xs12 md12>
                     <v-layout row wrap class="text-xs-center">
-                        <v-flex sm4 class="pr-3 text-sm-center">
-                            <v-card class="pt-2 mr-3 mb-3">
+                        <v-flex sm4 class="text-sm-center">
+                            <v-card class="mb-3">
                                 <v-card-text>
                                     <v-img
                                         :src="profileImage"

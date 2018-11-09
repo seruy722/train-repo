@@ -55,7 +55,7 @@
     import axios from 'axios';
 
     export default {
-        middleware: 'auth',
+        middleware: 'authed',
         data: () => ({
             data: {
                 name: '',

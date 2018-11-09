@@ -1,260 +1,260 @@
 <template>
 
     <div class="main" data-component-name="BlackList">
-        <v-toolbar flat color="white">
-            <v-toolbar-title class="hidden-sm-and-down blue--text">Клиенты</v-toolbar-title>
-            <v-divider
-                class="mx-2 hidden-sm-and-down"
-                inset
-                vertical
-            ></v-divider>
-            <v-spacer></v-spacer>
+        <v-container fluid>
+            <v-toolbar color="white" dark>
+                <v-toolbar-title class="text-xs-center title blue--text">Черный список
+                </v-toolbar-title>
+            </v-toolbar>
+            <v-toolbar flat color="white" evaluation-1>
 
-            <!--ПОИСК-->
-            <search :value.sync="search"></search>
+                <!--ПОИСК-->
+                <search :value.sync="search"></search>
 
-            <v-spacer></v-spacer>
-            <v-dialog v-model="dialog" width="800px">
-                <v-btn slot="activator" dark class="mb-2 main_color-bg">
-                    <v-icon class="mr-2" dark>person_add</v-icon>
-                    Добавить
-                </v-btn>
-                <v-card>
-                    <v-card-title
-                        class="grey lighten-4 py-4 title"
-                    >
-                        <span class="headline">{{ dialogTitle }}</span>
-                    </v-card-title>
-                    <v-container grid-list-sm class="pa-4">
-                        <v-layout row wrap>
-                            <v-flex xs12 align-center justify-space-between>
-                                <v-layout>
-                                    <v-flex xs12 sm6 offset-sm3>
-                                        <v-card>
-                                            <v-container grid-list-sm fluid>
-                                                <v-layout row wrap justify-center>
-                                                    <v-flex
-                                                        xs12
-                                                        sm12
-                                                        md12
-                                                        d-flex
-                                                    >
-                                                        <v-card flat tile class="d-flex">
-                                                            <v-img
-                                                                :src="profileImage"
-                                                                :lazy-src="`https://picsum.photos/10/6?image=${1 * 5 + 10}`"
-                                                                aspect-ratio="1"
-                                                                ref="userImage"
-                                                                class="grey lighten-2"
-                                                            >
-                                                                <v-layout
-                                                                    slot="placeholder"
-                                                                    fill-height
-                                                                    align-center
-                                                                    justify-center
-                                                                    ma-0
+                <v-spacer></v-spacer>
+                <v-dialog v-model="dialog" width="800px">
+                    <v-btn slot="activator" dark class="mb-2 main_color-bg">
+                        <!--<v-icon class="mr-2" dark>person_add</v-icon>-->
+                        Добавить
+                    </v-btn>
+                    <v-card>
+                        <v-card-title
+                            class="grey lighten-4 py-4 title"
+                        >
+                            <span class="headline">{{ dialogTitle }}</span>
+                        </v-card-title>
+                        <v-container grid-list-sm class="pa-4">
+                            <v-layout row wrap>
+                                <v-flex xs12 align-center justify-space-between>
+                                    <v-layout>
+                                        <v-flex xs12 sm6 offset-sm3>
+                                            <v-card>
+                                                <v-container grid-list-sm fluid>
+                                                    <v-layout row wrap justify-center>
+                                                        <v-flex
+                                                            xs12
+                                                            sm12
+                                                            md12
+                                                            d-flex
+                                                        >
+                                                            <v-card flat tile class="d-flex">
+                                                                <v-img
+                                                                    :src="profileImage"
+                                                                    :lazy-src="`https://picsum.photos/10/6?image=${1 * 5 + 10}`"
+                                                                    aspect-ratio="1"
+                                                                    ref="userImage"
+                                                                    class="grey lighten-2"
                                                                 >
-                                                                    <v-progress-circular
-                                                                        indeterminate
-                                                                        color="grey lighten-5"
-                                                                    ></v-progress-circular>
-                                                                </v-layout>
-                                                            </v-img>
-                                                            <input type="file" ref="profileimage" @change="updatePhoto"
-                                                                   class="profile-image-input">
-                                                        </v-card>
+                                                                    <v-layout
+                                                                        slot="placeholder"
+                                                                        fill-height
+                                                                        align-center
+                                                                        justify-center
+                                                                        ma-0
+                                                                    >
+                                                                        <v-progress-circular
+                                                                            indeterminate
+                                                                            color="grey lighten-5"
+                                                                        ></v-progress-circular>
+                                                                    </v-layout>
+                                                                </v-img>
+                                                                <input type="file" ref="profileimage"
+                                                                       @change="updatePhoto"
+                                                                       class="profile-image-input">
+                                                            </v-card>
 
-                                                    </v-flex>
-                                                    <v-flex
-                                                        xs12
-                                                        sm12
-                                                        md12
-                                                        d-flex
-                                                    >
-                                                        <v-text-field
-                                                            v-model="previewImageName"
-                                                            :error-messages="checkError('file')"
-                                                            readonly
-                                                            clearable
+                                                        </v-flex>
+                                                        <v-flex
+                                                            xs12
+                                                            sm12
+                                                            md12
+                                                            d-flex
                                                         >
-                                                        </v-text-field>
-                                                    </v-flex>
-                                                    <v-flex
-                                                        xs12
-                                                        sm12
-                                                        md12
-                                                        d-flex
-                                                    >
-                                                        <v-tooltip
-                                                            top
-                                                            class="text-xs-center text-sm-center text-md-center"
-                                                        >
-                                                            <v-btn class="btn-bg-color"
-                                                                   @click="onSelectImage"
-                                                                   slot="activator"
+                                                            <v-text-field
+                                                                v-model="previewImageName"
+                                                                :error-messages="checkError('file')"
+                                                                readonly
+                                                                clearable
                                                             >
-                                                                <v-icon dark>add_photo_alternate</v-icon>
-                                                            </v-btn>
-                                                            <span>Заменить фото</span>
-                                                        </v-tooltip>
-                                                        <v-tooltip
-                                                            v-if="editedItem.foto && editedItem.foto !== 'nofoto.jpg'"
-                                                            top
-                                                            class="text-xs-center text-sm-center text-md-center"
+                                                            </v-text-field>
+                                                        </v-flex>
+                                                        <v-flex
+                                                            xs12
+                                                            sm12
+                                                            md12
+                                                            d-flex
                                                         >
-                                                            <v-btn @click="deleteClientFoto" class="btn-bg-color"
-                                                                   slot="activator">
-                                                                <v-icon>delete_forever</v-icon>
-                                                            </v-btn>
-                                                            <span>Удалить фото</span>
-                                                        </v-tooltip>
-                                                    </v-flex>
-                                                </v-layout>
-                                            </v-container>
-                                        </v-card>
-                                    </v-flex>
-                                </v-layout>
-                                <v-layout align-center>
-                                    <v-flex xs12 sm12 md12>
-                                        <v-text-field
-                                            v-model="editedItem.fio"
-                                            :error-messages="checkError('fio')"
-                                            prepend-icon="person"
-                                            autofocus
-                                            placeholder="ФИО"
-                                        ></v-text-field>
-                                    </v-flex>
-                                </v-layout>
-                            </v-flex>
-                            <v-flex
-                                xs12 sm4 md4
-                            >
-                                <v-text-field
-                                    v-model="editedItem.phone_1"
-                                    :error-messages="checkError('phone_1')"
-                                    type="tel"
-                                    prepend-icon="phone"
-                                    placeholder="(000) 000 - 0000"
-                                    mask="phone"
-                                ></v-text-field>
-                            </v-flex>
-                            <v-flex
-                                xs12 sm4 md4
-                            >
-                                <v-text-field
-                                    v-model="editedItem.phone_2"
-                                    :error-messages="checkError('phone_2')"
-                                    type="tel"
-                                    prepend-icon="phone"
-                                    placeholder="(000) 000 - 0000"
-                                    mask="phone"
-                                ></v-text-field>
-                            </v-flex>
-                            <v-flex
-                                xs12 sm4 md4
-                            >
-                                <v-text-field
-                                    v-model="editedItem.phone_3"
-                                    :error-messages="checkError('phone_3')"
-                                    type="tel"
-                                    prepend-icon="phone"
-                                    placeholder="(000) 000 - 0000"
-                                    mask="phone"
-                                ></v-text-field>
-                            </v-flex>
+                                                            <v-tooltip
+                                                                top
+                                                                class="text-xs-center text-sm-center text-md-center"
+                                                            >
+                                                                <v-btn class="btn-bg-color"
+                                                                       @click="onSelectImage"
+                                                                       slot="activator"
+                                                                >
+                                                                    <v-icon dark>add_photo_alternate</v-icon>
+                                                                </v-btn>
+                                                                <span>Заменить фото</span>
+                                                            </v-tooltip>
+                                                            <v-tooltip
+                                                                v-if="editedItem.foto && editedItem.foto !== 'nofoto.jpg'"
+                                                                top
+                                                                class="text-xs-center text-sm-center text-md-center"
+                                                            >
+                                                                <v-btn @click="deleteClientFoto" class="btn-bg-color"
+                                                                       slot="activator">
+                                                                    <v-icon>delete_forever</v-icon>
+                                                                </v-btn>
+                                                                <span>Удалить фото</span>
+                                                            </v-tooltip>
+                                                        </v-flex>
+                                                    </v-layout>
+                                                </v-container>
+                                            </v-card>
+                                        </v-flex>
+                                    </v-layout>
+                                    <v-layout align-center>
+                                        <v-flex xs12 sm12 md12>
+                                            <v-text-field
+                                                v-model="editedItem.fio"
+                                                :error-messages="checkError('fio')"
+                                                prepend-icon="person"
+                                                autofocus
+                                                placeholder="ФИО"
+                                            ></v-text-field>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-flex>
+                                <v-flex
+                                    xs12 sm4 md4
+                                >
+                                    <v-text-field
+                                        v-model="editedItem.phone_1"
+                                        :error-messages="checkError('phone_1')"
+                                        type="tel"
+                                        prepend-icon="phone"
+                                        placeholder="(000) 000 - 0000"
+                                        mask="phone"
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex
+                                    xs12 sm4 md4
+                                >
+                                    <v-text-field
+                                        v-model="editedItem.phone_2"
+                                        :error-messages="checkError('phone_2')"
+                                        type="tel"
+                                        prepend-icon="phone"
+                                        placeholder="(000) 000 - 0000"
+                                        mask="phone"
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex
+                                    xs12 sm4 md4
+                                >
+                                    <v-text-field
+                                        v-model="editedItem.phone_3"
+                                        :error-messages="checkError('phone_3')"
+                                        type="tel"
+                                        prepend-icon="phone"
+                                        placeholder="(000) 000 - 0000"
+                                        mask="phone"
+                                    ></v-text-field>
+                                </v-flex>
 
-                            <v-flex xs12 sm12 md12>
-                                <v-text-field
-                                    v-model="editedItem.notation"
-                                    :error-messages="checkError('notation')"
-                                    prepend-icon="notes"
-                                    placeholder="Примечание"
-                                ></v-text-field>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="error" @click="dialog = false">
-                            Отмена
-                            <!--<v-icon dark right>block</v-icon>-->
-                        </v-btn>
-                        <v-btn
-                            :disabled="loadOnBtn"
-                            :loading="loadOnBtn"
-                            class="white--text main_color-bg"
-                            @click="save"
-                        >
-                            Сохранить
-                            <!--<v-icon dark right>check_circle</v-icon>-->
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-        </v-toolbar>
-        <v-data-table
-            :headers="headers"
-            :items="list"
-            :search="search"
-            disable-initial-sort
-            class="elevation-1"
-        >
-            <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
-            <template slot="items" slot-scope="props">
-                <tr>
-                    <td class="text-xs-center">{{ props.item.created_at }}</td>
-                    <td class="text-xs-center">
-                        <v-avatar
-                            slot="activator"
-                            size="36px"
-                        >
-                            <img
-                                :src="`/images/${props.item.foto}`"
-                                alt="Avatar"
+                                <v-flex xs12 sm12 md12>
+                                    <v-text-field
+                                        v-model="editedItem.notation"
+                                        :error-messages="checkError('notation')"
+                                        prepend-icon="notes"
+                                        placeholder="Примечание"
+                                    ></v-text-field>
+                                </v-flex>
+                            </v-layout>
+                        </v-container>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="error" @click="dialog = false">
+                                Отмена
+                                <!--<v-icon dark right>block</v-icon>-->
+                            </v-btn>
+                            <v-btn
+                                :disabled="loadOnBtn"
+                                :loading="loadOnBtn"
+                                class="white--text main_color-bg"
+                                @click="save"
                             >
-                        </v-avatar>
-                    </td>
-                    <td class="text-xs-center">{{ props.item.fio }}</td>
-                    <td class="text-xs-center">{{ props.item.phone_1 }}</td>
-                    <td class="text-xs-center">{{ props.item.phone_2 }}</td>
-                    <td class="text-xs-center">{{ props.item.phone_3 }}</td>
-                    <td class="text-xs-center">{{ props.item.notation }}</td>
-                    <td class="justify-center align-center layout px-0">
-                        <v-tooltip top>
-                            <v-icon
+                                Сохранить
+                                <!--<v-icon dark right>check_circle</v-icon>-->
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            </v-toolbar>
+            <v-data-table
+                :headers="headers"
+                :items="list"
+                :search="search"
+                disable-initial-sort
+                class="elevation-1"
+            >
+                <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+                <template slot="items" slot-scope="props">
+                    <tr>
+                        <td class="text-xs-center">{{ props.item.created_at }}</td>
+                        <td class="text-xs-center">
+                            <v-avatar
                                 slot="activator"
-                                class="mr-2"
-                                color="teal"
-                                @click="editItem(props.item)"
+                                size="36px"
                             >
-                                edit
-                            </v-icon>
-                            <span>Редактировать</span>
-                        </v-tooltip>
-                        <v-tooltip top>
-                            <v-icon
-                                slot="activator"
-                                color="red"
-                                @click="deleteItem(props.item)"
-                            >
-                                delete
-                            </v-icon>
-                            <span>Удалить</span>
-                        </v-tooltip>
-                    </td>
-                </tr>
-            </template>
-            <template slot="no-results">
-                <v-alert :value="true" color="error" icon="warning">
-                    Поиск по "{{ search }}" не дал результатов.
-                </v-alert>
-            </template>
-            <template slot="no-data">
-                <v-alert :value="true" color="error" icon="warning">
-                    Таблица пустая
-                </v-alert>
-            </template>
-        </v-data-table>
+                                <img
+                                    :src="`/storage/images/${props.item.foto}`"
+                                    alt="Avatar"
+                                >
+                            </v-avatar>
+                        </td>
+                        <td class="text-xs-center">{{ props.item.fio }}</td>
+                        <td class="text-xs-center">{{ props.item.phone_1 }}</td>
+                        <td class="text-xs-center">{{ props.item.phone_2 }}</td>
+                        <td class="text-xs-center">{{ props.item.phone_3 }}</td>
+                        <td class="text-xs-center">{{ props.item.notation }}</td>
+                        <td class="justify-center align-center layout px-0">
+                            <v-tooltip top>
+                                <v-icon
+                                    slot="activator"
+                                    class="mr-2"
+                                    color="teal"
+                                    @click="editItem(props.item)"
+                                >
+                                    edit
+                                </v-icon>
+                                <span>Редактировать</span>
+                            </v-tooltip>
+                            <v-tooltip top>
+                                <v-icon
+                                    slot="activator"
+                                    color="red"
+                                    @click="deleteItem(props.item)"
+                                >
+                                    delete
+                                </v-icon>
+                                <span>Удалить</span>
+                            </v-tooltip>
+                        </td>
+                    </tr>
+                </template>
+                <template slot="no-results">
+                    <v-alert :value="true" color="error" icon="warning">
+                        Поиск по "{{ search }}" не дал результатов.
+                    </v-alert>
+                </template>
+                <template slot="no-data">
+                    <v-alert :value="true" color="error" icon="warning">
+                        Таблица пустая
+                    </v-alert>
+                </template>
+            </v-data-table>
+        </v-container>
     </div>
 </template>
 <script>
