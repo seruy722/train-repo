@@ -81,7 +81,8 @@
                 this.$store.dispatch('auth/saveToken', {token});
 
                 // Update the user.
-                await this.$store.dispatch('auth/updateUser', {user: data});
+                // await this.$store.dispatch('auth/updateUser', {user: data});
+                this.$store.dispatch('auth/fetchUser');
 
                 // Redirect home.
                 this.$router.push('/');

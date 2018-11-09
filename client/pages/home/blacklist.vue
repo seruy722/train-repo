@@ -451,14 +451,16 @@
                 await this.saveItemToServer(data).then((response) => {
                     const {status} = response.data;
                     const {type} = response.data;
-                    const {item} = response.data;
+                    let {item} = response.data;
+                    // Форматируем дату
+                    item = formatDate(item, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
 
                     if (status) {
                         this.close();
                         this.saveLog(item, type);
 
                         if (type === 'update') {
-                            const data = {item: formatDate(item), index: this.editedIndex};
+                            const data = {item, index: this.editedIndex};
                             this.updateItemInStorage(data);
                             this.$snotify.success('Запись успешно обновлена', {
                                 timeout: 3000,
