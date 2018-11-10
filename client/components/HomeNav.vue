@@ -20,8 +20,11 @@
 
 <script>
     import {mapGetters} from 'vuex';
+    import navClickMixin from '~/mixins/navClick';
+    import logout from '~/mixins/logout';
 
     export default {
+        mixins: [navClickMixin, logout],
         computed: {
             ...mapGetters({
                 user: 'auth/user'
@@ -36,22 +39,6 @@
                     }
                 });
                 return newArr;
-            }
-        },
-        methods: {
-            navClick (item) {
-                if (item.path === '/logout') {
-                    this.logout();
-                } else {
-                    this.$router.push(item.path);
-                }
-            },
-            async logout () {
-                // Log out the user.
-                await this.$store.dispatch('auth/logout');
-
-                // Redirect to login.
-                this.$router.push('/login');
             }
         }
     }
