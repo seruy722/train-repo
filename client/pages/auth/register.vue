@@ -8,8 +8,8 @@
                             <v-toolbar-title>Регистрация</v-toolbar-title>
                             <v-spacer></v-spacer>
                             <v-img
-                                :src="`/logo.png`"
-                                :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`"
+                                :src="`/storage/logo.png`"
+                                :lazy-src="`https://picsum.photos/10/6?image=${2 * 5 + 10}`"
                                 aspect-ratio="1.7"
                                 contain
                             >
@@ -40,7 +40,14 @@
                             </v-form>
                         </v-card-text>
                         <v-card-actions>
-                            <v-btn color="primary" @click="register">Зарегистрироватся</v-btn>
+                            <v-btn
+                                :disabled="loadOnBtn"
+                                :loading="loadOnBtn"
+                                color="primary"
+                                @click="register"
+                            >
+                                Зарегистрироватся
+                            </v-btn>
                             <v-spacer></v-spacer>
                             <v-btn flat color="orange" to="/login">Войти</v-btn>
                         </v-card-actions>
@@ -53,9 +60,11 @@
 
 <script>
     import axios from 'axios';
+    import checkErrorMixin from '~/mixins/checkError';
 
     export default {
         middleware: 'authed',
+        mixins: [checkErrorMixin],
         data: () => ({
             data: {
                 name: '',
@@ -63,15 +72,17 @@
                 password: '',
                 password_confirmation: ''
             },
-            errors: {}
+            loadOnBtn: false
         }),
 
         methods: {
             async register () {
-                this.errors = {};
+                this.loadOnBtn = true;
+                this.changeErrors({});
                 // Register the user.
-                const {data} = await axios.post('/register', this.data).catch((errors)=>{
-                    this.errors = errors.response.data.errors;
+                const {data} = await axios.post('/register', this.data).catch((errors) => {
+                    this.loadOnBtn = false;
+                    this.changeErrors(errors.response.data.errors);
                 });
 
                 // Log in the user.
@@ -91,9 +102,6 @@
                 if (event.code === "Enter" || event.code === 'NumpadEnter') {
                     this.register();
                 }
-            },
-            checkError (field) {
-                return this.errors.hasOwnProperty(field) ? this.errors[field] : [];
             }
         }
     }

@@ -201,23 +201,6 @@
                 <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
                 <template slot="items" slot-scope="props">
                     <tr>
-                        <td class="text-xs-center">{{ props.item.created_at }}</td>
-                        <td class="text-xs-center">
-                            <v-avatar
-                                slot="activator"
-                                size="36px"
-                            >
-                                <img
-                                    :src="`/storage/images/${props.item.foto}`"
-                                    alt="Avatar"
-                                >
-                            </v-avatar>
-                        </td>
-                        <td class="text-xs-center">{{ props.item.fio }}</td>
-                        <td class="text-xs-center">{{ props.item.phone_1 }}</td>
-                        <td class="text-xs-center">{{ props.item.phone_2 }}</td>
-                        <td class="text-xs-center">{{ props.item.phone_3 }}</td>
-                        <td class="text-xs-center">{{ props.item.notation }}</td>
                         <td class="justify-center align-center layout px-0">
                             <v-tooltip top>
                                 <v-icon
@@ -241,6 +224,23 @@
                                 <span>Удалить</span>
                             </v-tooltip>
                         </td>
+                        <td class="text-xs-center">
+                            <v-avatar
+                                slot="activator"
+                                size="36px"
+                            >
+                                <img
+                                    :src="`/storage/images/${props.item.foto}`"
+                                    alt="Avatar"
+                                >
+                            </v-avatar>
+                        </td>
+                        <td class="text-xs-center">{{ props.item.fio }}</td>
+                        <td class="text-xs-center">{{ props.item.phone_1 }}</td>
+                        <td class="text-xs-center">{{ props.item.phone_2 }}</td>
+                        <td class="text-xs-center">{{ props.item.phone_3 }}</td>
+                        <td class="text-xs-center">{{ props.item.notation }}</td>
+                        <td class="text-xs-center">{{ props.item.created_at }}</td>
                     </tr>
                 </template>
                 <template slot="no-results">
@@ -287,11 +287,7 @@
             previewImgSrc: null, // Код загружаемого изображения для предосмотра
             loadOnBtn: false, // Оверлей для кнопки
             headers: [ // Заголовки таблицы
-                {
-                    text: 'Дата добавления',
-                    align: 'center',
-                    value: 'created_at'
-                },
+                {text: 'Управление', align: 'center', sortable: false},
                 {
                     text: 'Фото',
                     align: 'center',
@@ -307,7 +303,11 @@
                 {text: 'Телефон', align: 'center', value: 'phone_2'},
                 {text: 'Телефон', align: 'center', value: 'phone_3'},
                 {text: 'Примечание', align: 'center', value: 'notation'},
-                {text: 'Actions', align: 'center', sortable: false}
+                {
+                    text: 'Дата добавления',
+                    align: 'center',
+                    value: 'created_at'
+                }
             ],
             editedIndex: -1, // Для определения (добавление или сохранение)
             editedItem: {
@@ -352,9 +352,9 @@
                 let imageSrc = null;
                 if (this.editedItem.foto && this.editedItem.foto !== 'null') {
                     imageSrc = this.editedItem.foto;
-                    return this.previewImgSrc || `/images/${imageSrc}` || '/nofoto.jpg';
+                    return this.previewImgSrc || `/storage/images/${imageSrc}` || '/storage/nofoto.jpg';
                 }
-                return this.previewImgSrc || '/nofoto.jpg';
+                return this.previewImgSrc || '/storage/nofoto.jpg';
             }
         },
 

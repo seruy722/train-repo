@@ -8,8 +8,8 @@
                             <v-toolbar-title>Вход</v-toolbar-title>
                             <v-spacer></v-spacer>
                             <v-img
-                                :src="`/logo.png`"
-                                :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`"
+                                :src="`/storage/logo.png`"
+                                :lazy-src="`https://picsum.photos/10/6?image=${2 * 5 + 10}`"
                                 aspect-ratio="1.7"
                                 contain
                                 height="40px"
@@ -36,7 +36,14 @@
                             </v-form>
                         </v-card-text>
                         <v-card-actions align-center justify-space-around>
-                            <v-btn color="primary" @click="login">Войти</v-btn>
+                            <v-btn
+                                :disabled="loadOnBtn"
+                                :loading="loadOnBtn"
+                                color="primary"
+                                @click="login"
+                            >
+                                Войти
+                            </v-btn>
                             <v-spacer></v-spacer>
                             <v-btn flat color="orange" to="/register">Регистрация</v-btn>
                         </v-card-actions>
@@ -49,20 +56,22 @@
 
 <script>
     import axios from 'axios';
-    import {MapActions} from 'vuex';
+    import checkErrorMixin from '~/mixins/checkError';
 
     export default {
-        middleware: 'authed',
         data: () => ({
             data: {
                 email: null,
                 password: null
             },
-            errors: {},
+            loadOnBtn: false
         }),
+        middleware: 'authed',
+        mixins: [checkErrorMixin],
         methods: {
             async login () {
-                this.errors = {};
+                this.loadOnBtn = true;
+                this.changeErrors({});
 
                 await axios.post('/login', this.data).then((response) => {
                     // Save the token.
@@ -76,14 +85,12 @@
                     // Redirect home.
                     this.$router.push('/');
                 }).catch((errors) => {
-                    this.errors = errors.response.data.errors;
+                    this.loadOnBtn = false;
+                    this.changeErrors(errors.response.data.errors);
                 });
             },
-            checkError (field) {
-                return this.errors.hasOwnProperty(field) ? this.errors[field] : [];
-            },
-            onKeyup (e) {
-                if (e.code === "Enter" || e.code === 'NumpadEnter') {
+            onKeyup (event) {
+                if (event.code === "Enter" || event.code === 'NumpadEnter') {
                     this.login();
                 }
             }

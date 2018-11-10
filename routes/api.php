@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +18,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout', 'Auth\LoginController@logout');
 
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        $user = $request->user();
+        $userID = $user->id;
+        $fullDataUser = User::findOrFail($userID);
+        return $fullDataUser;
     });
 
     Route::patch('settings/profile', 'Settings\ProfileController@update');

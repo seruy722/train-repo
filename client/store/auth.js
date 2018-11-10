@@ -14,13 +14,10 @@ export const getters = {
     check: state => state.user !== null,
     role: state => state.user.role,
     userProfileImg: state => {
-        const userFoto = state.user['set_photo_url'];
-        const defaultUserFoto = state.user.photo_url;
-        if (userFoto) {
-            return `/images/${userFoto}`;
-        } else {
-            return defaultUserFoto;
-        }
+        const user = state.user;
+        const defaultUserFoto = _.get(user, 'photo_url');
+        const userFoto = _.get(user, 'set_photo_url');
+        return !_.isNull(userFoto) ? userFoto : defaultUserFoto;
     }
 };
 
