@@ -97,11 +97,11 @@
                                                                 <span>Заменить фото</span>
                                                             </v-tooltip>
                                                             <v-tooltip
-                                                                v-if="editedItem.foto && editedItem.foto !== 'nofoto.jpg'"
+                                                                v-if="editedItem.set_photo_url && editedItem.set_photo_url !== 'nofoto.jpg'"
                                                                 top
                                                                 class="text-xs-center text-sm-center text-md-center"
                                                             >
-                                                                <v-btn @click="deleteClientFoto" class="btn-bg-color"
+                                                                <v-btn @click="deleteUserFoto" class="btn-bg-color"
                                                                        slot="activator">
                                                                     <v-icon>delete_forever</v-icon>
                                                                 </v-btn>
@@ -116,58 +116,47 @@
                                     <v-layout align-center>
                                         <v-flex xs12 sm12 md12>
                                             <v-text-field
-                                                v-model="editedItem.fio"
-                                                :error-messages="checkError('fio')"
+                                                v-model="editedItem.name"
+                                                :error-messages="checkError('name')"
                                                 prepend-icon="person"
                                                 autofocus
-                                                placeholder="ФИО"
+                                                label="Имя"
                                             ></v-text-field>
                                         </v-flex>
                                     </v-layout>
                                 </v-flex>
-                                <v-flex
-                                    xs12 sm4 md4
-                                >
+                                <v-flex xs12 sm12 md12>
                                     <v-text-field
-                                        v-model="editedItem.phone_1"
-                                        :error-messages="checkError('phone_1')"
-                                        type="tel"
-                                        prepend-icon="phone"
-                                        placeholder="(000) 000 - 0000"
-                                        mask="phone"
+                                        v-model="editedItem.email"
+                                        :error-messages="checkError('email')"
+                                        prepend-icon="email"
+                                        label="Email"
                                     ></v-text-field>
                                 </v-flex>
-                                <v-flex
-                                    xs12 sm4 md4
-                                >
-                                    <v-text-field
-                                        v-model="editedItem.phone_2"
-                                        :error-messages="checkError('phone_2')"
-                                        type="tel"
-                                        prepend-icon="phone"
-                                        placeholder="(000) 000 - 0000"
-                                        mask="phone"
-                                    ></v-text-field>
+                                <v-flex xs12 sm12 md12>
+                                    <v-select
+                                        v-model="editedItem.role"
+                                        :items="roles"
+                                        :error-messages="checkError('role')"
+                                        prepend-icon="view_list"
+                                        label="Роль"
+                                    ></v-select>
                                 </v-flex>
-                                <v-flex
-                                    xs12 sm4 md4
-                                >
+                                <v-flex xs12 sm12 md12>
                                     <v-text-field
-                                        v-model="editedItem.phone_3"
-                                        :error-messages="checkError('phone_3')"
-                                        type="tel"
-                                        prepend-icon="phone"
-                                        placeholder="(000) 000 - 0000"
-                                        mask="phone"
+                                        v-model="editedItem.code"
+                                        :error-messages="checkError('code')"
+                                        prepend-icon="how_to_reg"
+                                        label="Код"
                                     ></v-text-field>
                                 </v-flex>
 
                                 <v-flex xs12 sm12 md12>
                                     <v-text-field
-                                        v-model="editedItem.notation"
-                                        :error-messages="checkError('notation')"
-                                        prepend-icon="notes"
-                                        placeholder="Примечание"
+                                        v-model="editedItem.password"
+                                        :error-messages="checkError('password')"
+                                        prepend-icon="lock"
+                                        label="Пароль"
                                     ></v-text-field>
                                 </v-flex>
                             </v-layout>
@@ -176,16 +165,14 @@
                             <v-spacer></v-spacer>
                             <v-btn color="error" @click="dialog = false">
                                 Отмена
-                                <!--<v-icon dark right>block</v-icon>-->
                             </v-btn>
                             <v-btn
                                 :disabled="loadOnBtn"
                                 :loading="loadOnBtn"
                                 class="white--text main_color-bg"
-                                @click="save"
+                                @click="onSaveUser"
                             >
                                 Сохранить
-                                <!--<v-icon dark right>check_circle</v-icon>-->
                             </v-btn>
                         </v-card-actions>
                     </v-card>
@@ -193,7 +180,7 @@
             </v-toolbar>
             <v-data-table
                 :headers="headers"
-                :items="list"
+                :items="userList"
                 :search="search"
                 disable-initial-sort
                 class="elevation-1"
@@ -207,7 +194,7 @@
                                     slot="activator"
                                     class="mr-2"
                                     color="teal"
-                                    @click="editItem(props.item)"
+                                    @click="editUser(props.item)"
                                 >
                                     edit
                                 </v-icon>
@@ -217,29 +204,29 @@
                                 <v-icon
                                     slot="activator"
                                     color="red"
-                                    @click="deleteItem(props.item)"
+                                    @click="deleteUser(props.item)"
                                 >
                                     delete
                                 </v-icon>
                                 <span>Удалить</span>
                             </v-tooltip>
                         </td>
+                        <td class="text-xs-center">{{ props.item.name }}</td>
                         <td class="text-xs-center">
                             <v-avatar
                                 slot="activator"
                                 size="36px"
                             >
                                 <img
-                                    :src="`/storage/images/${props.item.foto}`"
+                                    :src="`${props.item.set_photo_url ? imageUrl + props.item.set_photo_url : defaultFoto}`"
                                     alt="Avatar"
                                 >
                             </v-avatar>
                         </td>
-                        <td class="text-xs-center">{{ props.item.fio }}</td>
-                        <td class="text-xs-center">{{ props.item.phone_1 }}</td>
-                        <td class="text-xs-center">{{ props.item.phone_2 }}</td>
-                        <td class="text-xs-center">{{ props.item.phone_3 }}</td>
-                        <td class="text-xs-center">{{ props.item.notation }}</td>
+                        <td class="text-xs-center">{{ props.item.email }}</td>
+                        <td class="text-xs-center">{{ props.item.role }}</td>
+                        <td class="text-xs-center">{{ props.item.code }}</td>
+                        <td class="text-xs-center">{{ props.item.password }}</td>
                         <td class="text-xs-center">{{ props.item.created_at }}</td>
                     </tr>
                 </template>
@@ -258,22 +245,24 @@
     </div>
 </template>
 <script>
-    import {mapGetters, mapMutations} from 'vuex';
+    import {mapGetters} from 'vuex';
     import axios from 'axios';
     import Search from '~/components/Search';
     import {formatDate} from '~/utils';
     import checkErrorMixin from '~/mixins/checkError';
 
     export default {
-        async fetch ({store}) {
-            const {data} = await axios.get('/blacklist');
-            const list = data.data;
-            const formatList = formatDate(list, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
+        async asyncData () {
+            const { data } = await axios.get('/users').catch((errors) => {
+                console.error('Ошибка при запросе пользователей', errors);
+            });
+            const { users } = data;
+            const formatList = formatDate(users, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
 
-            store.commit('blacklist/SET_LIST', formatList);
+            return { userList: formatList };
         },
         head () {
-            return {title: `Главная`};
+            return {title: `Пользователи`};
         },
         components: {
             Search
@@ -288,21 +277,17 @@
             loadOnBtn: false, // Оверлей для кнопки
             headers: [ // Заголовки таблицы
                 {text: 'Управление', align: 'center', sortable: false},
+                {text: 'Имя', align: 'center', value: 'name'},
                 {
                     text: 'Фото',
                     align: 'center',
                     sortable: false,
-                    value: 'fio'
+                    value: 'name'
                 },
-                {
-                    text: 'ФИО',
-                    align: 'center',
-                    value: 'fio'
-                },
-                {text: 'Телефон', align: 'center', value: 'phone_1'},
-                {text: 'Телефон', align: 'center', value: 'phone_2'},
-                {text: 'Телефон', align: 'center', value: 'phone_3'},
-                {text: 'Примечание', align: 'center', value: 'notation'},
+                {text: 'Email', align: 'center', value: 'email'},
+                {text: 'Роль', align: 'center', value: 'role'},
+                {text: 'Код', align: 'center', value: 'code'},
+                {text: 'Пароль', align: 'center', value: 'name'},
                 {
                     text: 'Дата добавления',
                     align: 'center',
@@ -312,31 +297,32 @@
             editedIndex: -1, // Для определения (добавление или сохранение)
             editedItem: {
                 type: null,
-                fio: null,
-                foto: null,
                 file: null,
-                phone_1: null,
-                phone_2: null,
-                phone_3: null,
-                notation: null,
+                name: null,
+                set_photo_url: null,
+                email: null,
+                role: null,
+                code: null,
+                password: null
             },
             defaultItem: {
-                fio: null,
-                foto: null,
-                phone_1: null,
-                phone_2: null,
-                phone_3: null,
-                notation: null,
+                name: null,
+                set_photo_url: null,
+                email: null,
+                role: null,
+                code: null,
+                password: null
             },
         }),
 
         computed: {
             dialogTitle () {
-                return this.editedIndex === -1 ? 'Добавление клиента' : 'Редактирование клиента';
+                return this.editedIndex === -1 ? 'Добавление пользователя' : 'Редактирование пользователя';
             },
             ...mapGetters({
-                list: 'blacklist/getlist',
-                currentUser: 'auth/user'
+                defaultFoto: 'settings/defaultFoto',
+                imageUrl: 'settings/imageUrl',
+                roles: 'auth/roles'
             }),
             // Предосмотр загружаемого изображения
             previewImageName: {
@@ -350,44 +336,36 @@
             },
             profileImage () {
                 let imageSrc = null;
-                if (this.editedItem.foto && this.editedItem.foto !== 'null') {
-                    imageSrc = this.editedItem.foto;
-                    return this.previewImgSrc || `/storage/images/${imageSrc}` || '/storage/nofoto.jpg';
+                if (this.editedItem.set_photo_url && this.editedItem.set_photo_url !== 'null') {
+                    imageSrc = this.editedItem.set_photo_url;
+                    return this.previewImgSrc || `${this.imageUrl + imageSrc}` || this.defaultFoto;
                 }
-                return this.previewImgSrc || '/storage/nofoto.jpg';
+                return this.previewImgSrc || this.defaultFoto;
             }
         },
 
         watch: {
             dialog (val) {
-                val || this.close();
+                val || this.closeDialog();
             }
         },
         methods: {
-            ...mapMutations({
-                setList: 'blacklist/SET_LIST',
-                addItemToStorage: 'blacklist/ADD_ITEM',
-                updateItemInStorage: 'blacklist/UPDATE_ITEM',
-                deleteItemFromStorage: 'blacklist/DELETE_ITEM',
-                deleteItemFromServer: 'blacklist/DELETE_ITEM'
-            }),
-            editItem (item) {
+            editUser (item) {
                 this.changeErrors({});
-                this.editedIndex = _.indexOf(this.list, item);
+                this.editedIndex = _.indexOf(this.userList, item);
                 this.editedItem = _.assign({}, item);
                 this.dialog = true;
             },
-            async deleteItem (item) {
-                const index = this.list.indexOf(item);
-                const answer = confirm('Удалить запись?');
+            async deleteUser (item) {
+                const index = _.indexOf(this.userList, item);
+                const answer = confirm('Удалить пользователя?');
                 if (answer) {
-                    await this.deleteItemFromServer(item.id).then((response) => {
-                        const {status} = response.data;
+                    await this.deleteUserFromServer(item.id).then((response) => {
+                        const { status } = response.data;
 
                         if (status) {
-                            this.deleteItemFromStorage(index);
-                            this.saveLog(item, 'delete');
-                            this.$snotify.success('Запись успешно удалена', {
+                            this.userList.splice(index, 1);
+                            this.$snotify.success('Пользователь успешно удален!', {
                                 timeout: 2000,
                                 showProgressBar: true,
                                 closeOnClick: true,
@@ -405,11 +383,11 @@
                 }
             },
 
-            close () {
+            closeDialog () {
                 this.dialog = false;
                 this.loadOnBtn = false;
                 setTimeout(() => {
-                    this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedItem = _.assign({}, this.defaultItem);
                     this.editedIndex = -1;
                 }, 300);
                 // ИСПРАВИТЬ
@@ -420,14 +398,13 @@
             changeLoadBtn () {
                 this.loadOnBtn = !this.loadOnBtn;
             },
-            async save () {
+            async onSaveUser () {
                 this.changeLoadBtn();
                 this.changeErrors({});
                 // Если удалено название изображения значит не отправляем изображение на сервер
                 if (!this.imageName) {
                     this.editedItem.file = null;
                 }
-                // Если editedIndex > -1 значит это обновление записи
                 if (this.editedIndex === -1) {
                     // СОХРАНЕНИЕ ДАННЫХ
                     this.editedItem.type = 'save';
@@ -436,40 +413,36 @@
                     this.editedItem.type = 'update';
                 }
                 // Очищаем обьект от ложных данных
-                const cleanedEditItem = _.pickBy(this.editedItem, _.identity);
+                const cleanedSendObject = _.pickBy(this.editedItem, _.identity);
                 // Для отправки файлов помещаем свойства обьекта editedItem в FormData
-                const data = new FormData();
+                const sendData = new FormData();
 
-                _.forEach(cleanedEditItem, (value, key) => {
+                _.forEach(cleanedSendObject, (value, key) => {
                     if (!value) {
-                        data.append(key, '');
+                        sendData.append(key, '');
                     } else {
-                        data.append(key, value);
+                        sendData.append(key, value);
                     }
                 });
 
-                await this.saveItemToServer(data).then((response) => {
-                    const {status} = response.data;
-                    const {type} = response.data;
-                    let {item} = response.data;
-                    // Форматируем дату
-                    item = formatDate(item, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
+                await this.saveUserToServer(sendData).then((response) => {
+                    const { status, type, user } = response.data;
+                    const formatUserDate =  formatDate(user, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
 
                     if (status) {
-                        this.close();
-                        this.saveLog(item, type);
-
+                        this.closeDialog();
                         if (type === 'update') {
-                            const data = {item, index: this.editedIndex};
-                            this.updateItemInStorage(data);
-                            this.$snotify.success('Запись успешно обновлена', {
+                            const userIndex = this.editedIndex;
+                            this.userList.splice(userIndex, 1, formatUserDate);
+
+                            this.$snotify.success('Запись успешно обновлена!', {
                                 timeout: 3000,
                                 showProgressBar: true,
                                 closeOnClick: true,
                                 pauseOnHover: true
                             });
                         } else if (type === 'save') {
-                            this.addItemToStorage(item);
+                            this.userList.unshift(formatUserDate);
                             this.$snotify.success('Запись успешно добавлена!', {
                                 timeout: 3000,
                                 showProgressBar: true,
@@ -483,11 +456,11 @@
                     this.changeErrors(errors.response.data.errors);
                 });
             },
-            async saveItemToServer (item) {
-                return await axios.post('blacklist/saveUpdate', item);
+            async saveUserToServer (data) {
+                return await axios.post('users/saveUpdate', data);
             },
-            async deleteItemFromServer (id) {
-                return await axios.post('blacklist/delete', {id});
+            async deleteUserFromServer (id) {
+                return await axios.post('users/delete', {id});
             },
             onSelectImage () {
                 this.$refs.profileimage.click();
@@ -503,31 +476,18 @@
 
                 }
             },
-            async saveLog (item, type) {
-                item.user_fio_id = `${this.currentUser.name}_${this.currentUser.id}`;
-                item.action = type;
-
-                await axios.post('blacklist/saveLog', item).catch((error) => {
-                    this.saveLog({
-                        action: 'ERROR',
-                        user_fio_id: `${this.currentUser.name}_${this.currentUser.id}`,
-                        notation: error
-                    })
-                });
-            },
-            async deleteClientFoto () {
-                await axios.post('blacklist/deleteFoto', this.editedItem).then((response) => {
-                    const {item} = response.data;
-                    const data = {item, index: this.editedIndex};
-                    this.updateItemInStorage(data);
-
-                    this.$snotify.success('Изображение успешно удалено', {
+            async deleteUserFoto () {
+                await axios.post('users/deleteFoto', {id: this.editedItem.id}).then((response) => {
+                    const { user } = response.data;
+                    const formatUserDate = formatDate(user, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
+                    this.userList.splice(this.editedIndex, 1, formatUserDate);
+                    this.$snotify.success('Изображение успешно удалено!', {
                         timeout: 3000,
                         showProgressBar: true,
                         closeOnClick: true,
                         pauseOnHover: true
                     });
-                    this.editedItem.foto = item.foto;
+                    this.editedItem.set_photo_url = user.set_photo_url;
                 }).catch((error) => {
                     console.error(error);
                 });
