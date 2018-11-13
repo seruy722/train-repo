@@ -81,7 +81,7 @@
                 <v-spacer></v-spacer>
                 <v-avatar>
                     <v-img
-                        :src="profileImage"
+                        :src="`${profileImage ? imageUrl + profileImage : defaultFoto}`"
                         aspect-ratio="1"
                         alt="Avatar"
                         class="grey lighten-2"
@@ -163,6 +163,8 @@
         computed: {
             ...mapGetters({
                 profileImage: 'auth/userProfileImg',
+                defaultFoto: 'settings/defaultFoto',
+                imageUrl: 'settings/imageUrl'
             })
         },
         methods:{

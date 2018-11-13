@@ -35,6 +35,11 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::post('blacklist/saveLog', 'LogController@store');
     Route::get('getLogList', 'LogController@index');
+
+    Route::get('users', 'UserController@index');
+    Route::post('users/saveUpdate', 'UserController@store');
+    Route::post('users/delete', 'UserController@destroy');
+    Route::post('users/deleteFoto', 'UserController@deleteFoto');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

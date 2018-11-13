@@ -16,7 +16,7 @@
                             <v-card class="mb-3">
                                 <v-card-text>
                                     <v-img
-                                        :src="profileImage"
+                                        :src="`${profileImage ? imageUrl + profileImage : defaultFoto}`"
                                         aspect-ratio="1"
                                         class="grey lighten-2"
                                     >
@@ -154,6 +154,8 @@
             ...mapGetters({
                 user: 'auth/user',
                 profileImage: 'auth/userProfileImg',
+                defaultFoto: 'settings/defaultFoto',
+                imageUrl: 'settings/imageUrl'
             }),
 
         },

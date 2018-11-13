@@ -57,7 +57,7 @@ return [
 
         'images' => [
             'driver' => 'local',
-            'root' => base_path() . '/client/static/storage',
+            'root' => base_path() . '/client/static/storage/images',
             'visibility' => 'public',
         ],
 

@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 export const state = () => ({
     user: null,
     token: null,
+    roles: ['admin', 'moder', 'user', 'blacklist'],
 });
 
 // getters
@@ -13,11 +14,11 @@ export const getters = {
     token: state => state.token,
     check: state => state.user !== null,
     role: state => state.user.role,
+    roles: state => state.roles,
     userProfileImg: state => {
         const user = state.user;
-        const defaultUserFoto = _.get(user, 'photo_url');
         const userFoto = _.get(user, 'set_photo_url');
-        return !_.isNull(userFoto) ? userFoto : defaultUserFoto;
+        return userFoto ? userFoto : null;
     }
 };
 

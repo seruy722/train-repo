@@ -336,7 +336,9 @@
             },
             ...mapGetters({
                 list: 'blacklist/getlist',
-                currentUser: 'auth/user'
+                currentUser: 'auth/user',
+                defaultFoto: 'settings/defaultFoto',
+                imageUrl: 'settings/imageUrl'
             }),
             // Предосмотр загружаемого изображения
             previewImageName: {
@@ -352,9 +354,9 @@
                 let imageSrc = null;
                 if (this.editedItem.foto && this.editedItem.foto !== 'null') {
                     imageSrc = this.editedItem.foto;
-                    return this.previewImgSrc || `/storage/images/${imageSrc}` || '/storage/nofoto.jpg';
+                    return this.previewImgSrc || `${this.imageUrl + imageSrc}` || this.defaultFoto;
                 }
-                return this.previewImgSrc || '/storage/nofoto.jpg';
+                return this.previewImgSrc || this.defaultFoto;
             }
         },
 
