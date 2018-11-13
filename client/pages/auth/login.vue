@@ -8,7 +8,7 @@
                             <v-toolbar-title>Вход</v-toolbar-title>
                             <v-spacer></v-spacer>
                             <v-img
-                                :src="`${imageUrl+'logo.png'}`"
+                                :src="logoUrl"
                                 :lazy-src="`https://picsum.photos/10/6?image=${2 * 5 + 10}`"
                                 aspect-ratio="1.7"
                                 contain
@@ -71,7 +71,7 @@
         mixins: [checkErrorMixin],
         computed: {
             ...mapGetters({
-                imageUrl: 'settings/imageUrl'
+                logoUrl: 'settings/logoUrl'
             })
         },
         methods: {

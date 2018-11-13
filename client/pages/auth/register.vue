@@ -8,7 +8,7 @@
                             <v-toolbar-title>Регистрация</v-toolbar-title>
                             <v-spacer></v-spacer>
                             <v-img
-                                :src="`/storage/logo.png`"
+                                :src="logoUrl"
                                 :lazy-src="`https://picsum.photos/10/6?image=${2 * 5 + 10}`"
                                 aspect-ratio="1.7"
                                 contain
@@ -61,6 +61,7 @@
 <script>
     import axios from 'axios';
     import checkErrorMixin from '~/mixins/checkError';
+    import { mapGetters } from 'vuex';
 
     export default {
         middleware: 'authed',
@@ -74,7 +75,11 @@
             },
             loadOnBtn: false
         }),
-
+        computed: {
+            ...mapGetters({
+                logoUrl: 'settings/logoUrl'
+            })
+        },
         methods: {
             async register () {
                 this.loadOnBtn = true;
