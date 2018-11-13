@@ -8,7 +8,7 @@
                             <v-toolbar-title>Вход</v-toolbar-title>
                             <v-spacer></v-spacer>
                             <v-img
-                                :src="`/storage/logo.png`"
+                                :src="`${imageUrl+'logo.png'}`"
                                 :lazy-src="`https://picsum.photos/10/6?image=${2 * 5 + 10}`"
                                 aspect-ratio="1.7"
                                 contain
@@ -57,6 +57,7 @@
 <script>
     import axios from 'axios';
     import checkErrorMixin from '~/mixins/checkError';
+    import { mapGetters } from 'vuex';
 
     export default {
         data: () => ({
@@ -68,6 +69,11 @@
         }),
         middleware: 'authed',
         mixins: [checkErrorMixin],
+        computed: {
+            ...mapGetters({
+                imageUrl: 'settings/imageUrl'
+            })
+        },
         methods: {
             async login () {
                 this.loadOnBtn = true;
