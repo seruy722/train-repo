@@ -3,18 +3,24 @@ import Router from 'vue-router';
 import {scrollBehavior} from '~/utils';
 
 Vue.use(Router);
-
+// Main page
 const Home = () => import('~/pages/home').then(m => m.default || m);
+// BlackList users
 const BlackList = () => import('~/pages/blacklist/blacklist').then(m => m.default || m);
+// Logs for blacklist users
 const Logs = () => import('~/pages/blacklist/logs').then(m => m.default || m);
+// Profile users
 const Profile = () => import('~/pages/users/profile').then(m => m.default || m);
-
+// Auth
 const Login = () => import('~/pages/auth/login').then(m => m.default || m);
 const Register = () => import('~/pages/auth/register').then(m => m.default || m);
-
+// Edit users data
 const Users = () => import('~/pages/users/users').then(m => m.default || m);
-
+// Emails for access to site
 const Emails = () => import('~/pages/accessemails/emails').then(m => m.default || m);
+
+// Cargo && Debts
+const Cargo = () => import('~/pages/cargo/cargo').then(m => m.default || m);
 
 const routes = [
     {path: '/', component: Home,
@@ -43,6 +49,11 @@ const routes = [
                 path: 'emails',
                 component: Emails,
                 name: 'home-emails',
+            },
+            {
+                path: 'cargo',
+                component: Cargo,
+                name: 'home-cargo',
             }
         ]
     },
