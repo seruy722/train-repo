@@ -14,6 +14,8 @@ const Register = () => import('~/pages/auth/register').then(m => m.default || m)
 
 const Users = () => import('~/pages/users/users').then(m => m.default || m);
 
+const Emails = () => import('~/pages/accessemails/emails').then(m => m.default || m);
+
 const routes = [
     {path: '/', component: Home,
         children: [
@@ -37,6 +39,11 @@ const routes = [
                 component: Users,
                 name: 'home-users',
             },
+            {
+                path: 'emails',
+                component: Emails,
+                name: 'home-emails',
+            }
         ]
     },
 

@@ -122,10 +122,9 @@
     export default {
         mixins: [navClickMixin, logout],
         data: ()=>({
-            drawer: null,
+            drawer: false,
             items: [
                 { icon: 'home', text: 'Главная', path: '/'},
-                { icon: 'exit_to_app', text: 'Выход', path: '/logout'},
                 { icon: 'people_outline', text: 'Пользователи', path: '/users' },
                 {
                     icon: 'people',
@@ -136,24 +135,8 @@
                         { icon: 'list', text: 'Логи', path: '/logs' },
                     ]
                 },
-                {
-                    icon: 'keyboard_arrow_up',
-                    'icon-alt': 'keyboard_arrow_down',
-                    text: 'More',
-                    model: false,
-                    children: [
-                        { text: 'Import' },
-                        { text: 'Export' },
-                        { text: 'Print' },
-                        { text: 'Undo changes' },
-                        { text: 'Other contacts' }
-                    ]
-                },
-                { icon: 'settings', text: 'Settings' },
-                { icon: 'chat_bubble', text: 'Send feedback' },
-                { icon: 'help', text: 'Help' },
-                { icon: 'phonelink', text: 'App downloads' },
-                { icon: 'keyboard', text: 'Go to the old version' }
+                { icon: 'email', text: 'Email доступы', path: '/emails' },
+                { icon: 'exit_to_app', text: 'Выход', path: '/logout'}
             ]
         }),
         components: {

@@ -40,6 +40,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('users/saveUpdate', 'UserController@store');
     Route::post('users/delete', 'UserController@destroy');
     Route::post('users/deleteFoto', 'UserController@deleteFoto');
+
+    Route::get('emails', 'EmailsController@index');
+    Route::post('email/saveUpdate', 'EmailsController@store');
+    Route::post('email/delete', 'EmailsController@destroy');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {
