@@ -13,7 +13,7 @@ export const getters = {
     user: state => state.user,
     token: state => state.token,
     check: state => state.user !== null,
-    role: state => state.user.role,
+    role: state => _.get(state.user, 'role'),
     roles: state => state.roles,
     userProfileImg: state => {
         const user = state.user;
