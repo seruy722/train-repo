@@ -2,6 +2,7 @@
     <div data-component-name="Home">
         <v-app id="inspire">
             <v-navigation-drawer
+                v-if="showAdminData"
                 :clipped="$vuetify.breakpoint.lgAndUp"
                 v-model="drawer"
                 fixed
@@ -75,7 +76,7 @@
             >
                 <v-toolbar-title style="width: 500px" class="ml-0 pl-3">
                     <v-toolbar-side-icon
-                        v-if="role === adminRole"
+                        v-if="showAdminData"
                         @click.stop="drawer = !drawer"
                     ></v-toolbar-side-icon>
                     <span class="mr-2 ml-2 hidden-sm-and-down"><v-icon medium color="black">people</v-icon></span>
@@ -128,6 +129,7 @@
             HomeNav // Меню навигации
         },
         middleware: 'auth',
+        showAdminData: false,
         data: ()=>({
             drawer: false,
             items: [
@@ -146,6 +148,9 @@
                 { icon: 'exit_to_app', text: 'Выход', path: '/logout'}
             ]
         }),
+        created () {
+            this.checkAdminRole();
+        },
         computed: {
             ...mapGetters({
                 profileImage: 'auth/userProfileImg',
@@ -154,6 +159,13 @@
                 role: 'auth/role',
                 adminRole: 'settings/adminRole'
             })
+        },
+        methods: {
+            checkAdminRole () {
+                if (this.role === this.adminRole) {
+                    this.showAdminData = true;
+                }
+            }
         }
     }
 </script>
