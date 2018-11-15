@@ -135,7 +135,7 @@
         components: {
             Search
         },
-        middleware: 'auth',
+        middleware: 'admin',
         mixins: [checkErrorMixin],
         data: () => ({
             dialog: false,
@@ -282,13 +282,3 @@
         }
     }
 </script>
-
-<style lang="scss" scoped>
-    .main {
-        width: 95%;
-    }
-
-    .profile-image-input {
-        display: none;
-    }
-</style>

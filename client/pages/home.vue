@@ -74,7 +74,10 @@
                 fixed
             >
                 <v-toolbar-title style="width: 500px" class="ml-0 pl-3">
-                    <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+                    <v-toolbar-side-icon
+                        v-if="role === adminRole"
+                        @click.stop="drawer = !drawer"
+                    ></v-toolbar-side-icon>
                     <span class="mr-2 ml-2 hidden-sm-and-down"><v-icon medium color="black">people</v-icon></span>
                     <span class="hidden-sm-and-down">Черный список клиентов</span>
                 </v-toolbar-title>
@@ -121,6 +124,10 @@
 
     export default {
         mixins: [navClickMixin, logout],
+        components: {
+            HomeNav // Меню навигации
+        },
+        middleware: 'auth',
         data: ()=>({
             drawer: false,
             items: [
@@ -139,19 +146,14 @@
                 { icon: 'exit_to_app', text: 'Выход', path: '/logout'}
             ]
         }),
-        components: {
-            HomeNav // Меню навигации
-        },
-        middleware: 'auth',
         computed: {
             ...mapGetters({
                 profileImage: 'auth/userProfileImg',
                 defaultFoto: 'settings/defaultFoto',
-                imageUrl: 'settings/imageUrl'
+                imageUrl: 'settings/imageUrl',
+                role: 'auth/role',
+                adminRole: 'settings/adminRole'
             })
-        },
-        methods:{
-
         }
     }
 </script>

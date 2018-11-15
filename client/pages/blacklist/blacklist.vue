@@ -265,6 +265,11 @@
     import checkErrorMixin from '~/mixins/checkError';
 
     export default {
+        components: {
+            Search
+        },
+        middleware: 'auth',
+        mixins: [checkErrorMixin],
         async fetch ({store}) {
             const {data} = await axios.get('/blacklist');
             const list = data.data;
@@ -275,11 +280,6 @@
         head () {
             return {title: `Главная`};
         },
-        components: {
-            Search
-        },
-        middleware: 'auth',
-        mixins: [checkErrorMixin],
         data: () => ({
             dialog: false,
             search: '',
@@ -329,7 +329,6 @@
                 notation: null,
             },
         }),
-
         computed: {
             dialogTitle () {
                 return this.editedIndex === -1 ? 'Добавление клиента' : 'Редактирование клиента';
@@ -359,7 +358,6 @@
                 return this.previewImgSrc || this.defaultFoto;
             }
         },
-
         watch: {
             dialog (val) {
                 val || this.close();
@@ -537,13 +535,3 @@
         }
     }
 </script>
-
-<style lang="scss" scoped>
-    .main {
-        width: 95%;
-    }
-
-    .profile-image-input {
-        display: none;
-    }
-</style>

@@ -2,14 +2,16 @@
 export const state = () => ({
     defaultFoto: 'nofoto.jpg',
     imageUrl: '/storage/images/',
-    logoImg: 'logo.png'
+    logoImg: 'logo.png',
+    adminRole: 'admin'
 });
 
 // getters
 export const getters = {
     defaultFoto: state => `${state.imageUrl}${state.defaultFoto}`,
     imageUrl: state => state.imageUrl,
-    logoUrl: state => `${state.imageUrl}${state.logoImg}`
+    logoUrl: state => `${state.imageUrl}${state.logoImg}`,
+    adminRole: state => state.adminRole,
 };
 
 // mutations

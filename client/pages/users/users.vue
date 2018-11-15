@@ -252,6 +252,11 @@
     import checkErrorMixin from '~/mixins/checkError';
 
     export default {
+        components: {
+            Search
+        },
+        middleware: 'admin',
+        mixins: [checkErrorMixin],
         async asyncData () {
             const { data } = await axios.get('/users').catch((errors) => {
                 console.error('Ошибка при запросе пользователей', errors);
@@ -264,11 +269,6 @@
         head () {
             return {title: `Пользователи`};
         },
-        components: {
-            Search
-        },
-        middleware: 'auth',
-        mixins: [checkErrorMixin],
         data: () => ({
             dialog: false,
             search: '',
@@ -495,13 +495,3 @@
         }
     }
 </script>
-
-<style lang="scss" scoped>
-    .main {
-        width: 95%;
-    }
-
-    .profile-image-input {
-        display: none;
-    }
-</style>

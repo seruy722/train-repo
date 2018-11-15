@@ -18,3 +18,11 @@
 .btn-bg-color {
     background-color: $btn-bg-color;
 }
+// Главный блок страниц (для растягивания его на всю страницу)
+.main {
+    width: 95%;
+}
+// Скрытие инпута выбора файла
+.profile-image-input {
+    display: none;
+}

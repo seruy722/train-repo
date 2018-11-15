@@ -60,6 +60,8 @@
     import { mapGetters } from 'vuex';
 
     export default {
+        middleware: 'authed',
+        mixins: [checkErrorMixin],
         data: () => ({
             data: {
                 email: null,
@@ -67,8 +69,6 @@
             },
             loadOnBtn: false
         }),
-        middleware: 'authed',
-        mixins: [checkErrorMixin],
         computed: {
             ...mapGetters({
                 logoUrl: 'settings/logoUrl'

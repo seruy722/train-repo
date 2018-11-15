@@ -241,8 +241,4 @@
     .main_profile_block {
         width: 70%;
     }
-
-    .profile-image-input {
-        display: none;
-    }
 </style>
