@@ -17,6 +17,7 @@ class CreateCargosTable extends Migration
             $table->increments('id');
             $table->string('type');
             $table->float('sum', 8, 2)->default(0);
+            $table->float('sale', 8, 2)->default(0);
             $table->string('client');
             $table->integer('place')->default(0)->unsigned();
             $table->float('kg', 8, 2)->default(0)->unsigned();
