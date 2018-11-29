@@ -24,26 +24,31 @@ Route::group(['middleware' => 'auth:api'], function () {
         return $fullDataUser;
     });
 
+
+    // PROFILE
     Route::patch('settings/profile', 'Settings\ProfileController@update');
     Route::post('settings/profile', 'Settings\ProfileController@updateProfileFoto');
+    // PASSWORD
     Route::patch('settings/password', 'Settings\PasswordController@update');
-
+    // BLACKLIST
     Route::get('blacklist', 'BlackListController@index');
     Route::post('blacklist/saveUpdate', 'BlackListController@store');
     Route::post('blacklist/delete', 'BlackListController@destroy');
     Route::post('blacklist/deleteFoto', 'BlackListController@deleteFoto');
-
     Route::post('blacklist/saveLog', 'LogController@store');
     Route::get('getLogList', 'LogController@index');
-
+    // USERS
     Route::get('users', 'UserController@index');
     Route::post('users/saveUpdate', 'UserController@store');
     Route::post('users/delete', 'UserController@destroy');
     Route::post('users/deleteFoto', 'UserController@deleteFoto');
-
+    // EMAILS
     Route::get('emails', 'EmailsController@index');
     Route::post('email/saveUpdate', 'EmailsController@store');
     Route::post('email/delete', 'EmailsController@destroy');
+    // CARGOS
+    Route::get('cargos', 'CargoController@index');
+    Route::post('cargo/saveProfit', 'CargoController@store');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {
