@@ -136,6 +136,14 @@
                 { icon: 'home', text: 'Главная', path: '/'},
                 { icon: 'people_outline', text: 'Пользователи', path: '/users' },
                 {
+                    icon: 'business',
+                    text: 'Карго Долги',
+                    model: false,
+                    children: [
+                        { icon: 'home', text: 'Карго', path: '/cargo' },
+                    ]
+                },
+                {
                     icon: 'people',
                     text: 'Чорный список',
                     model: false,
