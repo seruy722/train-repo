@@ -122,12 +122,12 @@
     import axios from 'axios';
 
     export default {
-        async fetch ({store}) {
-            const { data } = await axios.get('cargo/clientsNames');
-            const clientsNamesList = data.data;
-
-            store.commit('cargo/SET_CLIENTSNAMES', clientsNamesList);
-        },
+        // async fetch ({store}) {
+        //     const { data } = await axios.get('cargo/clientsNames');
+        //     const clientsNamesList = data.data;
+        //
+        //     store.commit('cargo/SET_CLIENTSNAMES', clientsNamesList);
+        // },
         components: {
             CargoProfit,
             CargoDebts,
