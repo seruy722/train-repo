@@ -63,3 +63,65 @@ export function formatDate (data, enterFormat, needFormat) {
 
     return data;
 }
+
+
+/**
+ * Class for work with dates
+ *
+ */
+
+export class Date {
+    constructor () {
+        this.month = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+        this.dateFormat = 'DD-MM-YYYY';
+    }
+
+    today () {
+        return moment().format(this.dateFormat);
+    }
+
+    tomorrow () {
+        return moment(new Date()).add(1, 'days').format(this.dateFormat);
+    }
+
+    yesterday () {
+        return moment(new Date()).add(-1, 'days').format(this.dateFormat);
+    }
+
+    next (date) {
+        return moment(date, this.dateFormat).add(1, 'days').format(this.dateFormat);
+    }
+
+    prev (date) {
+        return moment(date, this.dateFormat).add(-1, 'days').format(this.dateFormat);
+    }
+
+    isValid (date) {
+        return moment(date, this.dateFormat,true).isValid();
+    }
+
+    currentMonth () {
+        const month = moment().month();
+        return `${this.month[month]} ${moment().year()}`;
+    }
+
+    currentYear () {
+        return `${moment().year()} год`;
+    }
+
+    currentWeek () {
+        const startOfWeek = moment().startOf('isoweek').format('DD-MM');
+        const endOfWeek = moment().endOf('isoweek').format(this.dateFormat);
+        return `Нед. ${startOfWeek} - ${endOfWeek}`;
+    }
+
+    year(date){
+        return `${moment(date).year()} год`;
+    }
+
+    choiceWeek(date){
+        const monday = moment(date, this.dateFormat).startOf('isoweek').format(this.dateFormat);
+        const sunday = moment(date, this.dateFormat).endOf('isoweek').format(this.dateFormat);
+        return {monday, sunday};
+    }
+}
