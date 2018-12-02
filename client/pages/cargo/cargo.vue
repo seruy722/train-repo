@@ -3,8 +3,10 @@
     <div class="main" data-component-name="Cargo">
         <v-container fluid>
 
-            <v-toolbar color="white" dark>
+            <v-toolbar>
                 <v-toolbar-title class="text-xs-center title blue--text">{{ currentTable }}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <search :value.sync="search"></search>
             </v-toolbar>
 
             <v-toolbar flat color="white" evaluation-1>
@@ -120,20 +122,27 @@
     import ControlPanel from '~/components/Cargo/Control/ControlPanel';
     import { mapGetters } from 'vuex';
     import axios from 'axios';
+    import Search from '~/components/Search';
 
     export default {
-        // async fetch ({store}) {
-        //     const { data } = await axios.get('cargo/clientsNames');
-        //     const clientsNamesList = data.data;
-        //
-        //     store.commit('cargo/SET_CLIENTSNAMES', clientsNamesList);
-        // },
+        // Сохранение имен клиентов в cargo store
+        async fetch ({store}) {
+            const { data } = await axios.get('/clientNames').catch((errors) => {
+                console.error('Ошибка при запросе клиентов', errors);
+            });
+            const { clientsNames } = data;
+            const names = _.map(clientsNames, 'name');
+            console.log(clientsNames);
+
+            store.commit('cargo/SET_CLIENTSNAMES', names);
+        },
         components: {
             CargoProfit,
             CargoDebts,
             CargoTable,
             CargoDebtsNav,
-            ControlPanel
+            ControlPanel,
+            Search
         },
         middleware: 'auth',
         head () {
@@ -141,7 +150,13 @@
         },
         data: () => ({
             navElem: null,
+            search: ''
         }),
+        watch: {
+            search (val) {
+                this.$store.commit('controlPanel/SET_SEARCH', val);
+            }
+        },
         computed: {
             ...mapGetters({
                 currentTable: 'controlPanel/getCurrentTable',
