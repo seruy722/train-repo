@@ -39,6 +39,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('getLogList', 'LogController@index');
     // USERS
     Route::get('users', 'UserController@index');
+    Route::get('clientNames', 'UserController@getClientsNames');
     Route::post('users/saveUpdate', 'UserController@store');
     Route::post('users/delete', 'UserController@destroy');
     Route::post('users/deleteFoto', 'UserController@deleteFoto');

@@ -140,6 +140,13 @@ class UserController extends Controller
         }
     }
 
+    public function getClientsNames()
+    {
+        $clientsNames = User::all(['name'])->toArray();
+
+        return response()->json(['status' => true, 'clientsNames' => $clientsNames]);
+    }
+
     /**
      * Display the specified resource.
      *
