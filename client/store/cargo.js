@@ -6,7 +6,8 @@ export const state = () => ({
 
 // GETTERS
 export const getters = {
-    cargoList: state => state.cargoList
+    cargoList: state => state.cargoList,
+    clientsNames: state => state.clientsNames
 };
 
 // MUTATIONS
