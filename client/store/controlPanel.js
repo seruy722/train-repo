@@ -1,15 +1,22 @@
+import moment from 'moment';
+
 // STATE
 export const state = () => ({
     search: '',
-    currentTable: 'КАРГО',
+    // currentTable: 'КАРГО',
     openedComponent: false,
+    currentClient: null,
+    // currentDate:  moment().format('DD-MM-YYYY'),
 });
 
 // GETTERS
 export const getters = {
     getSearch: state => state.search,
-    getCurrentTable: state => state.currentTable,
-    getOpenedComponent: state => state.openedComponent
+    // getCurrentTable: state => state.currentTable,
+    // getCurrentClient: state => state.currentClient,
+    getOpenedComponent: state => state.openedComponent,
+    // getcurrentDate: state => state.currentDate,
+
 };
 
 // MUTATIONS
@@ -32,19 +39,22 @@ export const mutations = {
     DELETE_ITEM (state, index) {
         state.list.splice(index, 1);
     },
-    SET_SEARCH (state, string){
+    SET_SEARCH (state, string) {
         state.search = string;
     },
-    SET_TABLE (state, title){
-        state.currentTable = title;
-    },
-    SET_OPENEDCOMPONENT (state, title){
+    // SET_TABLE (state, title) {
+    //     state.currentTable = title;
+    // },
+    // SET_CLIENT (state, client) {
+    //     state.currentClient = client;
+    // },
+    SET_OPENEDCOMPONENT (state, title) {
         state.openedComponent = title;
     },
+    // SET_CURRENTDATE (state, date) {
+    //     state.currentDate = date;
+    // }
 };
 
 // ACTIONS
-export const actions = {
-
-
-};
+export const actions = {};

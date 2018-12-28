@@ -17,13 +17,18 @@
                     </v-flex>
 
                     <v-flex xs12 sm3 md3>
-                        <v-text-field
+                        <v-combobox
                             v-model="item.client"
+                            :items="clients"
                             :error-messages="checkError('client')"
-                            prepend-icon="person"
-                            label="Клиент"
+                            item-text="name"
+                            item-value="id"
+                            prepend-icon="people"
+                            return-object
+                            single-line
                             autofocus
-                        ></v-text-field>
+                            label="Клиент"
+                        ></v-combobox>
                     </v-flex>
 
                     <v-flex xs12 sm2 md2>
@@ -124,6 +129,7 @@
     import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
     import { formatDate } from '~/utils';
     import checkErrorMixin from '~/mixins/checkError';
+    import {mapGetters} from 'vuex';
 
     export default {
         components: {
@@ -162,6 +168,9 @@
             }
         },
         computed: {
+            ...mapGetters({
+                clients: 'cargo/clientsNames'
+            }),
             cargoDebtsList () {
                 return this.dataDebts;
             }

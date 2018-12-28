@@ -1,16 +1,14 @@
 <template>
-    <div data-vue-component="CargoTable">
+    <div data-vue-component="DebtsTable">
         <v-container>
             <span>Сумма: {{countObject.sum}}</span>
-            <span>Мест: {{countObject.place}}</span>
-            <span>Вес: {{countObject.kg}}</span>
-            <span>Скидка: {{countObject.sale}}</span>
+            <span>Комиссия: {{countObject.commission}}</span>
         </v-container>
 
         <v-data-table
             v-model="selected"
             :headers="headers"
-            :items="cargoList"
+            :items="debtsList"
             :search="search"
             :loading="progressLoading"
             disable-initial-sort
@@ -32,11 +30,8 @@
                     <td>{{ props.item.created_at }}</td>
                     <td class="text-xs-center">{{ props.item.type }}</td>
                     <td class="text-xs-center">{{ props.item.sum }}</td>
-                    <td class="text-xs-center">{{ props.item.sale }}</td>
+                    <td class="text-xs-center">{{ props.item.commission }}</td>
                     <td class="text-xs-center">{{ props.item.client }}</td>
-                    <td class="text-xs-center">{{ props.item.place }}</td>
-                    <td class="text-xs-center">{{ props.item.kg }}</td>
-                    <td class="text-xs-center">{{ props.item.fax }}</td>
                     <td class="text-xs-center">{{ props.item.notation }}</td>
                 </tr>
             </template>
@@ -66,7 +61,7 @@
     import {formatDate} from '~/utils';
 
     export default {
-        name: 'CargoTable',
+        name: 'DebtsTable',
         data: () => ({
             selected: [],
             progressLoading: true,
@@ -78,20 +73,18 @@
                 },
                 {text: 'Тип', align: 'center', value: 'type'},
                 {text: 'Сумма', align: 'center', value: 'sum'},
-                {text: 'Скидка', align: 'center', value: 'sale'},
+                {text: 'Комиссия', align: 'center', value: 'commission'},
                 {text: 'Клиент', align: 'center', value: 'client'},
-                {text: 'Мест', align: 'center', value: 'place'},
-                {text: 'Вес', align: 'center', value: 'kg'},
-                {text: 'Факс', align: 'center', value: 'fax'},
                 {text: 'Примечания', align: 'center', value: 'notation'},
             ],
         }),
         created () {
             this.fetch();
+            console.log('created');
         },
         computed: {
             ...mapGetters({
-                cargoList: 'cargo/cargoList',
+                debtsList: 'cargo/debtsList',
                 search: 'controlPanel/getSearch',
                 countObject: 'cargo/countObject'
             }),
@@ -99,12 +92,13 @@
         methods: {
             // Запрос данных с сервера
             async fetch () {
-                const {data} = await axios.get('/cargos');
-                const {cargoList} = data;
+                const {data} = await axios.get('/debts');
+                const { debtsList } = data;
 
-                const formatedList = formatDate(cargoList, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YY');
+                const formatedList = formatDate(debtsList, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YY');
 
-                this.$store.commit('cargo/SET_LIST', formatedList);
+                this.$store.commit('cargo/SET_DEBTS_LIST', formatedList);
+                this.$store.commit('cargo/CHANGE_CARGOLIST');
                 this.$store.dispatch('cargo/calcData');
                 this.progressLoading = false;
             }

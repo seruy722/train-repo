@@ -181,6 +181,9 @@
                 this.pickersValues.monday = obj.monday;
                 this.pickersValues.sunday = obj.sunday;
 
+            },
+            select (val) {
+                this.$store.commit('cargo/SET_CURRENTDATE', val);
             }
         },
         methods: {
@@ -188,9 +191,13 @@
             changeDate (title) {
                 this.dialogChangeInside = null;
                 switch (title) {
+                    case 'Все даты':
+                        this.savePrevSelect(title);
+                        this.select = null;
+                        break;
+
                     case 'Сегодня':
                         this.savePrevSelect(title);
-                        console.log(this.savedPrevSelect);
                         this.select = date.today();
                         break;
 

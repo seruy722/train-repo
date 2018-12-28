@@ -9,12 +9,12 @@
 @import 'elements/transitions';
 @import "~vue-snotify/styles/material"; // Стили для оповещений
 
-
+// Главный цвет фона сайта
 .main_color-bg {
     background-color: $main-color-bg;
     color: $text-color;
 }
-
+// Цвет фона кнопок
 .btn-bg-color {
     background-color: $btn-bg-color;
 }
@@ -26,4 +26,19 @@
 // Скрытие инпута выбора файла
 .profile-image-input {
     display: none;
+}
+
+// Цвет фона строк табицы доходов
+.tr_profit__bg {
+    background-color: $tr_profit__bg;
+}
+
+// Цвет фона строк табицы долгов
+.tr_debts__bg {
+    background-color: $tr_debts__bg;
+}
+
+// Рамка для строк таблиц
+.tr_border {
+    border: $tr_border;
 }

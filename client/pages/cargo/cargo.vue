@@ -101,7 +101,6 @@
                 <!--</v-card>-->
                 <!--</v-dialog>-->
             </v-toolbar>
-
             <!--ДОБАВЛЕНИЕ НОВЫХ ЗАПИСЕЙ В ТАБЛИЦУ-->
             <keep-alive v-if="openedComponent">
                 <component v-bind:is="dynamicComponent"></component>
@@ -118,6 +117,7 @@
     import CargoProfit from '~/components/Cargo/CargoProfit';
     import CargoDebts from '~/components/Cargo/CargoDebts';
     import CargoTable from '~/components/Cargo/CargoTable';
+    import DebtsTable from '~/components/Cargo/DebtsTable';
     import CargoDebtsNav from '~/components/Cargo/CargoDebtsNav';
     import ControlPanel from '~/components/Cargo/Control/ControlPanel';
     import { mapGetters } from 'vuex';
@@ -132,7 +132,6 @@
             });
             const { clientsNames } = data;
             const names = _.map(clientsNames, 'name');
-            console.log(clientsNames);
 
             store.commit('cargo/SET_CLIENTSNAMES', names);
         },
@@ -142,7 +141,8 @@
             CargoTable,
             CargoDebtsNav,
             ControlPanel,
-            Search
+            Search,
+            DebtsTable
         },
         middleware: 'auth',
         head () {
@@ -159,9 +159,11 @@
         },
         computed: {
             ...mapGetters({
-                currentTable: 'controlPanel/getCurrentTable',
-                openedComponent: 'controlPanel/getOpenedComponent'
+                currentTable: 'cargo/getCurrentTable',
+                openedComponent: 'controlPanel/getOpenedComponent',
+                countObject: 'cargo/countObject'
             }),
+            // Добавление оплат и долгов в таблицу cargos
             dynamicComponent () {
                 if (this.openedComponent === 'ОПЛАТА' && this.currentTable === 'КАРГО') {
                     return 'CargoProfit';
@@ -169,10 +171,16 @@
                     return 'CargoDebts';
                 }
             },
+            // Смена таблиц КАРГО и ДОЛГИ
             dynamicTableComponent () {
                 if (this.currentTable === 'КАРГО') {
                     return 'CargoTable';
+                } else {
+                    return 'DebtsTable';
                 }
+            },
+            suman(){
+                return this.suma;
             }
         },
         methods: {

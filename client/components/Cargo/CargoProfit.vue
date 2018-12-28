@@ -17,20 +17,12 @@
 
                 <v-flex xs12 sm2 md2>
                     <v-text-field
-                        v-model="item.client"
-                        :error-messages="checkError('client')"
-                        prepend-icon="person"
-                        placeholder="Клиент"
-                        autofocus
-                    ></v-text-field>
-                </v-flex>
-
-                <v-flex xs12 sm2 md2>
-                    <v-text-field
                         v-model="item.sum"
                         :error-messages="checkError('sum')"
                         prepend-icon="monetization_on"
-                        placeholder="Сумма"
+                        autofocus
+                        type="number"
+                        label="Сумма"
                     ></v-text-field>
                 </v-flex>
 
@@ -39,7 +31,8 @@
                         v-model="item.sale"
                         :error-messages="checkError('sale')"
                         prepend-icon="money_off"
-                        placeholder="Скидка"
+                        type="number"
+                        label="Скидка"
                     ></v-text-field>
                 </v-flex>
 
@@ -48,13 +41,22 @@
                         v-model="item.notation"
                         :error-messages="checkError('notation')"
                         prepend-icon="notes"
-                        placeholder="Примечание"
+                        label="Примечание"
                     ></v-text-field>
+                </v-flex>
+
+                <v-flex xs12 sm2 md2>
+                    <v-combobox
+                        v-model="item.client"
+                        :items="clients"
+                        :error-messages="checkError('client')"
+                        prepend-icon="people"
+                        label="Клиент"
+                    ></v-combobox>
                 </v-flex>
 
                 <v-flex xs12 sm1 md1>
                     <v-btn
-                        v-if="index > 0"
                         fab
                         small
                         dark
@@ -68,12 +70,11 @@
             </v-layout>
         </v-container>
 
-        <v-card-actions>
+        <v-card-actions v-if="dataProfit.length">
 
             <v-spacer></v-spacer>
 
             <v-btn
-                v-if="dataProfit.length"
                 :disabled="loadOnBtn"
                 :loading="loadOnBtn"
                 fab
@@ -105,6 +106,7 @@
     import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
     import { formatDate } from '~/utils';
     import checkErrorMixin from '~/mixins/checkError';
+    import {mapGetters} from 'vuex';
 
     export default {
         components: {
@@ -114,35 +116,37 @@
         mixins: [checkErrorMixin],
         data () {
             return {
-                search: '',
                 loadOnBtn: false, // Оверлей для кнопки
-                selected: [],
-                dataProfit: [
-                    {
-                        type: 'ОПЛАТА',
-                        client: null,
-                        date: null,
-                        sum: 0,
-                        sale: null,
-                        notation: null,
-                    }
-                ],
+                dataProfit: [],
                 defaultItem: {
                     type: 'ОПЛАТА',
                     client: null,
                     date: null,
-                    sum: 0,
+                    sum: null,
                     sale: null,
                     notation: null,
                 },
             }
         },
         computed: {
+            ...mapGetters({
+                clients: 'cargo/clientsNames',
+                currentClient: 'cargo/getCurrentClient'
+
+            }),
             getDataProfit () {
                 return this.dataProfit;
             },
         },
+        created () {
+            this.addEmptyEntry();
+        },
         methods: {
+            setDefaultValues(){
+                this.defaultItem.client = this.currentClient;
+                this.defaultItem.date = this.$store.getters['cargo/getcurrentDate'];
+                console.log(this.$store.getters['controlPanel/getcurrentDate']);
+            },
             clearAndCloseComponent () {
                 this.$store.commit('controlPanel/SET_OPENEDCOMPONENT', false);
                 const emptyDataPtofit = [];
@@ -154,6 +158,8 @@
                 this.dataProfit.splice(elemIndex, 1);
             },
             addEmptyEntry () {
+                this.setDefaultValues();
+                console.log(_.assign({}, this.defaultItem));
                 this.dataProfit.push(_.assign({}, this.defaultItem));
             },
             changeLoadBtn () {
@@ -172,22 +178,10 @@
                     }
                 });
 
-                // Проверяем массив на пустоту
-                if (_.isEmpty(clearDataProfit)) {
-                    this.$snotify.warning('Данные не заполнены', {
-                        timeout: 3000,
-                        showProgressBar: true,
-                        closeOnClick: true,
-                        pauseOnHover: true
-                    });
-
-                    return;
-                }
                 console.log(clearDataProfit);
 
                 await this.saveCargoProfitToServer(clearDataProfit).then((response) => {
                     const { status } = response.data;
-
 
                     if (status) {
                         this.changeLoadBtn();

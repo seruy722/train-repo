@@ -50,6 +50,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     // CARGOS
     Route::get('cargos', 'CargoController@index');
     Route::post('cargo/saveProfit', 'CargoController@store');
+    // DEBTS
+    Route::get('debts', 'DebtsController@index');
+//    Route::post('cargo/saveProfit', 'CargoController@store');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {
