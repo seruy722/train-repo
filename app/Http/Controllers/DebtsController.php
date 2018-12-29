@@ -3,14 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Debts;
+use Illuminate\Support\Facades\DB;
+use App\Traits\FormatDates;
 
 class DebtsController extends Controller
 {
+    use FormatDates;
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
-        $debtsList = Debts::orderBy('created_at', 'DESC')->get();
+        $debtsList = DB::table('debts')->orderBy('created_at', 'DESC')->get();
+        $formatedList = $this->needFormatDate($debtsList);
 
-        return response()->json(['status' => true, 'debtsList' => $debtsList]);
+        return response()->json(['status' => true, 'debtsList' => $formatedList]);
     }
 }

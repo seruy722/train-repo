@@ -51,7 +51,7 @@
                                     <!--Выбор дня-->
                                     <div v-if="dialogChangeInside === 'day'">
                                         Дата:
-                                        <date-picker :value.sync="pickersValues.day"></date-picker>
+                                        <date-picker :value.sync="day"></date-picker>
                                     </div>
                                     <!--Выбор года-->
                                     <div v-if="dialogChangeInside === 'year'">
@@ -129,6 +129,7 @@
                 sunday: null,
                 week: null
             },
+            day: null,
             value: null,
             dialog: false,
             dialogChangeInside: null,
@@ -184,21 +185,31 @@
             },
             select (val) {
                 this.$store.commit('cargo/SET_CURRENTDATE', val);
+            },
+            day (val) {
+                console.log('DAY', val);
+                this.$store.commit('cargo/SET_CURRENTDATE', {
+                    item: 'day',
+                    value: val
+                });
             }
         },
         methods: {
 
             changeDate (title) {
                 this.dialogChangeInside = null;
+
                 switch (title) {
                     case 'Все даты':
                         this.savePrevSelect(title);
-                        this.select = null;
+                        this.$store.commit('cargo/SET_CURRENTDATE', null);
                         break;
 
                     case 'Сегодня':
-                        this.savePrevSelect(title);
-                        this.select = date.today();
+                        this.$store.commit('cargo/SET_CURRENTDATE', date.today());
+
+                        this.setSelectValue(date.today());
+                        this.$store.dispatch('cargo/changeList');
                         break;
 
                     case 'Текущий месяц':
@@ -244,6 +255,8 @@
                         this.dialog = true;
                         break;
 
+                    default:
+                        this.select = title;
                 }
             },
 
@@ -276,6 +289,11 @@
             },
             setDialogTitle (title) {
                 this.dialogTitle = title;
+            },
+            setSelectValue (value) {
+                setTimeout(() => {
+                    this.select = value;
+                });
             }
         }
     }

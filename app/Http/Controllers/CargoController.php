@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Cargo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Traits\FormatDates;
 
 
 class CargoController extends Controller
 {
+    use FormatDates;
     /**
      * Display a listing of the resource.
      *
@@ -15,10 +18,27 @@ class CargoController extends Controller
      */
     public function index()
     {
-        $cargoList = Cargo::orderBy('created_at', 'DESC')->get();
+        $cargoList = DB::table('cargos')->orderBy('created_at', 'DESC')->get();
+        $formatedList = $this->needFormatDate($cargoList);
 
-        return response()->json(['status' => true, 'cargoList' => $cargoList]);
+        return response()->json(['status' => true, 'cargoList' => $formatedList]);
     }
+
+
+//    /**
+//     * Преобразование даты в нужный формат
+//     *
+//     * @param {array} $arr
+//     * @return mixed
+//     */
+//    protected function needFormatDate($arr)
+//    {
+//        foreach ($arr as $item) {
+//            $item->created_at = date("d-m-Y", strtotime($item->created_at));
+//        }
+//
+//        return $arr;
+//    }
 
     /**
      * Show the form for creating a new resource.

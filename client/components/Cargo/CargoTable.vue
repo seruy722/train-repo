@@ -102,9 +102,7 @@
                 const {data} = await axios.get('/cargos');
                 const {cargoList} = data;
 
-                const formatedList = formatDate(cargoList, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YY');
-
-                this.$store.commit('cargo/SET_LIST', formatedList);
+                this.$store.commit('cargo/SET_LIST', cargoList);
                 this.$store.dispatch('cargo/calcData');
                 this.progressLoading = false;
             }

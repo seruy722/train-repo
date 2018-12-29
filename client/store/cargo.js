@@ -116,16 +116,16 @@ export const mutations = {
 
         switch (table) {
             case 'КАРГО':
-                if (client && date) {
-                    // state.cargoList = _.filter(state.staticCargolist, (item) => {
-                    //     return item.client === client;
-                    // });
-                    state.cargoList = _.reduce(state.staticCargolist, (result, item) => {
-                        if (item.client === client && item.created_at === date) {
-                            result.push(item);
-                        }
-                        return result;
-                    }, []);
+                if (client) {
+                    state.cargoList = _.filter(state.staticCargolist, (item) => {
+                        return item.client === client;
+                    });
+                    // state.cargoList = _.reduce(state.staticCargolist, (result, item) => {
+                    //     if (item.client === client && item.created_at === date) {
+                    //         result.push(item);
+                    //     }
+                    //     return result;
+                    // }, []);
                     return;
                 }
                 state.cargoList = state.staticCargolist;
@@ -159,5 +159,10 @@ export const actions = {
             commit('CALCULATE_SUM');
             commit('CALC_COMISSION');
         }
+    },
+    changeList ({commit, dispatch}) {
+        console.log('DISPATCH statrt');
+        commit('CHANGE_CARGOLIST');
+        dispatch('calcData');
     }
 };

@@ -95,9 +95,7 @@
                 const {data} = await axios.get('/debts');
                 const { debtsList } = data;
 
-                const formatedList = formatDate(debtsList, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YY');
-
-                this.$store.commit('cargo/SET_DEBTS_LIST', formatedList);
+                this.$store.commit('cargo/SET_DEBTS_LIST', debtsList);
                 this.$store.commit('cargo/CHANGE_CARGOLIST');
                 this.$store.dispatch('cargo/calcData');
                 this.progressLoading = false;
