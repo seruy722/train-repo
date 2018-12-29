@@ -161,7 +161,7 @@ export const actions = {
         }
     },
     changeList ({commit, dispatch}) {
-        console.log('DISPATCH statrt');
+        console.log('DISPATCH start');
         commit('CHANGE_CARGOLIST');
         dispatch('calcData');
     }

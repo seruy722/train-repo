@@ -202,11 +202,17 @@
                 switch (title) {
                     case 'Все даты':
                         this.savePrevSelect(title);
-                        this.$store.commit('cargo/SET_CURRENTDATE', null);
+                        this.$store.commit('cargo/SET_CURRENTDATE', {
+                            item: title,
+                            value : null
+                        });
                         break;
 
                     case 'Сегодня':
-                        this.$store.commit('cargo/SET_CURRENTDATE', date.today());
+                        this.$store.commit('cargo/SET_CURRENTDATE', {
+                            item: title,
+                            value : [date.today()]
+                        });
 
                         this.setSelectValue(date.today());
                         this.$store.dispatch('cargo/changeList');

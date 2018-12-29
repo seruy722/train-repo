@@ -59,12 +59,13 @@
     import {mapGetters} from 'vuex';
     import axios from 'axios';
     import {formatDate} from '~/utils';
+    import progressLoadingTable from '~/mixins/progressLoadingTable';
 
     export default {
         name: 'DebtsTable',
+        mixins: [progressLoadingTable],
         data: () => ({
             selected: [],
-            progressLoading: true,
             headers: [
                 {
                     text: 'Дата',
@@ -98,7 +99,7 @@
                 this.$store.commit('cargo/SET_DEBTS_LIST', debtsList);
                 this.$store.commit('cargo/CHANGE_CARGOLIST');
                 this.$store.dispatch('cargo/calcData');
-                this.progressLoading = false;
+                this.stopProgressbarOnTable();
             }
         }
     }

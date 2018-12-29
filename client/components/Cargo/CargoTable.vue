@@ -64,12 +64,13 @@
     import {mapGetters} from 'vuex';
     import axios from 'axios';
     import {formatDate} from '~/utils';
+    import progressLoadingTable from '~/mixins/progressLoadingTable';
 
     export default {
         name: 'CargoTable',
+        mixins: [progressLoadingTable],
         data: () => ({
             selected: [],
-            progressLoading: true,
             headers: [
                 {
                     text: 'Дата',
@@ -104,7 +105,7 @@
 
                 this.$store.commit('cargo/SET_LIST', cargoList);
                 this.$store.dispatch('cargo/calcData');
-                this.progressLoading = false;
+                this.stopProgressbarOnTable();
             }
         }
     }
