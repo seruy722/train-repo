@@ -22,10 +22,16 @@ class DebtsTableSeeder extends Seeder
         for ($i = 0; $i < 5000; $i++) {
             $arrRole = ['ДОЛГ', 'ОПЛАТА'];
             $type = $faker->randomElement($arrRole);
+            $summa = $faker->numberBetween($min = 1, $max = 50000);
+
+            if($type === 'ДОЛГ'){
+                $summa *= -1;
+            }
+
             DB::table('debts')->insert([
                 'created_at' => $faker->dateTime($max = 'now', $timezone = null),
                 'type' => $type,
-                'sum' => $faker->numberBetween($min = 1, $max = 50000),
+                'sum' => $summa,
                 'client' => $faker->randomElement($clients),
                 'notation' => $faker->sentence($nbWords = 3, $variableNbWords = true),
                 'commission' => $faker->numberBetween($min = 1, $max = 1000),

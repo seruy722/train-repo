@@ -18,7 +18,7 @@ class CreateDebtsTable extends Migration
             $table->string('type');
             $table->string('client');
             $table->float('sum', 8, 2)->default(0);
-            $table->float('commission', 8, 2)->default(0);
+            $table->float('commission', 8, 2)->default(0)->unsigned();
             $table->string('notation')->nullable();
             $table->timestamps();
         });

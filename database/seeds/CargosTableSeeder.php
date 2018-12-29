@@ -22,10 +22,16 @@ class CargosTableSeeder extends Seeder
         for ($i = 0; $i < 5000; $i++) {
             $arrRole = ['ДОЛГ', 'ОПЛАТА'];
             $type = $faker->randomElement($arrRole);
+            $summa = $faker->numberBetween($min = 1, $max = 50000);
+
+            if($type === 'ДОЛГ'){
+                $summa *= -1;
+            }
+
             DB::table('cargos')->insert([
                 'created_at' => $faker->dateTime($max = 'now', $timezone = null),
                 'type' => $type,
-                'sum' => $faker->numberBetween($min = 1, $max = 50000),
+                'sum' => $summa,
                 'sale' => $type === 'ДОЛГ' ? 0 : $faker->numberBetween($min = 1, $max = 1000),
                 'client' => $faker->randomElement($clients),
                 'place' => $faker->numberBetween($min = 1, $max = 100),
