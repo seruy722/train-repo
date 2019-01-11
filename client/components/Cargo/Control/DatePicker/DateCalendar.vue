@@ -1,5 +1,5 @@
 <template>
-    <div data-component-name="">
+    <div data-component-name="DateCalendar">
         <v-layout row wrap align-center>
 
             <v-flex d-flex>
@@ -42,34 +42,31 @@
                             <v-layout>
                                 <v-flex>
                                     <!--Выбор периода-->
-                                    <div v-if="dialogChangeInside === 'period'">
+                                    <div v-show="dialogChangeInside === 'Выбрать период'">
                                         ОТ:
-                                        <date-picker :value.sync="pickersValues.period1"></date-picker>
+                                        <DatePicker :value.sync="datePickerValue.startDate"></DatePicker>
                                         ДО:
-                                        <date-picker :value.sync="pickersValues.period2"></date-picker>
+                                        <DatePicker :value.sync="datePickerValue.endDate"></DatePicker>
                                     </div>
                                     <!--Выбор дня-->
-                                    <div v-if="dialogChangeInside === 'day'">
+                                    <div v-show="dialogChangeInside === 'Выбрать день'">
                                         Дата:
-                                        <date-picker :value.sync="day"></date-picker>
+                                        <DatePicker :value.sync="datePickerValue.day"></DatePicker>
                                     </div>
                                     <!--Выбор года-->
-                                    <div v-if="dialogChangeInside === 'year'">
-                                        Дата:
-                                        <year-picker :value.sync="pickersValues.year"></year-picker>
+                                    <div v-show="dialogChangeInside === 'Выбрать год'">
+                                        <YearPicker :value.sync="datePickerValue.year"></YearPicker>
                                     </div>
                                     <!--Выбор месяца-->
-                                    <div v-if="dialogChangeInside === 'month'">
-                                        Месяц:
-                                        <month-picker :value.sync="pickersValues.month"></month-picker>
+                                    <div v-show="dialogChangeInside === 'Выбрать месяц'">
+                                        <MonthPicker :value.sync="datePickerValue.month"></MonthPicker>
                                     </div>
                                     <!--Выбор недели-->
-                                    <div v-if="dialogChangeInside === 'week'">
+                                    <div v-show="dialogChangeInside === 'Выбрать неделю'">
                                         День недели:
-                                        <date-picker :value.sync="pickersValues.week"></date-picker>
-                                        <div><span>Понедельник:</span> {{ monday }}</div>
-                                        <div><span>Воскресенье:</span> {{ sunday }}</div>
-
+                                        <DatePicker :value.sync="datePickerValue.week"></DatePicker>
+                                        <div><span>Понедельник:</span> {{ datePickerValue.startDate }}</div>
+                                        <div><span>Воскресенье:</span> {{ datePickerValue.endDate }}</div>
                                     </div>
                                 </v-flex>
                             </v-layout>
@@ -107,35 +104,32 @@
     import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
     import YearPicker from '~/components/Cargo/Control/DatePicker/YearPicker';
     import MonthPicker from '~/components/Cargo/Control/DatePicker/MonthPicker';
+    import { DateClass } from '~/utils'; // Класс для работы с датами
     import { mapGetters } from 'vuex';
-    import { Date } from '~/utils';
 
-    const date = new Date();
+    const date = new DateClass();
 
     export default {
+        name: 'DateCalendar',
         components: {
             MonthPicker,
             DatePicker,
-            YearPicker
+            YearPicker,
         },
         data: () => ({
-            pickersValues: {
-                period1: null,
-                period2: null,
+            datePickerValue: {
+                title: null,
                 day: null,
+                startDate: null,
+                endDate: null,
                 year: null,
                 month: null,
-                monday: null,
-                sunday: null,
-                week: null
+                week: null,
             },
-            day: null,
-            value: null,
             dialog: false,
-            dialogChangeInside: null,
+            dialogChangeInside: false,
             dialogTitle: null,
             select: 'Все даты',
-            savedPrevSelect: null,
             items: [
                 'Все даты',
                 'Сегодня',
@@ -147,161 +141,154 @@
                 'Выбрать месяц',
                 'Текущая неделя',
                 'Выбрать неделю',
-            ]
+            ],
         }),
         computed: {
             ...mapGetters({
-                // select: 'controlPanel/getSelect',
-                // items: 'controlPanel/getItems',
+                sensor: 'cargo/getSensor',
             }),
             viewDialogTitle () {
                 return this.dialogTitle;
             },
-            monday(){
-
-                if(this.pickersValues.week){
-                    const obj = date.choiceWeek(this.pickersValues.week);
-                    this.pickersValues.monday = obj.monday;
-                    return this.pickersValues.monday;
-                }
-            },
-
-            sunday(){
-
-                if(this.pickersValues.week){
-                    const obj = date.choiceWeek(this.pickersValues.week);
-                    this.pickersValues.sunday = obj.sunday;
-                    return this.pickersValues.sunday;
-                }
-            },
         },
         watch: {
-            pickersValues (){
-                console.log('FFFF');
-                const obj = date.choiceWeek(this.week);
-                this.pickersValues.monday = obj.monday;
-                this.pickersValues.sunday = obj.sunday;
+            // Слежение за значением при выборе в селекте (select title)
+            select () {
+                setTimeout(() => {
+                    this.select = this.sensor;
+                }, 50);
+            },
+            // Слежение за значением возвращемого со store (select title)
+            sensor () {
+                setTimeout(() => {
+                    this.select = this.sensor;
+                }, 50);
+            },
+            // Слежение за выбором дня недели
+            'datePickerValue.week': function () {
+                console.log('this.datePickerValue.startDate', this.datePickerValue.startDate);
+                const obj = date.choiceWeek(this.datePickerValue.week);
 
+                this.datePickerValue.startDate = obj.monday;
+                this.datePickerValue.endDate = obj.sunday;
             },
-            select (val) {
-                this.$store.commit('cargo/SET_CURRENTDATE', val);
-            },
-            day (val) {
-                console.log('DAY', val);
-                this.$store.commit('cargo/SET_CURRENTDATE', {
-                    item: 'day',
-                    value: val
-                });
-            }
         },
         methods: {
-
-            changeDate (title) {
-                this.dialogChangeInside = null;
+            async changeDate (title) {
+                this.dialogChangeInside = false;
 
                 switch (title) {
                     case 'Все даты':
-                        this.savePrevSelect(title);
                         this.$store.commit('cargo/SET_CURRENTDATE', {
-                            item: title,
-                            value : null
+                            title,
                         });
+
+                        await this.$store.dispatch('cargo/changeList');
+
                         break;
 
                     case 'Сегодня':
                         this.$store.commit('cargo/SET_CURRENTDATE', {
-                            item: title,
-                            value : [date.today()]
+                            title,
+                            day: date.today(),
                         });
 
-                        this.setSelectValue(date.today());
-                        this.$store.dispatch('cargo/changeList');
+                        await this.$store.dispatch('cargo/changeList');
+
                         break;
 
                     case 'Текущий месяц':
-                        this.savePrevSelect(title);
-                        this.select = date.currentMonth();
+                        this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, date.currentMonth(), {title}));
+
+                        await this.$store.dispatch('cargo/changeList');
                         break;
 
                     case 'Текущий год':
-                        this.savePrevSelect(title);
-                        this.select = date.currentYear();
+                        this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, date.currentYear(), {title}));
+
+                        await this.$store.dispatch('cargo/changeList');
                         break;
+
                     case 'Текущая неделя':
-                        this.select = date.currentWeek();
+                        this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, date.currentWeek(), {title}));
+
+                        await this.$store.dispatch('cargo/changeList');
                         break;
 
                     case 'Выбрать период':
-                        this.dialogChangeInside = 'period';
-                        this.setDialogTitle(title);
-                        this.dialog = true;
-                        break;
-
                     case 'Выбрать день':
-                        this.dialogChangeInside = 'day';
-                        this.setDialogTitle(title);
-                        this.dialog = true;
-                        break;
-
                     case 'Выбрать год':
-                        this.dialogChangeInside = 'year';
-                        this.setDialogTitle(title);
-                        this.dialog = true;
-                        break;
-
                     case 'Выбрать месяц':
-                        this.dialogChangeInside = 'month';
-                        this.setDialogTitle(title);
-                        this.dialog = true;
-                        break;
-
                     case 'Выбрать неделю':
-                        this.dialogChangeInside = 'week';
+                        this.dialogChangeInside = title;
                         this.setDialogTitle(title);
+                        this.setDateTitle(title);
                         this.dialog = true;
                         break;
 
                     default:
+                        console.error('default title in DateCalendar ', title);
                         this.select = title;
                 }
             },
 
-            nextDate () {
-                const selectDate = this.select;
-                if (date.isValid(selectDate)) {
-                    this.select = date.next(this.select);
-                }
+            async nextDate () {
+                this.$store.commit('cargo/SET_CURRENTDATE', {
+                    title: 'Выбрать день',
+                    day: date.next(this.select),
+                });
+
+                await this.$store.dispatch('cargo/changeList');
+                this.dialog = false;
             },
 
-            prevDate () {
-                const selectDate = this.select;
-                if (date.isValid(selectDate)) {
-                    this.select = date.prev(this.select);
-                }
-            },
-            onClickOk () {
+            async prevDate () {
+                this.$store.commit('cargo/SET_CURRENTDATE', {
+                    title: 'Выбрать день',
+                    day: date.prev(this.select),
+                });
+
+                await this.$store.dispatch('cargo/changeList');
                 this.dialog = false;
             },
-            clickCancel () {
-                this.dialog = false;
-                this.select = this.savedPrevSelect;
-            },
-            savePrevSelect (title) {
-                if (!this.select) {
-                    this.select = 'Все даты';
+
+            async onClickOk () {
+                const isEmptyDatePickerValue = await this.checkDatePickerValueOnEmpty(_.cloneDeep(this.datePickerValue));
+                if (isEmptyDatePickerValue) {
                     return;
                 }
-                this.savedPrevSelect = title;
+
+                this.dialog = false;
+                this.$store.commit('cargo/SET_CURRENTDATE', this.datePickerValue);
+
+                await this.$store.dispatch('cargo/changeList');
+                this.resetDatePickerValue();
             },
+
+            clickCancel () {
+                this.dialog = false;
+            },
+
             setDialogTitle (title) {
                 this.dialogTitle = title;
             },
-            setSelectValue (value) {
-                setTimeout(() => {
-                    this.select = value;
-                });
-            }
-        }
-    }
-</script>
 
+            setDateTitle (val) {
+                this.datePickerValue.title = val;
+            },
+
+            resetDatePickerValue () {
+                _.forIn(this.datePickerValue, (value, key, obj) => {
+                    obj[key] = null;
+                });
+            },
+
+            checkDatePickerValueOnEmpty (obj) {
+                _.unset(obj, 'title', 'week');
+                const result = _.pickBy(obj, _.isString);
+
+                return _.isEmpty(result);
+            },
+        },
+    };
+</script>

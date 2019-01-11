@@ -10,7 +10,7 @@
             :headers="headers"
             :items="debtsList"
             :search="search"
-            :loading="progressLoading"
+            :loading="progressbarTable"
             disable-initial-sort
             item-key="id"
             select-all
@@ -43,7 +43,7 @@
             </template>
 
             <template slot="no-data">
-                <v-alert v-if="progressLoading" :value="true" color="primary" icon="info">
+                <v-alert v-if="progressbarTable" :value="true" color="primary" icon="info">
                     <span>Загрузка...</span>
                 </v-alert>
 
@@ -59,11 +59,9 @@
     import {mapGetters} from 'vuex';
     import axios from 'axios';
     import {formatDate} from '~/utils';
-    import progressLoadingTable from '~/mixins/progressLoadingTable';
 
     export default {
         name: 'DebtsTable',
-        mixins: [progressLoadingTable],
         data: () => ({
             selected: [],
             headers: [
@@ -87,19 +85,22 @@
             ...mapGetters({
                 debtsList: 'cargo/debtsList',
                 search: 'controlPanel/getSearch',
-                countObject: 'cargo/countObject'
+                countObject: 'cargo/countObject',
+                progressbarTable: 'cargo/getProgressbarTable'
             }),
         },
         methods: {
             // Запрос данных с сервера
             async fetch () {
+                this.$store.commit('cargo/SET_PROGRESSBAR_TABLE', true);
+
                 const {data} = await axios.get('/debts');
                 const { debtsList } = data;
 
                 this.$store.commit('cargo/SET_DEBTS_LIST', debtsList);
-                this.$store.commit('cargo/CHANGE_CARGOLIST');
+                this.$store.dispatch('cargo/changeList');
                 this.$store.dispatch('cargo/calcData');
-                this.stopProgressbarOnTable();
+                this.$store.commit('cargo/SET_PROGRESSBAR_TABLE', false);
             }
         }
     }

@@ -69,15 +69,14 @@ export function formatDate (data, enterFormat, needFormat) {
  * Class for work with dates
  *
  */
-
-export class Date {
+export class DateClass {
     constructor () {
-        this.month = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+        this.month = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
         this.dateFormat = 'DD-MM-YYYY';
     }
 
     today () {
-        return moment().format(this.dateFormat);
+        return new Date().toISOString().substr(0, 10).split('-').reverse().join('-');
     }
 
     tomorrow () {
@@ -97,31 +96,81 @@ export class Date {
     }
 
     isValid (date) {
-        return moment(date, this.dateFormat,true).isValid();
+        return moment(date, this.dateFormat, true).isValid();
     }
 
     currentMonth () {
-        const month = moment().month();
-        return `${this.month[month]} ${moment().year()}`;
+        const startOfMonth = moment().startOf('month').format(this.dateFormat);
+        const endOfMonth = moment().endOf('month').format(this.dateFormat);
+        return {
+            startDate: startOfMonth,
+            endDate: endOfMonth,
+        };
+    }
+
+    startEndDateOfMonth (month) {
+        const startOfMonth = moment(month, 'MM').startOf('month').format(this.dateFormat);
+        const endOfMonth = moment(month, 'MM').endOf('month').format(this.dateFormat);
+        return {
+            startDate: startOfMonth,
+            endDate: endOfMonth,
+        };
     }
 
     currentYear () {
-        return `${moment().year()} год`;
+        const startOfYear = moment().startOf('year').format(this.dateFormat);
+        const endOfYear = moment().endOf('year').format(this.dateFormat);
+        return {
+            startDate: startOfYear,
+            endDate: endOfYear,
+        };
+    }
+
+    startEndDateOfYear (year) {
+        const startOfYear = moment(year, 'YYYY').startOf('year').format(this.dateFormat);
+        const endOfYear = moment(year, 'YYYY').endOf('year').format(this.dateFormat);
+        return {
+            startDate: startOfYear,
+            endDate: endOfYear,
+        };
     }
 
     currentWeek () {
-        const startOfWeek = moment().startOf('isoweek').format('DD-MM');
+        const startOfWeek = moment().startOf('isoweek').format(this.dateFormat);
         const endOfWeek = moment().endOf('isoweek').format(this.dateFormat);
-        return `Нед. ${startOfWeek} - ${endOfWeek}`;
+        return {
+            startDate: startOfWeek,
+            endDate: endOfWeek,
+        };
     }
 
-    year(date){
-        return `${moment(date).year()} год`;
-    }
-
-    choiceWeek(date){
+    choiceWeek (date) {
+        if (!date) {
+            return false;
+        }
         const monday = moment(date, this.dateFormat).startOf('isoweek').format(this.dateFormat);
         const sunday = moment(date, this.dateFormat).endOf('isoweek').format(this.dateFormat);
-        return {monday, sunday};
+        return { monday, sunday };
     }
+}
+
+/**
+ * Функция форматирует число в читабельный вид
+ * @param number
+ * @return {*}
+ */
+export function numberFormat (number) {
+    return new Intl.NumberFormat('ru-RU').format(number);
+}
+
+
+/**
+ * Функция обратная функции numberFormat
+ * @param number
+ * @return {*}
+ */
+export function numberUnformat (number) {
+    const result = number + '';
+    result.split(' ').join('');
+    return +result;
 }

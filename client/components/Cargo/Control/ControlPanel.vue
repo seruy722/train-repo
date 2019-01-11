@@ -3,7 +3,7 @@
     <v-container fluid>
         <v-layout row wrap justify-space-around>
 
-            <v-flex xs12 sm4 md4>
+            <v-flex xs12 sm6 md6>
                 <DateCalendar></DateCalendar>
             </v-flex>
 
@@ -44,7 +44,7 @@
         data: () => ({
             currentTable: null,
             items: ['КАРГО', 'ДОЛГИ'],
-            client: '',
+            client: 'Все',
             arr: []
         }),
         created () {
@@ -53,8 +53,7 @@
         watch: {
             client (val) {
                 this.$store.commit('cargo/SET_CLIENT', val);
-                this.$store.commit('cargo/CHANGE_CARGOLIST');
-                this.$store.dispatch('cargo/calcData');
+                this.$store.dispatch('cargo/changeList');
             }
         },
         computed: {
@@ -80,8 +79,7 @@
             },
             changeTable (title) {
                 this.$store.commit('cargo/SET_TABLE', title);
-                this.$store.commit('cargo/CHANGE_CARGOLIST');
-                this.$store.dispatch('cargo/calcData');
+                this.$store.dispatch('cargo/changeList');
             }
         }
     }

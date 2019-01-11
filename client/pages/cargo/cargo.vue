@@ -1,6 +1,9 @@
 <template>
 
-    <div class="main" data-component-name="Cargo">
+    <div
+        class="main"
+        data-component-name="Cargo"
+    >
         <v-container fluid>
 
             <v-toolbar>
@@ -126,14 +129,17 @@
 
     export default {
         // Сохранение имен клиентов в cargo store
-        async fetch ({store}) {
+        async fetch ({ store }) {
             const { data } = await axios.get('/clientNames').catch((errors) => {
                 console.error('Ошибка при запросе клиентов', errors);
             });
             const { clientsNames } = data;
             const names = _.map(clientsNames, 'name');
 
-            store.commit('cargo/SET_CLIENTSNAMES', names);
+            // Добавление в список имен клиентов пункта "Все"
+            names.unshift('Все');
+
+            store.dispatch('cargo/setClientsNames', names);
         },
         components: {
             CargoProfit,

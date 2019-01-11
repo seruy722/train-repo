@@ -12,7 +12,7 @@
             :headers="headers"
             :items="cargoList"
             :search="search"
-            :loading="progressLoading"
+            :loading="progressbarTable"
             disable-initial-sort
             item-key="id"
             select-all
@@ -48,7 +48,7 @@
             </template>
 
             <template slot="no-data">
-                <v-alert v-if="progressLoading" :value="true" color="primary" icon="info">
+                <v-alert v-if="progressbarTable" :value="true" color="primary" icon="info">
                     <span>Загрузка...</span>
                 </v-alert>
 
@@ -61,14 +61,11 @@
 </template>
 
 <script>
-    import {mapGetters} from 'vuex';
+    import { mapGetters } from 'vuex';
     import axios from 'axios';
-    import {formatDate} from '~/utils';
-    import progressLoadingTable from '~/mixins/progressLoadingTable';
 
     export default {
         name: 'CargoTable',
-        mixins: [progressLoadingTable],
         data: () => ({
             selected: [],
             headers: [
@@ -94,18 +91,23 @@
             ...mapGetters({
                 cargoList: 'cargo/cargoList',
                 search: 'controlPanel/getSearch',
-                countObject: 'cargo/countObject'
+                countObject: 'cargo/countObject',
+                progressbarTable: 'cargo/getProgressbarTable'
             }),
         },
         methods: {
             // Запрос данных с сервера
             async fetch () {
-                const {data} = await axios.get('/cargos');
-                const {cargoList} = data;
+                this.$store.commit('cargo/SET_PROGRESSBAR_TABLE', true);
 
-                this.$store.commit('cargo/SET_LIST', cargoList);
+                const { data } = await axios.get('/cargos');
+                const { cargoList } = data;
+
+                await this.$store.dispatch('cargo/setList', cargoList);
+
                 this.$store.dispatch('cargo/calcData');
-                this.stopProgressbarOnTable();
+
+                this.$store.commit('cargo/SET_PROGRESSBAR_TABLE', false);
             }
         }
     }
