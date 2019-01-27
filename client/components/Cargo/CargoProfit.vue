@@ -5,15 +5,29 @@
                 <span>Доход</span>
                 <v-icon>add</v-icon>
             </v-btn>
+
+            <v-spacer></v-spacer>
+
+            <v-flex xs12 sm2 md2>
+                <date-picker :value.sync="dateAdd"></date-picker>
+            </v-flex>
+
+            <v-flex xs12 sm3 md3>
+                <v-combobox
+                    v-model="currentClient"
+                    :items="clients"
+                    prepend-icon="people"
+                    label="Клиент"
+                    item-text="name"
+                    item-value="id"
+                    return-object
+                    disabled
+                ></v-combobox>
+            </v-flex>
         </v-card-actions>
 
         <v-container grid-list-sm class="pa-4">
-            <v-layout row wrap class="borderForEntry" v-for="(item, index) in getDataProfit" :key="index">
-
-                <!--ДАТА-->
-                <v-flex xs12 sm2 md2>
-                    <DatePicker :value.sync="item.date"></DatePicker>
-                </v-flex>
+            <v-layout row wrap v-for="(item, index) in getDataProfit" :key="index" class="borderForEntry">
 
                 <v-flex xs12 sm2 md2>
                     <v-text-field
@@ -43,16 +57,6 @@
                         prepend-icon="notes"
                         label="Примечание"
                     ></v-text-field>
-                </v-flex>
-
-                <v-flex xs12 sm2 md2>
-                    <v-combobox
-                        v-model="item.client"
-                        :items="clients"
-                        :error-messages="checkError('client')"
-                        prepend-icon="people"
-                        label="Клиент"
-                    ></v-combobox>
                 </v-flex>
 
                 <v-flex xs12 sm1 md1>
@@ -120,8 +124,6 @@
                 dataProfit: [],
                 defaultItem: {
                     type: 'ОПЛАТА',
-                    client: null,
-                    date: null,
                     sum: null,
                     sale: null,
                     notation: null,
@@ -132,10 +134,19 @@
             ...mapGetters({
                 clients: 'cargo/clientsNames',
                 currentClient: 'cargo/getCurrentClient',
+                dateForAddEntry: 'cargo/getDateForAddEntry',
 
             }),
             getDataProfit () {
                 return this.dataProfit;
+            },
+            dateAdd: {
+                get:function () {
+                    return this.dateForAddEntry;
+                },
+                set:function (val) {
+                    this.$store.commit('cargo/SET_DATEFORADDENTRY', val);
+                },
             },
         },
         created () {
@@ -148,13 +159,25 @@
             },
             clearAndCloseComponent () {
                 this.$store.commit('controlPanel/SET_OPENEDCOMPONENT', false);
-                const emptyDataPtofit = [];
-                emptyDataPtofit.push(_.assign({}, this.defaultItem));
-                this.dataProfit = emptyDataPtofit;
+                this.dataProfit = [];
+                this.addEmptyEntry();
             },
             deleteEntry (elem) {
                 const elemIndex = _.indexOf(this.dataProfit, elem);
                 this.dataProfit.splice(elemIndex, 1);
+
+                if (_.isEmpty(this.dataDebts)) {
+                    this.addEmptyEntry();
+                }
+            },
+            addValuesToEntries (props) {
+                return _.reduce(props, (result, item) => {
+                    result.push(_.assign(item, {
+                        client: this.currentClient,
+                        date: this.dateForAddEntry,
+                    }));
+                    return result;
+                }, []);
             },
             addEmptyEntry () {
                 this.setDefaultValues();
@@ -164,6 +187,9 @@
                 this.loadOnBtn = !this.loadOnBtn;
             },
             async save () {
+                const sendData = this.addValuesToEntries(this.dataProfit);
+                console.log('sendData', sendData);
+                return;
                 this.changeLoadBtn();
                 this.changeErrors({});
 
@@ -193,7 +219,7 @@
                                 timeout: 3000,
                                 showProgressBar: true,
                                 closeOnClick: true,
-                                pauseOnHover: true
+                                pauseOnHover: true,
                             });
                         });
 

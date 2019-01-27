@@ -170,7 +170,6 @@
         data () {
             return {
                 loadOnBtn: false, // Оверлей для кнопки
-                selected: [],
                 dataDebts: [],
                 fax: null,
                 defaultItem: {
