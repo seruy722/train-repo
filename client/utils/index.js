@@ -13,7 +13,7 @@ export function cookieFromRequest (req, key) {
     }
 
     const cookie = req.headers.cookie.split(';').find(
-        c => c.trim().startsWith(`${key}=`)
+        c => c.trim().startsWith(`${key}=`),
     );
 
     if (cookie) {
@@ -32,12 +32,12 @@ export function scrollBehavior (to, from, savedPosition) {
     let position = {};
 
     if (to.matched.length < 2) {
-        position = {x: 0, y: 0};
+        position = { x: 0, y: 0 };
     } else if (to.matched.some(r => r.components.default.options.scrollToTop)) {
-        position = {x: 0, y: 0};
+        position = { x: 0, y: 0 };
     }
     if (to.hash) {
-        position = {selector: to.hash};
+        position = { selector: to.hash };
     }
 
     return position;
@@ -64,96 +64,6 @@ export function formatDate (data, enterFormat, needFormat) {
     return data;
 }
 
-
-/**
- * Class for work with dates
- *
- */
-export class DateClass {
-    constructor () {
-        this.month = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-        this.dateFormat = 'DD-MM-YYYY';
-    }
-
-    today () {
-        return new Date().toISOString().substr(0, 10).split('-').reverse().join('-');
-    }
-
-    tomorrow () {
-        return moment(new Date()).add(1, 'days').format(this.dateFormat);
-    }
-
-    yesterday () {
-        return moment(new Date()).add(-1, 'days').format(this.dateFormat);
-    }
-
-    next (date) {
-        return moment(date, this.dateFormat).add(1, 'days').format(this.dateFormat);
-    }
-
-    prev (date) {
-        return moment(date, this.dateFormat).add(-1, 'days').format(this.dateFormat);
-    }
-
-    isValid (date) {
-        return moment(date, this.dateFormat, true).isValid();
-    }
-
-    currentMonth () {
-        const startOfMonth = moment().startOf('month').format(this.dateFormat);
-        const endOfMonth = moment().endOf('month').format(this.dateFormat);
-        return {
-            startDate: startOfMonth,
-            endDate: endOfMonth,
-        };
-    }
-
-    startEndDateOfMonth (month) {
-        const startOfMonth = moment(month, 'MM').startOf('month').format(this.dateFormat);
-        const endOfMonth = moment(month, 'MM').endOf('month').format(this.dateFormat);
-        return {
-            startDate: startOfMonth,
-            endDate: endOfMonth,
-        };
-    }
-
-    currentYear () {
-        const startOfYear = moment().startOf('year').format(this.dateFormat);
-        const endOfYear = moment().endOf('year').format(this.dateFormat);
-        return {
-            startDate: startOfYear,
-            endDate: endOfYear,
-        };
-    }
-
-    startEndDateOfYear (year) {
-        const startOfYear = moment(year, 'YYYY').startOf('year').format(this.dateFormat);
-        const endOfYear = moment(year, 'YYYY').endOf('year').format(this.dateFormat);
-        return {
-            startDate: startOfYear,
-            endDate: endOfYear,
-        };
-    }
-
-    currentWeek () {
-        const startOfWeek = moment().startOf('isoweek').format(this.dateFormat);
-        const endOfWeek = moment().endOf('isoweek').format(this.dateFormat);
-        return {
-            startDate: startOfWeek,
-            endDate: endOfWeek,
-        };
-    }
-
-    choiceWeek (date) {
-        if (!date) {
-            return false;
-        }
-        const monday = moment(date, this.dateFormat).startOf('isoweek').format(this.dateFormat);
-        const sunday = moment(date, this.dateFormat).endOf('isoweek').format(this.dateFormat);
-        return { monday, sunday };
-    }
-}
-
 /**
  * Функция форматирует число в читабельный вид
  * @param number
@@ -170,7 +80,16 @@ export function numberFormat (number) {
  * @return {*}
  */
 export function numberUnformat (number) {
-    const result = number + '';
-    result.split(' ').join('');
-    return +result;
+    return _.chain(number).toString().split(' ').join('').toNumber();
+}
+
+/**
+ * Проверяет существование клиента
+ *
+ * @param array
+ * @param clientObj
+ * @return {object}
+ */
+export function isClient (array, clientObj) {
+    return _.find(array, clientObj);
 }

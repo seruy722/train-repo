@@ -49,7 +49,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('email/delete', 'EmailsController@destroy');
     // CARGOS
     Route::get('cargos', 'CargoController@index');
-    Route::post('cargo/saveProfit', 'CargoController@store');
+    Route::post('cargo/saveUpdate', 'CargoController@store');
     // DEBTS
     Route::get('debts', 'DebtsController@index');
 //    Route::post('cargo/saveProfit', 'CargoController@store');

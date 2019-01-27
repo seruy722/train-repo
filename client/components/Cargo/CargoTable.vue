@@ -72,28 +72,28 @@
                 {
                     text: 'Дата',
                     align: 'center',
-                    value: 'created_at'
+                    value: 'created_at',
                 },
-                {text: 'Тип', align: 'center', value: 'type'},
-                {text: 'Сумма', align: 'center', value: 'sum'},
-                {text: 'Скидка', align: 'center', value: 'sale'},
-                {text: 'Клиент', align: 'center', value: 'client'},
-                {text: 'Мест', align: 'center', value: 'place'},
-                {text: 'Вес', align: 'center', value: 'kg'},
-                {text: 'Факс', align: 'center', value: 'fax'},
-                {text: 'Примечания', align: 'center', value: 'notation'},
+                { text: 'Тип', align: 'center', value: 'type' },
+                { text: 'Сумма', align: 'center', value: 'sum' },
+                { text: 'Скидка', align: 'center', value: 'sale' },
+                { text: 'Клиент', align: 'center', value: 'client' },
+                { text: 'Мест', align: 'center', value: 'place' },
+                { text: 'Вес', align: 'center', value: 'kg' },
+                { text: 'Факс', align: 'center', value: 'fax' },
+                { text: 'Примечания', align: 'center', value: 'notation' },
             ],
         }),
-        created () {
-            this.fetch();
-        },
         computed: {
             ...mapGetters({
-                cargoList: 'cargo/cargoList',
+                cargoList: 'cargo/getList',
                 search: 'controlPanel/getSearch',
                 countObject: 'cargo/countObject',
-                progressbarTable: 'cargo/getProgressbarTable'
+                progressbarTable: 'cargo/getProgressbarTable',
             }),
+        },
+        created () {
+            this.fetch();
         },
         methods: {
             // Запрос данных с сервера
@@ -108,9 +108,9 @@
                 this.$store.dispatch('cargo/calcData');
 
                 this.$store.commit('cargo/SET_PROGRESSBAR_TABLE', false);
-            }
-        }
-    }
+            },
+        },
+    };
 </script>
 
 

@@ -1,5 +1,4 @@
 <template>
-
     <div
         class="main"
         data-component-name="Cargo"
@@ -13,11 +12,10 @@
             </v-toolbar>
 
             <v-toolbar flat color="white" evaluation-1>
-                <control-panel></control-panel>
-                <v-spacer></v-spacer>
-
                 <!--МЕНЮ ДОБАВЛЕНИЯ ЗАПИСЕЙ В КАРГО И ДОЛГИ-->
-                <cargo-debts-nav @click-nav="clickNav"></cargo-debts-nav>
+                <CargoDebtsNav @click-nav="clickNav"></CargoDebtsNav>
+                <v-spacer></v-spacer>
+                <control-panel></control-panel>
 
                 <!--<v-dialog v-model="dialog" width="800px">-->
 
@@ -106,12 +104,12 @@
             </v-toolbar>
             <!--ДОБАВЛЕНИЕ НОВЫХ ЗАПИСЕЙ В ТАБЛИЦУ-->
             <keep-alive v-if="openedComponent">
-                <component v-bind:is="dynamicComponent"></component>
+                <component :is="dynamicComponent"></component>
             </keep-alive>
 
             <!--CargoTable  и DebtsTable КОМПОНЕНТЫ-->
             <keep-alive>
-                <component v-bind:is="dynamicTableComponent"></component>
+                <component :is="dynamicTableComponent"></component>
             </keep-alive>
         </v-container>
     </div>
@@ -134,12 +132,13 @@
                 console.error('Ошибка при запросе клиентов', errors);
             });
             const { clientsNames } = data;
-            const names = _.map(clientsNames, 'name');
 
             // Добавление в список имен клиентов пункта "Все"
-            names.unshift('Все');
+            const allClientsObj = store.getters['settings/allClientsObj'];
+            clientsNames.unshift(allClientsObj);
 
-            store.dispatch('cargo/setClientsNames', names);
+            store.commit('cargo/SET_CLIENT', allClientsObj);
+            store.dispatch('cargo/setClientsNames', clientsNames);
         },
         components: {
             CargoProfit,
@@ -148,32 +147,30 @@
             CargoDebtsNav,
             ControlPanel,
             Search,
-            DebtsTable
+            DebtsTable,
         },
         middleware: 'auth',
         head () {
-            return { title: `Карго и Долги` };
+            return { title: 'Карго и Долги' };
         },
         data: () => ({
             navElem: null,
-            search: ''
+            search: '',
         }),
-        watch: {
-            search (val) {
-                this.$store.commit('controlPanel/SET_SEARCH', val);
-            }
-        },
         computed: {
             ...mapGetters({
                 currentTable: 'cargo/getCurrentTable',
                 openedComponent: 'controlPanel/getOpenedComponent',
-                countObject: 'cargo/countObject'
+                countObject: 'cargo/countObject',
+                currentClient: 'cargo/getCurrentClient',
             }),
             // Добавление оплат и долгов в таблицу cargos
             dynamicComponent () {
                 if (this.openedComponent === 'ОПЛАТА' && this.currentTable === 'КАРГО') {
                     return 'CargoProfit';
-                } else if (this.openedComponent === 'ДОЛГ' && this.currentTable === 'КАРГО') {
+                }
+
+                if (this.openedComponent === 'ДОЛГ' && this.currentTable === 'КАРГО') {
                     return 'CargoDebts';
                 }
             },
@@ -181,18 +178,30 @@
             dynamicTableComponent () {
                 if (this.currentTable === 'КАРГО') {
                     return 'CargoTable';
-                } else {
-                    return 'DebtsTable';
                 }
+                return 'DebtsTable';
             },
-            suman(){
-                return this.suma;
-            }
         },
+        watch: {
+            search (val) {
+                this.$store.commit('controlPanel/SET_SEARCH', val);
+            },
+        },
+
         methods: {
             clickNav (type) {
-                this.$store.commit('controlPanel/SET_OPENEDCOMPONENT', type);
-            }
-        }
-    }
+                if (this.currentClient.name === 'Все') {
+                    this.$snotify.warning('Выберите клиента', {
+                        timeout: 3000,
+                        showProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                    });
+                } else {
+                    this.$store.commit('controlPanel/SET_OPENEDCOMPONENT', type);
+                }
+
+            },
+        },
+    };
 </script>

@@ -1,17 +1,19 @@
 /**
  * Хранилище для работы с таблицами cargos и debts
  */
-import { numberFormat, DateClass } from '~/utils';
-
-const dateClass = new DateClass();
+import { numberFormat, numberUnformat } from '~/utils';
+import { startEndDateOfYear, startEndDateOfMonth, today } from '~/utils/dates';
 
 // STATE
 export const state = () => ({
     currentTable: 'КАРГО',
-    currentClient: 'Все',
+    currentClient: null,
+    // Чтобы при каждом добавлении записи не выберать дату
+    dateForAddEntry: today(),
     currentDate: {
         title: 'Все даты',
         day: null,
+        id: 1,
         startDate: null,
         endDate: null,
         year: null,
@@ -19,11 +21,12 @@ export const state = () => ({
     },
     sensor: null,
     progressbarTable: false,
+    list: [],
+    allDataList: [],
     cargoList: [],
     debtsList: [],
     staticCargolist: [],
     staticDebtslist: [],
-    mainCalcList: [],
     clientsNames: [],
     countObject: {
         sum: 0,
@@ -36,28 +39,23 @@ export const state = () => ({
 
 // GETTERS
 export const getters = {
-    cargoList: state => state.cargoList,
-    debtsList: state => state.debtsList,
     clientsNames: state => state.clientsNames,
     countObject: state => state.countObject,
     getCurrentTable: state => state.currentTable,
+    getDateForAddEntry: state => state.dateForAddEntry,
     getCurrentClient: state => state.currentClient,
     getcurrentDate: state => state.currentDate,
     getProgressbarTable: state => state.progressbarTable,
     getSensor: state => state.sensor,
+    getList: state => state.list,
 };
 
 // MUTATIONS
 export const mutations = {
-    // SET_LOCAL_LIST (state) {
-    //     if (state.currentTable === 'КАРГО') {
-    //         state.mainCalcList = state.cargoList;
-    //     } else {
-    //         state.mainCalcList = state.debtsList;
-    //     }
-    // },
     // Установка списка карго
     SET_LIST (state, list) {
+        state.list = list;
+        state.allDataList = list;
         state.cargoList = list;
         state.staticCargolist = list;
     },
@@ -66,6 +64,8 @@ export const mutations = {
     },
     // Установка списка долгов
     SET_DEBTS_LIST (state, list) {
+        state.list = list;
+        state.allDataList = list;
         state.debtsList = list;
         state.staticDebtslist = list;
     },
@@ -75,7 +75,7 @@ export const mutations = {
     },
     // Добавление записи в таблицу
     ADD_ITEM (state, item) {
-        state.cargoList.unshift(item);
+        state.list.unshift(item);
     },
     // Обновление записи в таблице
     UPDATE_ITEM (state, data) {
@@ -88,47 +88,33 @@ export const mutations = {
         console.log('DATE', date);
         _.assign(state.currentDate, date);
     },
+    // Изменение даты при добавлении записей
+    SET_DATEFORADDENTRY (state, date) {
+        state.dateForAddEntry = date;
+    },
     // Удаление записи с таблицы
     DELETE_ITEM (state, index) {
         state.list.splice(index, 1);
     },
     // Общая сумма
     CALC_SUM (state) {
-        let list = null;
-
-        if (state.currentTable === 'КАРГО') {
-            list = state.cargoList;
-        } else {
-            list = state.debtsList;
-        }
-
-        state.countObject.sum = numberFormat(_.sumBy(list, (item) => {
-            return item.sum;
-        }));
+        state.countObject.sum = numberFormat(_.sumBy(state.list, item => numberUnformat(item.sum)));
     },
     // Количество мест
     CALC_PLACES (state) {
-        state.countObject.place = numberFormat(_.sumBy(state.cargoList, (item) => {
-            return item.place;
-        }));
+        state.countObject.place = numberFormat(_.sumBy(state.list, item => numberUnformat(item.place)));
     },
     // Количество кг
     CALC_KG (state) {
-        state.countObject.kg = numberFormat(_.sumBy(state.cargoList, (item) => {
-            return item.kg;
-        }));
+        state.countObject.kg = numberFormat(_.sumBy(state.list, item => numberUnformat(item.kg)));
     },
     // Скидки по карго
     CALC_SALE (state) {
-        state.countObject.sale = numberFormat(_.sumBy(state.cargoList, (item) => {
-            return item.sale;
-        }));
+        state.countObject.sale = numberFormat(_.sumBy(state.list, item => numberUnformat(item.sale)));
     },
     // Комиссия по долгам
     CALC_COMISSION (state) {
-        state.countObject.commission = numberFormat(_.sumBy(state.debtsList, (item) => {
-            return item.commission;
-        }));
+        state.countObject.commission = numberFormat(_.sumBy(state.list, item => numberUnformat(item.commission)));
     },
     // Установка таблицы
     SET_TABLE (state, table) {
@@ -141,181 +127,168 @@ export const mutations = {
     SET_CLIENTSNAMES (state, arrayClients) {
         state.clientsNames = arrayClients;
     },
+    SWITCH_LISTS (state) {
+        if (state.currentTable === 'КАРГО') {
+            state.list = state.cargoList;
+            state.allDataList = state.staticCargolist;
+        } else {
+            state.list = state.debtsList;
+            state.allDataList = state.staticDebtslist;
+        }
+    },
     // Изменение списка в зависимости от выьора таблицы, клиента, даты
     CHANGE_CARGOLIST (state) {
-        const client = state.currentClient;
+        const clientID = _.toNumber(state.currentClient.id);
         const date = state.currentDate;
-        const table = state.currentTable;
-        console.log('client', client);
-        console.log('date', date);
+        // console.log('clientID', clientID);
+        // console.log('date', date);
 
-        switch (table) {
-            case 'КАРГО':
-                switch (date.title) {
-                    case 'Все даты':
-                        state.sensor = date.title;
-                        if (client !== 'Все') {
-                            state.cargoList = _.filter(state.staticCargolist, item => item.client === client);
-                            return;
+        switch (date.id) {
+            // Все даты
+            case 1:
+                if (clientID) {
+                    state.list = _.filter(state.allDataList, item => _.toNumber(item.client_id) === clientID);
+                }
+                break;
+            case 7: // Выбрать день
+            case 2: // Сегодня
+                date.title = date.day;
+                state.sensor = date;
+                if (clientID) {
+                    state.list = _.reduce(state.allDataList, (result, item) => {
+                        if (item.created_at === date.day && _.toNumber(item.client_id) === clientID) {
+                            result.push(item);
                         }
+                        return result;
+                    }, []);
+                } else {
+                    state.list = _.filter(state.allDataList, item => item.created_at === date.day);
+                }
+                break;
 
-                        break;
-                    case 'Выбрать день':
-                    case 'Сегодня':
-                        if (!date.day) {
-                            state.sensor = 'Сегодня';
-                            const today = new Date().toISOString().substr(0, 10).split('-').reverse().join('-');
-                            state.cargoList = _.filter(state.staticCargolist, item => item.created_at === today);
-
-                            return;
-                        }
-
-                        state.sensor = date.day;
-                        if (client !== 'Все') {
-                            state.cargoList = _.reduce(state.staticCargolist, (result, item) => {
-                                if (item.created_at === date.day && item.client === client) {
-                                    result.push(item);
-                                }
-                                return result;
-                            }, []);
-                            return;
-                        } else {
-                            state.cargoList = _.filter(state.staticCargolist, item => item.created_at === date.day);
-                            return;
-                        }
-
-                    case 'Выбрать неделю':
-                    case 'Выбрать месяц':
-                    case 'Выбрать год':
-                    case 'Текущая неделя':
-                    case 'Текущий год':
-                    case 'Текущий месяц':
-                    case 'Выбрать период':
-                        console.log('DSD', date);
-                        if (date.year) {
-                            console.log('date.year', date.year);
-                            const yearDates = dateClass.startEndDateOfYear(date.year);
-                            date.startDate = yearDates.startDate;
-                            date.endDate = yearDates.endDate;
-                        }
-
-                        if (date.month) {
-                            console.log('date.year', date.month);
-                            const monthDates = dateClass.startEndDateOfMonth(date.month);
-                            date.startDate = monthDates.startDate;
-                            date.endDate = monthDates.endDate;
-                        }
-
-                        if (date.startDate && date.endDate) {
-                            state.sensor = `${date.startDate} по ${date.endDate}`;
-                        } else if (date.startDate && !date.endDate) {
-                            state.sensor = `С ${date.startDate}`;
-                        } else if (!date.startDate && date.endDate) {
-                            state.sensor = `По ${date.endDate}`;
-                        }
-
-                        let start = null;
-                        let end = null;
-
-                        if (date.endDate) {
-                            const endDate = date.endDate.split('-').reverse().join('/');
-                            end = new Date(endDate);
-                        }
-
-                        if (date.startDate) {
-                            const startDate = date.startDate.split('-').reverse().join('/');
-                            start = new Date(startDate);
-                        }
-
-                        if (!date.startDate) {
-                            if (client !== 'Все') {
-                                state.cargoList = _.reduce(state.staticCargolist, (result, item) => {
-                                    const currentDate = item.created_at.split('-').reverse().join('/');
-                                    const itemDate = new Date(currentDate);
-
-                                    if (itemDate <= end && item.client === client) {
-                                        result.push(item);
-                                    }
-                                    return result;
-                                }, []);
-
-                                return;
-                            } else {
-                                state.cargoList = _.reduce(state.staticCargolist, (result, item) => {
-                                    const currentDate = item.created_at.split('-').reverse().join('/');
-                                    const itemDate = new Date(currentDate);
-
-                                    if (itemDate <= end) {
-                                        result.push(item);
-                                    }
-                                    return result;
-                                }, []);
-
-                                return;
-                            }
-                        }
-
-                        if (!date.endDate) {
-                            if (client !== 'Все') {
-                                state.cargoList = _.reduce(state.staticCargolist, (result, item) => {
-                                    const currentDate = item.created_at.split('-').reverse().join('/');
-                                    const itemDate = new Date(currentDate);
-
-                                    if (itemDate >= start && item.client === client) {
-                                        result.push(item);
-                                    }
-                                    return result;
-                                }, []);
-                                return;
-                            } else {
-                                state.cargoList = _.reduce(state.staticCargolist, (result, item) => {
-                                    const currentDate = item.created_at.split('-').reverse().join('/');
-                                    const itemDate = new Date(currentDate);
-
-                                    if (itemDate >= start) {
-                                        result.push(item);
-                                    }
-                                    return result;
-                                }, []);
-                                return;
-                            }
-                        }
-
-
-                        if (client !== 'Все') {
-                            state.cargoList = _.reduce(state.staticCargolist, (result, item) => {
-                                const currentDate = item.created_at.split('-').reverse().join('/');
-                                const itemDate = new Date(currentDate);
-
-                                if (itemDate >= start && itemDate <= end && item.client === client) {
-                                    result.push(item);
-                                }
-                                return result;
-                            }, []);
-
-                            return;
-                        } else {
-                            state.cargoList = _.reduce(state.staticCargolist, (result, item) => {
-                                const currentDate = item.created_at.split('-').reverse().join('/');
-                                const itemDate = new Date(currentDate);
-
-                                if (itemDate >= start && itemDate <= end) {
-                                    result.push(item);
-                                }
-                                return result;
-                            }, []);
-
-                            return;
-                        }
+            case 10: // Выбрать неделю
+            case 9: // Выбрать месяц
+            case 8: // Выбрать год
+            case 5: // Текущая неделя
+            case 4: // Текущий год
+            case 3: // Текущий месяц
+            case 6: // Выбрать период
+                if (date.year) {
+                    const yearDates = startEndDateOfYear(date.year);
+                    _.assign(date, yearDates);
                 }
 
-                state.cargoList = state.staticCargolist;
-                break;
+                if (date.month) {
+                    const monthDates = startEndDateOfMonth(date.month);
+                    _.assign(date, monthDates);
+                }
 
-            case 'ДОЛГИ':
+                if (date.startDate && date.endDate) {
+                    date.title = `${date.startDate} по ${date.endDate}`;
+                    state.sensor = date;
+                } else if (date.startDate && !date.endDate) {
+                    date.title = `С ${date.startDate}`;
+                    state.sensor = date;
+                } else if (!date.startDate && date.endDate) {
+                    date.title = `По ${date.endDate}`;
+                    state.sensor = date;
+                }
 
-                state.debtsList = state.staticDebtslist;
-                break;
+                let start = null;
+                let end = null;
+
+                if (date.endDate) {
+                    const endDate = date.endDate.split('-').reverse().join('/');
+                    end = new Date(endDate);
+                }
+
+                if (date.startDate) {
+                    const startDate = date.startDate.split('-').reverse().join('/');
+                    start = new Date(startDate);
+                }
+
+                if (!date.startDate) {
+                    if (clientID) {
+                        state.list = _.reduce(state.allDataList, (result, item) => {
+                            const currentDate = item.created_at.split('-').reverse().join('/');
+                            const itemDate = new Date(currentDate);
+
+                            if (itemDate <= end && _.toNumber(item.client_id) === clientID) {
+                                result.push(item);
+                            }
+                            return result;
+                        }, []);
+
+                        return;
+                    } else {
+                        state.list = _.reduce(state.allDataList, (result, item) => {
+                            const currentDate = item.created_at.split('-').reverse().join('/');
+                            const itemDate = new Date(currentDate);
+
+                            if (itemDate <= end) {
+                                result.push(item);
+                            }
+                            return result;
+                        }, []);
+
+                        return;
+                    }
+                }
+
+                if (!date.endDate) {
+                    if (clientID) {
+                        state.list = _.reduce(state.allDataList, (result, item) => {
+                            const currentDate = item.created_at.split('-').reverse().join('/');
+                            const itemDate = new Date(currentDate);
+
+                            if (itemDate >= start && _.toNumber(item.client_id) === clientID) {
+                                result.push(item);
+                            }
+                            return result;
+                        }, []);
+                        return;
+                    } else {
+                        state.list = _.reduce(state.allDataList, (result, item) => {
+                            const currentDate = item.created_at.split('-').reverse().join('/');
+                            const itemDate = new Date(currentDate);
+
+                            if (itemDate >= start) {
+                                result.push(item);
+                            }
+                            return result;
+                        }, []);
+                        return;
+                    }
+                }
+
+
+                if (clientID) {
+                    state.list = _.reduce(state.allDataList, (result, item) => {
+                        const currentDate = item.created_at.split('-').reverse().join('/');
+                        const itemDate = new Date(currentDate);
+
+                        if (itemDate >= start && itemDate <= end && _.toNumber(item.client_id) === clientID) {
+                            result.push(item);
+                        }
+                        return result;
+                    }, []);
+
+                    return;
+                } else {
+                    state.list = _.reduce(state.allDataList, (result, item) => {
+                        const currentDate = item.created_at.split('-').reverse().join('/');
+                        const itemDate = new Date(currentDate);
+
+                        if (itemDate >= start && itemDate <= end) {
+                            result.push(item);
+                        }
+                        return result;
+                    }, []);
+
+                    return;
+                }
+            default:
+                state.list = state.allDataList;
         }
     },
 };
@@ -355,6 +328,7 @@ export const actions = {
     },
     changeList ({ commit, dispatch }) {
         commit('SET_PROGRESSBAR_TABLE', true);
+        commit('SWITCH_LISTS');
         commit('CHANGE_CARGOLIST');
         dispatch('calcData');
         commit('SET_PROGRESSBAR_TABLE', false);

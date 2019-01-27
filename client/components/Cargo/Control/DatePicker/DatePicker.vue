@@ -1,4 +1,5 @@
 <template>
+    <div data-vue-component-name="DatePicker">
     <v-menu
         ref="menu1"
         v-model="menu"
@@ -28,6 +29,7 @@
             @input="menu = false"
         ></v-date-picker>
     </v-menu>
+    </div>
 </template>
 
 <script>

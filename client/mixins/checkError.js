@@ -1,7 +1,7 @@
 // Проверка и вывод ошибок с сервера
 export default {
     data: () => ({
-        errors: {}
+        errors: {},
     }),
     methods: {
         checkError (field) {
@@ -10,5 +10,5 @@ export default {
         changeErrors (value) {
             this.errors = value;
         },
-    }
-}
+    },
+};

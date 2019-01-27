@@ -32,7 +32,12 @@
 
 <script>
     export default {
-        props: ['value'],
+        props: {
+            value: {
+                type: String,
+                default: '',
+            },
+        },
 
         data: () => ({
             date: new Date().toISOString().substr(0, 10),
@@ -46,29 +51,29 @@
                 },
                 set (val) {
                     this.$emit('update:value', val);
-                }
-            }
+                },
+            },
         },
 
         watch: {
-            date (val) {
+            date () {
                 this.dateFormatted = this.formatDate(this.date);
-            }
+            },
         },
 
         methods: {
             formatDate (date) {
                 if (!date) return null;
-
+                console.log('Ddate', date);
                 const [year, month, day] = date.split('-');
                 return `${day}-${month}-${year}`;
             },
             parseDate (date) {
                 if (!date) return null;
-
+                console.log('Ddate2', date);
                 const [day, month, year] = date.split('-');
                 return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-            }
-        }
-    }
+            },
+        },
+    };
 </script>

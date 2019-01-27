@@ -142,7 +142,7 @@ class UserController extends Controller
 
     public function getClientsNames()
     {
-        $clientsNames = User::all(['name'])->toArray();
+        $clientsNames = User::all(['name', 'id'])->toArray();
 
         return response()->json(['status' => true, 'clientsNames' => $clientsNames]);
     }

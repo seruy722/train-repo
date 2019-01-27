@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Cargo;
+use App\Traits\CleanData;
+use App\Traits\NumberFormat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Traits\FormatDates;
@@ -10,7 +12,7 @@ use App\Traits\FormatDates;
 
 class CargoController extends Controller
 {
-    use FormatDates;
+    use FormatDates, CleanData, NumberFormat;
     /**
      * Display a listing of the resource.
      *
@@ -19,26 +21,12 @@ class CargoController extends Controller
     public function index()
     {
         $cargoList = DB::table('cargos')->orderBy('created_at', 'DESC')->get();
-        $formatedList = $this->needFormatDate($cargoList);
+        $formatDateList = $this->needFormatDate($cargoList);
+        $formatNumberList = $this->prettyFormat($formatDateList);
 
-        return response()->json(['status' => true, 'cargoList' => $formatedList]);
+        return response()->json(['status' => true, 'cargoList' => $formatNumberList]);
     }
 
-
-//    /**
-//     * Преобразование даты в нужный формат
-//     *
-//     * @param {array} $arr
-//     * @return mixed
-//     */
-//    protected function needFormatDate($arr)
-//    {
-//        foreach ($arr as $item) {
-//            $item->created_at = date("d-m-Y", strtotime($item->created_at));
-//        }
-//
-//        return $arr;
-//    }
 
     /**
      * Show the form for creating a new resource.
@@ -70,31 +58,30 @@ class CargoController extends Controller
 //            'fax' => 'max:255',
 //            'created_at' => 'max:255',
 //        ]);
+
+        $this->validate($request, [
+            '*.type' => 'required|string|max:255',
+            '*.sum' => 'numeric|digits_between:1,8',
+            '*.sale' => 'numeric|digits_between:1,8',
+            '*.client' => 'required|max:255',
+            '*.place' => 'numeric|digits_between:1,8',
+            '*.kg' => 'numeric|digits_between:1,8',
+            '*.fax' => 'nullable|max:255',
+            '*.notation' => 'string|max:255',
+            '*.created_at' => 'max:255',
+        ]);
+
         $arr = [];
         foreach ($request->all() as $value) {
-//            return response()->json(['status', true, 'cargoEntry'=> $value]);
-
-
-
             $arrData = (array)$value;
 
-            $cleanData = $this->cleanData($arrData);
-//            return response()->json(['status', true, 'cargoEntry'=> $arrData]);
+            $cleanData = $this->clean($arrData);
 
             $savedCargoEntry = Cargo::create($cleanData);
             array_push($arr, $savedCargoEntry);
 
         }
         return response()->json(['status'=>true, 'cargoEntry'=> $arr]);
-//        return response()->json(['status', true, 'cargoEntry'=> $arrData]);
-    }
-
-    public function cleanData($value)
-    {
-        $arr = array_map("trim", $value);
-        $arr = array_map("strip_tags", $arr);
-        $arr = array_map("stripcslashes", $arr);
-        return $arr;
     }
 
     /**

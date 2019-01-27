@@ -13,6 +13,9 @@
                 <v-combobox
                     v-model="select"
                     :items="items"
+                    item-text="title"
+                    item-value="id"
+                    return-object
                     label="Выбор даты"
                     @change="changeDate"
                 ></v-combobox>
@@ -42,27 +45,27 @@
                             <v-layout>
                                 <v-flex>
                                     <!--Выбор периода-->
-                                    <div v-show="dialogChangeInside === 'Выбрать период'">
+                                    <div v-show="dialogChangeInside === 6">
                                         ОТ:
                                         <DatePicker :value.sync="datePickerValue.startDate"></DatePicker>
                                         ДО:
                                         <DatePicker :value.sync="datePickerValue.endDate"></DatePicker>
                                     </div>
                                     <!--Выбор дня-->
-                                    <div v-show="dialogChangeInside === 'Выбрать день'">
+                                    <div v-show="dialogChangeInside === 7">
                                         Дата:
                                         <DatePicker :value.sync="datePickerValue.day"></DatePicker>
                                     </div>
                                     <!--Выбор года-->
-                                    <div v-show="dialogChangeInside === 'Выбрать год'">
+                                    <div v-show="dialogChangeInside === 8">
                                         <YearPicker :value.sync="datePickerValue.year"></YearPicker>
                                     </div>
                                     <!--Выбор месяца-->
-                                    <div v-show="dialogChangeInside === 'Выбрать месяц'">
+                                    <div v-show="dialogChangeInside === 9">
                                         <MonthPicker :value.sync="datePickerValue.month"></MonthPicker>
                                     </div>
                                     <!--Выбор недели-->
-                                    <div v-show="dialogChangeInside === 'Выбрать неделю'">
+                                    <div v-show="dialogChangeInside === 10">
                                         День недели:
                                         <DatePicker :value.sync="datePickerValue.week"></DatePicker>
                                         <div><span>Понедельник:</span> {{ datePickerValue.startDate }}</div>
@@ -101,20 +104,18 @@
 </template>
 
 <script>
-    import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
-    import YearPicker from '~/components/Cargo/Control/DatePicker/YearPicker';
-    import MonthPicker from '~/components/Cargo/Control/DatePicker/MonthPicker';
-    import { DateClass } from '~/utils'; // Класс для работы с датами
+    // import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
+    // import YearPicker from '~/components/Cargo/Control/DatePicker/YearPicker';
+    // import MonthPicker from '~/components/Cargo/Control/DatePicker/MonthPicker';
+    import { today, choiceWeek, currentMonth, currentYear, currentWeek, nextDate, prevDate } from '~/utils/dates';
     import { mapGetters } from 'vuex';
-
-    const date = new DateClass();
 
     export default {
         name: 'DateCalendar',
         components: {
-            MonthPicker,
-            DatePicker,
-            YearPicker,
+            MonthPicker: () => import('~/components/Cargo/Control/DatePicker/MonthPicker'),
+            DatePicker: () => import('~/components/Cargo/Control/DatePicker/DatePicker'),
+            YearPicker: () => import('~/components/Cargo/Control/DatePicker/YearPicker'),
         },
         data: () => ({
             datePickerValue: {
@@ -129,18 +130,51 @@
             dialog: false,
             dialogChangeInside: false,
             dialogTitle: null,
-            select: 'Все даты',
+            select: {
+                id: 1,
+                title: 'Все даты',
+            },
             items: [
-                'Все даты',
-                'Сегодня',
-                'Выбрать период',
-                'Выбрать день',
-                'Текущий год',
-                'Выбрать год',
-                'Текущий месяц',
-                'Выбрать месяц',
-                'Текущая неделя',
-                'Выбрать неделю',
+                {
+                    id: 1,
+                    title: 'Все даты',
+                },
+                {
+                    id: 2,
+                    title: 'Сегодня',
+                },
+                {
+                    id: 3,
+                    title: 'Текущий месяц',
+                },
+                {
+                    id: 4,
+                    title: 'Текущий год',
+                },
+                {
+                    id: 5,
+                    title: 'Текущая неделя',
+                },
+                {
+                    id: 6,
+                    title: 'Выбрать период',
+                },
+                {
+                    id: 7,
+                    title: 'Выбрать день',
+                },
+                {
+                    id: 8,
+                    title: 'Выбрать год',
+                },
+                {
+                    id: 9,
+                    title: 'Выбрать месяц',
+                },
+                {
+                    id: 10,
+                    title: 'Выбрать неделю',
+                },
             ],
         }),
         computed: {
@@ -155,101 +189,99 @@
             // Слежение за значением при выборе в селекте (select title)
             select () {
                 setTimeout(() => {
-                    this.select = this.sensor;
+                    this.select = this.sensor.title;
                 }, 50);
             },
             // Слежение за значением возвращемого со store (select title)
-            sensor () {
+            'sensor.title': function () {
                 setTimeout(() => {
-                    this.select = this.sensor;
+                    this.select = this.sensor.title;
                 }, 50);
             },
             // Слежение за выбором дня недели
             'datePickerValue.week': function () {
-                console.log('this.datePickerValue.startDate', this.datePickerValue.startDate);
-                const obj = date.choiceWeek(this.datePickerValue.week);
+                const startEndDatesOfWeek = choiceWeek(this.datePickerValue.week);
 
-                this.datePickerValue.startDate = obj.monday;
-                this.datePickerValue.endDate = obj.sunday;
+                _.assign(this.datePickerValue, startEndDatesOfWeek);
             },
         },
         methods: {
-            async changeDate (title) {
+            async changeDate (objChangeDate) {
+                console.log('objChangeDate258', objChangeDate);
                 this.dialogChangeInside = false;
 
-                switch (title) {
-                    case 'Все даты':
-                        this.$store.commit('cargo/SET_CURRENTDATE', {
-                            title,
-                        });
+                switch (objChangeDate.id) {
+                    // 'Все даты'
+                    case 1:
+                        this.$store.commit('cargo/SET_CURRENTDATE', objChangeDate);
 
                         await this.$store.dispatch('cargo/changeList');
 
                         break;
-
-                    case 'Сегодня':
-                        this.$store.commit('cargo/SET_CURRENTDATE', {
-                            title,
-                            day: date.today(),
-                        });
+                    // 'Сегодня'
+                    case 2:
+                        objChangeDate.day = today();
+                        this.$store.commit('cargo/SET_CURRENTDATE', objChangeDate);
 
                         await this.$store.dispatch('cargo/changeList');
 
                         break;
+                    // Текущий месяц
+                    case 3:
+                        this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, currentMonth(), objChangeDate));
 
-                    case 'Текущий месяц':
-                        this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, date.currentMonth(), {title}));
+                        await this.$store.dispatch('cargo/changeList');
+                        break;
+                    // Текущий год
+                    case 4:
+                        this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, currentYear(), objChangeDate));
+
+                        await this.$store.dispatch('cargo/changeList');
+                        break;
+                    // Текущая неделя
+                    case 5:
+                        this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, currentWeek(), objChangeDate));
 
                         await this.$store.dispatch('cargo/changeList');
                         break;
 
-                    case 'Текущий год':
-                        this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, date.currentYear(), {title}));
-
-                        await this.$store.dispatch('cargo/changeList');
-                        break;
-
-                    case 'Текущая неделя':
-                        this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, date.currentWeek(), {title}));
-
-                        await this.$store.dispatch('cargo/changeList');
-                        break;
-
-                    case 'Выбрать период':
-                    case 'Выбрать день':
-                    case 'Выбрать год':
-                    case 'Выбрать месяц':
-                    case 'Выбрать неделю':
-                        this.dialogChangeInside = title;
-                        this.setDialogTitle(title);
-                        this.setDateTitle(title);
+                    case 6: // Выбрать период
+                    case 7: // Выбрать день
+                    case 8: // Выбрать год
+                    case 9: // Выбрать месяц
+                    case 10: // Выбрать неделю
+                        this.dialogChangeInside = objChangeDate.id;
+                        this.setDialogTitle(objChangeDate.title);
+                        this.setDateTitle(objChangeDate.title);
                         this.dialog = true;
                         break;
 
                     default:
-                        console.error('default title in DateCalendar ', title);
-                        this.select = title;
+                        console.error('default title in DateCalendar ', objChangeDate);
+                        this.select = objChangeDate;
                 }
             },
 
             async nextDate () {
-                this.$store.commit('cargo/SET_CURRENTDATE', {
-                    title: 'Выбрать день',
-                    day: date.next(this.select),
-                });
+                const isDateNext = nextDate(this.select.title);
+                if (isDateNext) {
+                    this.$store.commit('cargo/SET_CURRENTDATE', {
+                        title: 'Выбрать день',
+                        day: isDateNext,
+                    });
 
-                await this.$store.dispatch('cargo/changeList');
-                this.dialog = false;
+                    await this.$store.dispatch('cargo/changeList');
+                }
             },
 
             async prevDate () {
-                this.$store.commit('cargo/SET_CURRENTDATE', {
-                    title: 'Выбрать день',
-                    day: date.prev(this.select),
-                });
-
-                await this.$store.dispatch('cargo/changeList');
-                this.dialog = false;
+                console.log('SELECT', this.select);
+                const isDatePrev = prevDate(this.select);
+                if (isDatePrev) {
+                    const newObj = _.assign({}, { day: isDatePrev, id: 2 });
+                    this.$store.commit('cargo/SET_CURRENTDATE', newObj);
+                    await this.$store.dispatch('cargo/changeList');
+                }
             },
 
             async onClickOk () {

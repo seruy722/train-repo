@@ -56,54 +56,56 @@
 </template>
 
 <script>
-    import {mapGetters} from 'vuex';
+    import { mapGetters } from 'vuex';
     import axios from 'axios';
-    import {formatDate} from '~/utils';
 
     export default {
         name: 'DebtsTable',
+
         data: () => ({
             selected: [],
             headers: [
                 {
                     text: 'Дата',
                     align: 'center',
-                    value: 'created_at'
+                    value: 'created_at',
                 },
-                {text: 'Тип', align: 'center', value: 'type'},
-                {text: 'Сумма', align: 'center', value: 'sum'},
-                {text: 'Комиссия', align: 'center', value: 'commission'},
-                {text: 'Клиент', align: 'center', value: 'client'},
-                {text: 'Примечания', align: 'center', value: 'notation'},
+                { text: 'Тип', align: 'center', value: 'type' },
+                { text: 'Сумма', align: 'center', value: 'sum' },
+                { text: 'Комиссия', align: 'center', value: 'commission' },
+                { text: 'Клиент', align: 'center', value: 'client' },
+                { text: 'Примечания', align: 'center', value: 'notation' },
             ],
         }),
-        created () {
-            this.fetch();
-            console.log('created');
-        },
+
         computed: {
             ...mapGetters({
-                debtsList: 'cargo/debtsList',
+                debtsList: 'cargo/getList',
                 search: 'controlPanel/getSearch',
                 countObject: 'cargo/countObject',
-                progressbarTable: 'cargo/getProgressbarTable'
+                progressbarTable: 'cargo/getProgressbarTable',
             }),
         },
+
+        created () {
+            this.fetch();
+        },
+
         methods: {
             // Запрос данных с сервера
             async fetch () {
                 this.$store.commit('cargo/SET_PROGRESSBAR_TABLE', true);
 
-                const {data} = await axios.get('/debts');
+                const { data } = await axios.get('/debts');
                 const { debtsList } = data;
 
                 this.$store.commit('cargo/SET_DEBTS_LIST', debtsList);
-                this.$store.dispatch('cargo/changeList');
+                await this.$store.dispatch('cargo/changeList');
                 this.$store.dispatch('cargo/calcData');
                 this.$store.commit('cargo/SET_PROGRESSBAR_TABLE', false);
-            }
-        }
-    }
+            },
+        },
+    };
 </script>
 
 

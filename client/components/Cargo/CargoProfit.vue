@@ -106,11 +106,11 @@
     import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
     import { formatDate } from '~/utils';
     import checkErrorMixin from '~/mixins/checkError';
-    import {mapGetters} from 'vuex';
+    import { mapGetters } from 'vuex';
 
     export default {
         components: {
-            DatePicker
+            DatePicker,
         },
         middleware: 'auth',
         mixins: [checkErrorMixin],
@@ -126,12 +126,12 @@
                     sale: null,
                     notation: null,
                 },
-            }
+            };
         },
         computed: {
             ...mapGetters({
                 clients: 'cargo/clientsNames',
-                currentClient: 'cargo/getCurrentClient'
+                currentClient: 'cargo/getCurrentClient',
 
             }),
             getDataProfit () {
@@ -142,10 +142,9 @@
             this.addEmptyEntry();
         },
         methods: {
-            setDefaultValues(){
+            setDefaultValues () {
                 this.defaultItem.client = this.currentClient;
                 this.defaultItem.date = this.$store.getters['cargo/getcurrentDate'];
-                console.log(this.$store.getters['controlPanel/getcurrentDate']);
             },
             clearAndCloseComponent () {
                 this.$store.commit('controlPanel/SET_OPENEDCOMPONENT', false);
@@ -159,7 +158,6 @@
             },
             addEmptyEntry () {
                 this.setDefaultValues();
-                console.log(_.assign({}, this.defaultItem));
                 this.dataProfit.push(_.assign({}, this.defaultItem));
             },
             changeLoadBtn () {
@@ -188,7 +186,7 @@
                         let { cargoEntry } = response.data;
                         // Форматируем дату
                         cargoEntry = formatDate(cargoEntry, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
-                        _.forEach(cargoEntry, (item)=>{
+                        _.forEach(cargoEntry, (item) => {
                             this.$store.commit('cargo/ADD_ITEM', item);
 
                             this.$snotify.success('Запись успешно добавлена!', {
@@ -227,7 +225,7 @@
                 return await axios.post('cargo/saveProfit', item);
             },
             async deleteItemFromServer (id) {
-                return await axios.post('blacklist/delete', {id});
+                return await axios.post('blacklist/delete', { id });
             },
         }
     }
