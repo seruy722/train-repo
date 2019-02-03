@@ -1,1 +1,1 @@
-<h3>TRAIN</h3>
+<h3>Laravel-Nuxt train project</h3>
