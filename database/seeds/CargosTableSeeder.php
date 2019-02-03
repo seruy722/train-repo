@@ -19,7 +19,7 @@ class CargosTableSeeder extends Seeder
 
         $faker = Faker\Factory::create();
         $clients = User::all()->toArray();
-        for ($i = 0; $i < 5000; $i++) {
+        for ($i = 0; $i < 15000; $i++) {
             $arrRole = ['ДОЛГ', 'ОПЛАТА'];
             $type = $faker->randomElement($arrRole);
             $sum = $faker->numberBetween($min = 1, $max = 50000);

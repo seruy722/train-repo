@@ -11,8 +11,8 @@
                 </v-icon>
 
                 <v-combobox
-                    v-model="select"
-                    :items="items"
+                    v-model="selectItem"
+                    :items="selectDatesItems"
                     item-text="title"
                     item-value="id"
                     return-object
@@ -104,21 +104,22 @@
 </template>
 
 <script>
-    // import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
-    // import YearPicker from '~/components/Cargo/Control/DatePicker/YearPicker';
-    // import MonthPicker from '~/components/Cargo/Control/DatePicker/MonthPicker';
+    import DatePicker from '~/components/Pickers/DatePicker.vue';
+    import YearPicker from '~/components/Pickers/YearPicker.vue';
+    import MonthPicker from '~/components/Pickers/MonthPicker.vue';
     import { today, choiceWeek, currentMonth, currentYear, currentWeek, nextDate, prevDate } from '~/utils/dates';
     import { mapGetters } from 'vuex';
 
     export default {
         name: 'DateCalendar',
         components: {
-            MonthPicker: () => import('~/components/Cargo/Control/DatePicker/MonthPicker'),
-            DatePicker: () => import('~/components/Cargo/Control/DatePicker/DatePicker'),
-            YearPicker: () => import('~/components/Cargo/Control/DatePicker/YearPicker'),
+            MonthPicker,
+            DatePicker,
+            YearPicker,
         },
         data: () => ({
             datePickerValue: {
+                id: null,
                 title: null,
                 day: null,
                 startDate: null,
@@ -130,68 +131,26 @@
             dialog: false,
             dialogChangeInside: false,
             dialogTitle: null,
-            select: {
-                id: 1,
-                title: 'Все даты',
-            },
-            items: [
-                {
-                    id: 1,
-                    title: 'Все даты',
-                },
-                {
-                    id: 2,
-                    title: 'Сегодня',
-                },
-                {
-                    id: 3,
-                    title: 'Текущий месяц',
-                },
-                {
-                    id: 4,
-                    title: 'Текущий год',
-                },
-                {
-                    id: 5,
-                    title: 'Текущая неделя',
-                },
-                {
-                    id: 6,
-                    title: 'Выбрать период',
-                },
-                {
-                    id: 7,
-                    title: 'Выбрать день',
-                },
-                {
-                    id: 8,
-                    title: 'Выбрать год',
-                },
-                {
-                    id: 9,
-                    title: 'Выбрать месяц',
-                },
-                {
-                    id: 10,
-                    title: 'Выбрать неделю',
-                },
-            ],
+            select: {},
         }),
         computed: {
             ...mapGetters({
                 sensor: 'cargo/getSensor',
+                selectDatesItems: 'settings/selectDatesItems',
             }),
             viewDialogTitle () {
                 return this.dialogTitle;
             },
+            selectItem: {
+                get: function () {
+                    return this.select;
+                },
+                set: function (val) {
+                    this.select = val;
+                },
+            },
         },
         watch: {
-            // Слежение за значением при выборе в селекте (select title)
-            select () {
-                setTimeout(() => {
-                    this.select = this.sensor.title;
-                }, 50);
-            },
             // Слежение за значением возвращемого со store (select title)
             'sensor.title': function () {
                 setTimeout(() => {
@@ -205,7 +164,13 @@
                 _.assign(this.datePickerValue, startEndDatesOfWeek);
             },
         },
+        created () {
+            this.addDefaultSelectItem();
+        },
         methods: {
+            addDefaultSelectItem () {
+                this.select = _.head(this.selectDatesItems);
+            },
             async changeDate (objChangeDate) {
                 console.log('objChangeDate258', objChangeDate);
                 this.dialogChangeInside = false;
@@ -252,7 +217,6 @@
                     case 10: // Выбрать неделю
                         this.dialogChangeInside = objChangeDate.id;
                         this.setDialogTitle(objChangeDate.title);
-                        this.setDateTitle(objChangeDate.title);
                         this.dialog = true;
                         break;
 
@@ -291,7 +255,7 @@
                 }
 
                 this.dialog = false;
-                this.$store.commit('cargo/SET_CURRENTDATE', this.datePickerValue);
+                this.$store.commit('cargo/SET_CURRENTDATE', _.assign(this.datePickerValue, this.select));
 
                 await this.$store.dispatch('cargo/changeList');
                 this.resetDatePickerValue();
@@ -303,10 +267,6 @@
 
             setDialogTitle (title) {
                 this.dialogTitle = title;
-            },
-
-            setDateTitle (val) {
-                this.datePickerValue.title = val;
             },
 
             resetDatePickerValue () {

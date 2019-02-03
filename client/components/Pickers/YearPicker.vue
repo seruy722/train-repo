@@ -55,8 +55,8 @@
             },
         },
         watch: {
-            menu (val) {
-                val && this.$nextTick(() => {
+            menu () {
+                this.$nextTick(() => {
                     this.$refs.picker.activePicker = 'YEAR';
                 });
             },

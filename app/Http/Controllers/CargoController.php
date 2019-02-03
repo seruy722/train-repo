@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Cargo;
+use App\Price;
 use App\Traits\CleanData;
 use App\Traits\NumberFormat;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ use App\Traits\FormatDates;
 class CargoController extends Controller
 {
     use FormatDates, CleanData, NumberFormat;
+
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +22,7 @@ class CargoController extends Controller
      */
     public function index()
     {
-        $cargoList = DB::table('cargos')->orderBy('created_at', 'DESC')->get();
+        $cargoList = DB::table('cargos')->join('users', 'cargos.client_id', '=', 'users.id')->select('cargos.*', 'users.name')->get();
         $formatDateList = $this->needFormatDate($cargoList);
         $formatNumberList = $this->prettyFormat($formatDateList);
 
@@ -41,11 +43,12 @@ class CargoController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
+
 //        return response()->json(['status' => true,'item' => $request->all()]);
 //        $arr = [];
 //        $this->validate($request, [
@@ -59,35 +62,55 @@ class CargoController extends Controller
 //            'created_at' => 'max:255',
 //        ]);
 
-        $this->validate($request, [
-            '*.type' => 'required|string|max:255',
-            '*.sum' => 'numeric|digits_between:1,8',
-            '*.sale' => 'numeric|digits_between:1,8',
-            '*.client' => 'required|max:255',
-            '*.place' => 'numeric|digits_between:1,8',
-            '*.kg' => 'numeric|digits_between:1,8',
-            '*.fax' => 'nullable|max:255',
-            '*.notation' => 'string|max:255',
-            '*.created_at' => 'max:255',
-        ]);
+//        $this->validate($request, [
+//            '*.type' => 'required|string|max:255',
+//            '*.sum' => 'numeric|digits_between:1,8',
+//            '*.sale' => 'numeric|digits_between:1,8',
+//            '*.client_id' => 'required|max:255',
+//            '*.place' => 'numeric|digits_between:1,8',
+//            '*.kg' => 'numeric|digits_between:1,8',
+//            '*.fax' => 'nullable|max:255',
+//            '*.brand' => 'boolean',
+//            '*.notation' => 'string|max:255',
+//            '*.created_at' => 'max:255',
+//        ]);
 
+
+
+        $allData = $request->all();
+        $client = $allData[0]['client'];
+        $type =  $allData[0]['type'];
+        $userPriceObj = Price::where('client_id', $client->id)->first();
         $arr = [];
-        foreach ($request->all() as $value) {
-            $arrData = (array)$value;
+        switch ($type) {
+            case 'ОПЛАТА':
 
-            $cleanData = $this->clean($arrData);
+                break;
+            case 'ДОЛГ':
 
-            $savedCargoEntry = Cargo::create($cleanData);
-            array_push($arr, $savedCargoEntry);
+                foreach ($allData as $value) {
+                    $arrData = (array)$value;
 
+                    $cleanData = $this->clean($arrData);
+
+                    $cleanData['sum'] = round(($cleanData['kg'] * $userPriceObj->for_kg + $cleanData['place'] * $userPriceObj->for_place) * -1);
+
+                    $savedCargoEntry = Cargo::create($cleanData);
+                    array_push($arr, $savedCargoEntry);
+
+                }
+                break;
+            default:
+                return response()->json(['status' => 'error', 'message' => 'Неправильный тип: ' . $type]);
         }
-        return response()->json(['status'=>true, 'cargoEntry'=> $arr]);
+
+        return response()->json(['status' => true, 'cargoEntry' => $arr]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -98,7 +121,7 @@ class CargoController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -109,8 +132,8 @@ class CargoController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -121,7 +144,7 @@ class CargoController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

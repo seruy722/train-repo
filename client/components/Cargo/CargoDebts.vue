@@ -52,18 +52,6 @@
             <v-container grid-list-sm class="pa-4">
                 <v-layout row wrap class="borderForEntry" v-for="(item, index) in cargoDebtsList" :key="index">
 
-                    <!--<v-flex xs12 sm2 md2>-->
-                        <!--<v-text-field-->
-                            <!--v-model="item.sum"-->
-                            <!--:error-messages="checkError(`${index}.sum`)"-->
-                            <!--prepend-icon="monetization_on"-->
-                            <!--type="number"-->
-                            <!--label="Сумма"-->
-                            <!--autofocus-->
-                            <!--@focus="$event.target.select()"-->
-                        <!--&gt;</v-text-field>-->
-                    <!--</v-flex>-->
-
                     <v-flex xs12 sm2 md2>
                         <v-text-field
                             v-model="item.place"
@@ -71,6 +59,7 @@
                             prepend-icon="phone"
                             label="Мест"
                             type="number"
+                            autofocus
                             @focus="$event.target.select()"
                         ></v-text-field>
                     </v-flex>
@@ -84,6 +73,10 @@
                             type="number"
                             @focus="$event.target.select()"
                         ></v-text-field>
+                    </v-flex>
+
+                    <v-flex xs12 sm3 md3 justify-center>
+                        <v-switch v-model="item.brand" label="Бренд" prepend-icon="notes" ></v-switch>
                     </v-flex>
 
                     <v-flex xs12 sm3 md3>
@@ -156,7 +149,7 @@
 </template>
 <script>
     import axios from 'axios';
-    import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
+    import DatePicker from '~/components/Pickers/DatePicker.vue';
     import { formatDate } from '~/utils';
     import checkErrorMixin from '~/mixins/checkError';
     import { mapGetters } from 'vuex';
@@ -177,6 +170,7 @@
                     sum: 0,
                     place: 0,
                     kg: 0,
+                    brand: false,
                     notation: null,
                 },
             };
@@ -228,14 +222,20 @@
                 this.dataDebts.push(_.assign({}, this.defaultItem));
             },
             addValuesToEntries (props) {
-                return _.reduce(props, (result, item) => {
+                const arrObjects = _.reduce(props, (result, item) => {
                     result.push(_.assign(item, {
-                        client: this.currentClient,
-                        date: this.dateForAddEntry,
+                        created_at: this.dateForAddEntry,
                         fax: this.fax,
                     }));
                     return result;
                 }, []);
+
+                const { name, id } = this.currentClient;
+                const mainObj = { ...arrObjects };
+                mainObj.client = { name, id };
+                mainObj.type = this.defaultItem.type;
+
+                return mainObj;
             },
             changeLoadBtn () {
                 this.loadOnBtn = !this.loadOnBtn;

@@ -35,7 +35,7 @@
 </template>
 
 <script>
-    import DateCalendar from '~/components/Cargo/Control/DatePicker/DateCalendar';
+    import DateCalendar from '~/components/DateCalendar.vue';
     import { mapGetters } from 'vuex';
     import { isClient } from '~/utils';
     import checkErrorMixin from '~/mixins/checkError';

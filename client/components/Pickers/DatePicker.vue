@@ -1,34 +1,34 @@
 <template>
     <div data-vue-component-name="DatePicker">
-    <v-menu
-        ref="menu1"
-        v-model="menu"
-        :close-on-content-click="false"
-        :nudge-right="40"
-        lazy
-        transition="scale-transition"
-        offset-y
-        full-width
-        max-width="290px"
-        min-width="290px"
-    >
-        <v-text-field
-            slot="activator"
-            v-model="dateFormatted"
-            label="Дата"
-            persistent-hint
-            prepend-icon="event"
-            @blur="date = parseDate(dateFormatted)"
-        ></v-text-field>
+        <v-menu
+            ref="menu1"
+            v-model="menu"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            lazy
+            transition="scale-transition"
+            offset-y
+            full-width
+            max-width="290px"
+            min-width="290px"
+        >
+            <v-text-field
+                slot="activator"
+                v-model="dateFormatted"
+                label="Дата"
+                persistent-hint
+                prepend-icon="event"
+                @blur="date = parseDate(dateFormatted)"
+            ></v-text-field>
 
-        <v-date-picker
-            v-model="date"
-            first-day-of-week="1"
-            locale="ru-ru"
-            no-title
-            @input="menu = false"
-        ></v-date-picker>
-    </v-menu>
+            <v-date-picker
+                v-model="date"
+                first-day-of-week="1"
+                locale="ru-ru"
+                no-title
+                @input="menu = false"
+            ></v-date-picker>
+        </v-menu>
     </div>
 </template>
 

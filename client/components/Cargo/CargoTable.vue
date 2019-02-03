@@ -1,10 +1,10 @@
 <template>
     <div data-vue-component="CargoTable">
         <v-container>
-            <span>Сумма: {{countObject.sum}}</span>
-            <span>Мест: {{countObject.place}}</span>
-            <span>Вес: {{countObject.kg}}</span>
-            <span>Скидка: {{countObject.sale}}</span>
+            <span>Сумма: {{ countObject.sum }}</span>
+            <span>Мест: {{ countObject.place }}</span>
+            <span>Вес: {{ countObject.kg }}</span>
+            <span>Скидка: {{ countObject.sale }}</span>
         </v-container>
 
         <v-data-table
@@ -33,7 +33,7 @@
                     <td class="text-xs-center">{{ props.item.type }}</td>
                     <td class="text-xs-center">{{ props.item.sum }}</td>
                     <td class="text-xs-center">{{ props.item.sale }}</td>
-                    <td class="text-xs-center">{{ props.item.client }}</td>
+                    <td class="text-xs-center">{{ props.item.name }}</td>
                     <td class="text-xs-center">{{ props.item.place }}</td>
                     <td class="text-xs-center">{{ props.item.kg }}</td>
                     <td class="text-xs-center">{{ props.item.fax }}</td>
@@ -93,11 +93,11 @@
             }),
         },
         created () {
-            this.fetch();
+            this.fetchCargoList();
         },
         methods: {
             // Запрос данных с сервера
-            async fetch () {
+            async fetchCargoList () {
                 this.$store.commit('cargo/SET_PROGRESSBAR_TABLE', true);
 
                 const { data } = await axios.get('/cargos');

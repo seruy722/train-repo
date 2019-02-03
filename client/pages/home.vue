@@ -119,7 +119,7 @@
 
 <script>
     import {mapGetters} from 'vuex';
-    import HomeNav from '~/components/HomeNav';
+    import HomeNav from '~/components/Navs/HomeNav';
     import navClickMixin from '~/mixins/navClick';
     import logout from '~/mixins/logout';
 

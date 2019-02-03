@@ -73,12 +73,12 @@ export function currentMonth () {
 /**
  * Возвращает начальную и конечную дату переданного месяца
  *
- * @param month
+ * @param monthYearObj
  * @return {{startDate: string, endDate: string}}
  */
-export function startEndDateOfMonth (month) {
-    const startOfMonth = moment(month, 'MM').startOf('month').format(dateFormat);
-    const endOfMonth = moment(month, 'MM').endOf('month').format(dateFormat);
+export function startEndDateOfMonth (monthYear) {
+    const startOfMonth = moment(monthYear, 'MM-YYYY').startOf('month').format(dateFormat);
+    const endOfMonth = moment(monthYear, 'MM-YYYY').endOf('month').format(dateFormat);
     return {
         startDate: startOfMonth,
         endDate: endOfMonth,

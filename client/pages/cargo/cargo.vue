@@ -118,9 +118,9 @@
     import CargoProfit from '~/components/Cargo/CargoProfit';
     import CargoDebts from '~/components/Cargo/CargoDebts';
     import CargoTable from '~/components/Cargo/CargoTable';
-    import DebtsTable from '~/components/Cargo/DebtsTable';
-    import CargoDebtsNav from '~/components/Cargo/CargoDebtsNav';
-    import ControlPanel from '~/components/Cargo/Control/ControlPanel';
+    import DebtsTable from '~/components/Debts/DebtsTable';
+    import CargoDebtsNav from '~//components/Navs/CargoDebtsNav';
+    import ControlPanel from '~/components/ControlPanel.vue';
     import { mapGetters } from 'vuex';
     import axios from 'axios';
     import Search from '~/components/Search';
@@ -200,7 +200,6 @@
                 } else {
                     this.$store.commit('controlPanel/SET_OPENEDCOMPONENT', type);
                 }
-
             },
         },
     };

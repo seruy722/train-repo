@@ -107,7 +107,7 @@
 </template>
 <script>
     import axios from 'axios';
-    import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
+    import DatePicker from '~/components/Pickers/DatePicker.vue';
     import { formatDate } from '~/utils';
     import checkErrorMixin from '~/mixins/checkError';
     import { mapGetters } from 'vuex';

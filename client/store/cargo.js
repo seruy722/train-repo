@@ -141,7 +141,7 @@ export const mutations = {
         const clientID = _.toNumber(state.currentClient.id);
         const date = state.currentDate;
         // console.log('clientID', clientID);
-        // console.log('date', date);
+        console.log('date77', date);
 
         switch (date.id) {
             // Все даты
@@ -173,14 +173,14 @@ export const mutations = {
             case 4: // Текущий год
             case 3: // Текущий месяц
             case 6: // Выбрать период
-                if (date.year) {
-                    const yearDates = startEndDateOfYear(date.year);
-                    _.assign(date, yearDates);
-                }
-
                 if (date.month) {
                     const monthDates = startEndDateOfMonth(date.month);
                     _.assign(date, monthDates);
+                }
+
+                if (date.year) {
+                    const yearDates = startEndDateOfYear(date.year);
+                    _.assign(date, yearDates);
                 }
 
                 if (date.startDate && date.endDate) {

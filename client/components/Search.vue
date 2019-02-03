@@ -1,17 +1,22 @@
 <template>
     <v-text-field
+        ref="search"
+        v-model="search"
         append-icon="search"
         label="Поиск"
         single-line
         hide-details
-        ref="search"
-        v-model="search"
     ></v-text-field>
 </template>
 
 <script>
     export default {
-        props:['value'],
+        props: {
+            value: {
+                type: String,
+                default: '',
+            },
+        },
         computed: {
             search: {
                 get () {
@@ -19,8 +24,8 @@
                 },
                 set (val) {
                     this.$emit('update:value', val);
-                }
-            }
-        }
-    }
+                },
+            },
+        },
+    };
 </script>

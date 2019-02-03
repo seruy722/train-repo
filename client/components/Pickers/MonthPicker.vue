@@ -37,7 +37,7 @@
         props: {
             value: {
                 type: String,
-                default: new Date().toISOString().substr(5, 2),
+                default: new Date().toISOString().substr(5, 10),
             },
         },
         data: () => ({
@@ -55,12 +55,12 @@
             },
         },
         watch: {
-            menu (val) {
-                val && this.$nextTick(() => (this.$refs.picker.activePicker = 'MONTH'));
+            menu () {
+                this.$nextTick(() => this.$refs.picker.activePicker = 'MONTH');
             },
             date () {
                 const [year, month] = this.date.split('-');
-                this.dateFormatted = month;
+                this.dateFormatted = `${month}-${year}`;
             },
         },
         methods: {

@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Cargo extends Model
 {
     protected $fillable = [
-        'type', 'sum', 'sale', 'client', 'place', 'kg', 'fax', 'created_at', 'notation'
+        'type', 'sum', 'sale', 'client_id', 'place', 'kg', 'fax', 'brand', 'notation'
     ];
 }
