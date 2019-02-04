@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import {scrollBehavior} from '~/utils';
+import { scrollBehavior } from '~/utils';
 
 Vue.use(Router);
 // Main page
@@ -22,13 +22,18 @@ const Emails = () => import('~/pages/accessemails/emails').then(m => m.default |
 // Cargo && Debts
 const Cargo = () => import('~/pages/cargo/cargo').then(m => m.default || m);
 
+// Faxes
+const Faxes = () => import('~/pages/faxes').then(m => m.default || m);
+
 const routes = [
-    {path: '/', component: Home,
+    {
+        path: '/',
+        component: Home,
         children: [
             {
                 path: '/',
                 component: BlackList,
-                name: 'home-blacklist'
+                name: 'home-blacklist',
             },
             {
                 path: 'profile',
@@ -54,12 +59,17 @@ const routes = [
                 path: 'cargo',
                 component: Cargo,
                 name: 'home-cargo',
-            }
-        ]
+            },
+            {
+                path: 'faxes',
+                component: Faxes,
+                name: 'home-faxes',
+            },
+        ],
     },
 
-    {path: '/login', name: 'login', component: Login},
-    {path: '/register', name: 'register', component: Register},
+    { path: '/login', name: 'login', component: Login },
+    { path: '/register', name: 'register', component: Register },
 
 ];
 
@@ -68,5 +78,5 @@ export function createRouter () {
         routes,
         scrollBehavior,
         mode: 'history',
-    })
+    });
 }

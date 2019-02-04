@@ -118,7 +118,7 @@
 </template>
 
 <script>
-    import {mapGetters} from 'vuex';
+    import { mapGetters } from 'vuex';
     import HomeNav from '~/components/Navs/HomeNav';
     import navClickMixin from '~/mixins/navClick';
     import logout from '~/mixins/logout';
@@ -130,10 +130,10 @@
         },
         middleware: 'auth',
         showAdminData: false,
-        data: ()=>({
+        data: () => ({
             drawer: false,
             items: [
-                { icon: 'home', text: 'Главная', path: '/'},
+                { icon: 'home', text: 'Главная', path: '/' },
                 { icon: 'people_outline', text: 'Пользователи', path: '/users' },
                 {
                     icon: 'business',
@@ -141,7 +141,8 @@
                     model: false,
                     children: [
                         { icon: 'home', text: 'Карго', path: '/cargo' },
-                    ]
+                        { icon: 'home', text: 'Факсы', path: '/faxes' },
+                    ],
                 },
                 {
                     icon: 'people',
@@ -150,11 +151,11 @@
                     children: [
                         { icon: 'home', text: 'Главная', path: '/' },
                         { icon: 'list', text: 'Логи', path: '/logs' },
-                    ]
+                    ],
                 },
                 { icon: 'email', text: 'Email доступы', path: '/emails' },
-                { icon: 'exit_to_app', text: 'Выход', path: '/logout'}
-            ]
+                { icon: 'exit_to_app', text: 'Выход', path: '/logout' },
+            ],
         }),
         created () {
             this.checkAdminRole();

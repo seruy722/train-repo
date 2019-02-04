@@ -112,20 +112,3 @@
         },
     };
 </script>
-
-
-<style lang="scss" scoped>
-    @import '~assets/sass/variables';
-
-    tr.tr_profit__bg {
-        background-color: $tr_profit__bg;
-    }
-
-    tr.tr_debts__bg {
-        background-color: $tr_debts__bg;
-    }
-
-    tr.tr_profit__bg, tr.tr_debts__bg {
-        border: $tr_border;
-    }
-</style>

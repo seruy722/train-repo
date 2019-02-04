@@ -53,6 +53,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     // DEBTS
     Route::get('debts', 'DebtsController@index');
 //    Route::post('cargo/saveProfit', 'CargoController@store');
+    // FAXES
+    Route::get('faxes', 'FaxesController@index');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {
