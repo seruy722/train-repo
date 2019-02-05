@@ -28,7 +28,8 @@
                         <v-card-text>
                             <v-form>
                                 <v-text-field v-model="data.email" prepend-icon="person" name="email" label="E-mail"
-                                              type="text" :error-messages="checkError('email')"></v-text-field>
+                                              type="text" :rules="emailRules"
+                                              :error-messages="checkError('email')"></v-text-field>
                                 <v-text-field v-model="data.password" id="password" prepend-icon="lock" name="password"
                                               label="Пароль" type="password" :error-messages="checkError('password')"
                                               @keyup="onKeyup">
@@ -65,14 +66,24 @@
         data: () => ({
             data: {
                 email: null,
-                password: null
+                password: null,
             },
-            loadOnBtn: false
+            loadOnBtn: false,
+            emailRules: [],
         }),
         computed: {
             ...mapGetters({
-                logoUrl: 'settings/logoUrl'
-            })
+                logoUrl: 'settings/logoUrl',
+            }),
+        },
+        watch: {
+            'data.email': function (mail) {
+                if (mail !== '') {
+                    this.emailRules = [v => (v.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) || 'Неправильный Email адрес'];
+                } else if (mail === '') {
+                    this.emailRules = [];
+                }
+            },
         },
         methods: {
             async login () {
@@ -96,11 +107,10 @@
                 });
             },
             onKeyup (event) {
-                if (event.code === "Enter" || event.code === 'NumpadEnter') {
+                if (event.code === 'Enter' || event.code === 'NumpadEnter') {
                     this.login();
                 }
-            }
-        }
-    }
+            },
+        },
+    };
 </script>
-
