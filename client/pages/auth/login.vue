@@ -51,7 +51,6 @@
                                         counter
                                         maxlength="255"
                                         required
-                                        :rules="[rules.counter]"
                                         :error-messages="checkError('password')"
                                         @keyup="onKeyUp"
                                     >
@@ -95,7 +94,6 @@
             loadOnBtn: false,
             isUserLoginFormValid: false,
             rules: {
-                counter: value => (value && value.length > 6) || 'Меньше 6 символов.',
                 email: (value) => {
                     const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                     return pattern.test(value) || 'Неправильный e-mail.';
