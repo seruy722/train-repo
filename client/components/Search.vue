@@ -23,9 +23,14 @@
                     return this.value;
                 },
                 set (val) {
-                    this.$emit('update:value', val);
+                    this.debouncedSearch(val);
                 },
             },
+        },
+        methods: {
+            debouncedSearch: _.debounce(function (val) {
+                this.$emit('update:value', val);
+            }, 500),
         },
     };
 </script>
