@@ -3,7 +3,7 @@ import swal from 'sweetalert2';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-export default ({app, store, redirect}) => {
+export default ({ app, store, redirect }) => {
     axios.defaults.baseURL = process.env.apiUrl;
 
     if (process.server) {
@@ -11,7 +11,7 @@ export default ({app, store, redirect}) => {
     }
 
     // Request interceptor
-    axios.interceptors.request.use(request => {
+    axios.interceptors.request.use((request) => {
         request.baseURL = process.env.apiUrl;
 
         const token = store.getters['auth/token'];
@@ -29,8 +29,8 @@ export default ({app, store, redirect}) => {
     });
 
     // Response interceptor
-    axios.interceptors.response.use(response => response, error => {
-        const {status} = error.response || {};
+    axios.interceptors.response.use(response => response, (error) => {
+        const { status } = error.response || {};
 
         if (status >= 500) {
             swal({
@@ -40,7 +40,7 @@ export default ({app, store, redirect}) => {
                 reverseButtons: true,
                 confirmButtonText: app.i18n.t('ok'),
                 cancelButtonText: app.i18n.t('cancel'),
-            })
+            });
         }
 
         if (status === 401 && store.getters['auth/check']) {
@@ -54,10 +54,10 @@ export default ({app, store, redirect}) => {
             }).then(() => {
                 store.commit('auth/LOGOUT');
 
-                redirect({name: 'login'});
-            })
+                redirect({ name: 'login' });
+            });
         }
 
         return Promise.reject(error);
-    })
-}
+    });
+};
