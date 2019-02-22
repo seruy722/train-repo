@@ -22,7 +22,8 @@ class CargoController extends Controller
      */
     public function index()
     {
-        $cargoList = DB::table('cargos')->join('users', 'cargos.client_id', '=', 'users.id')->select('cargos.*', 'users.name')->orderBy('created_at', 'DESC')->get();
+        $cargoList = DB::table('cargos')->join('users', 'cargos.client_id', '=', 'users.id')->select('cargos.*', 'users.name')->orderBy('created_at', 'DESC')->take(1000)->get();
+//        $cargoList = Cargo::leftJoin('users', 'cargos.client_id', '=', 'users.id')->select('cargos.*', 'users.name')->orderBy('created_at', 'DESC')->get();
         $formatDateList = $this->needFormatDate($cargoList);
         $formatNumberList = $this->prettyFormat($formatDateList);
 
@@ -76,10 +77,9 @@ class CargoController extends Controller
 //        ]);
 
 
-
         $allData = $request->all();
         $client = $allData[0]['client'];
-        $type =  $allData[0]['type'];
+        $type = $allData[0]['type'];
         $userPriceObj = Price::where('client_id', $client->id)->first();
         $arr = [];
         switch ($type) {

@@ -22,7 +22,7 @@ class FaxesTableSeeder extends Seeder
             DB::table('faxes')->insert([
                 'created_at' => $faker->dateTime($max = 'now', $timezone = null),
                 'fax_name' => $faker->word,
-                'upload_date' => $faker->dateTime($max = 'now', $timezone = null),
+                'date_departure' => $faker->dateTime($max = 'now', $timezone = null),
                 'uploaded_to_table_cargos_date' => $faker->dateTime($max = 'now', $timezone = null),
                 'uploaded_to_table_cargos' => array_rand($arrUploaded, 1),
             ]);

@@ -54,7 +54,7 @@
 
                     <v-flex xs12 sm2 md2>
                         <v-text-field
-                            v-model="item.place"
+                            v-model.number="item.place"
                             :error-messages="checkError(`${index}.place`)"
                             prepend-icon="phone"
                             label="Мест"

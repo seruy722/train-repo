@@ -16,8 +16,8 @@ class CreateFaxesTable extends Migration
         Schema::create('faxes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('fax_name');
-            $table->string('upload_date');
-            $table->string('uploaded_to_table_cargos_date');
+            $table->string('date_departure');
+            $table->string('uploaded_to_table_cargos_date')->nullable();
             $table->boolean('uploaded_to_table_cargos')->default(false);
             $table->timestamps();
         });

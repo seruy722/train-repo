@@ -15,9 +15,12 @@
             <v-text-field
                 slot="activator"
                 v-model="dateFormatted"
-                label="Дата"
+                :label="datePickerSettings.label || 'Дата'"
+                :error-messages="checkError('pickerDate')"
                 persistent-hint
                 prepend-icon="event"
+                readonly
+                clearable
                 @blur="date = parseDate(dateFormatted)"
             ></v-text-field>
 
@@ -33,10 +36,21 @@
 </template>
 
 <script>
+    import checkErrorMixin from '~/mixins/checkError';
+
     export default {
         name: 'DatePicker',
+        mixins: [checkErrorMixin],
         props: {
             value: {
+                type: String,
+                default: '',
+            },
+            datePickerSettings: {
+                type: Object,
+                default: () => null,
+            },
+            errorDate: {
                 type: String,
                 default: '',
             },
@@ -45,7 +59,6 @@
             date: new Date().toISOString().substr(0, 10),
             menu: false,
         }),
-
         computed: {
             dateFormatted: {
                 get () {
@@ -60,6 +73,9 @@
         watch: {
             date () {
                 this.dateFormatted = this.formatDate(this.date);
+            },
+            errorDate (error) {
+                this.changeErrors({ pickerDate: error });
             },
         },
 

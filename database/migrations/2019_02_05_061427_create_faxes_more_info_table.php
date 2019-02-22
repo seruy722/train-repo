@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCargosTable extends Migration
+class CreateFaxesMoreInfoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,15 @@ class CreateCargosTable extends Migration
      */
     public function up()
     {
-        Schema::create('cargos', function (Blueprint $table) {
+        Schema::create('faxes_more_info', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('type');
-            $table->float('sum', 8, 2)->default(0);
-            $table->float('sale', 8, 2)->default(0);
-            $table->string('client');
+            $table->string('code')->nullable();
+            $table->integer('client_id')->unsigned();
+            $table->integer('fax_id')->unsigned();
             $table->integer('place')->default(0)->unsigned();
             $table->float('kg', 8, 2)->default(0)->unsigned();
-            $table->string('fax')->nullable();
+            $table->string('shop')->nullable();
+            $table->jsonb('name_of_things')->nullable();
             $table->boolean('brand')->default(false);
             $table->string('notation')->nullable();
             $table->timestamps();
@@ -35,6 +35,6 @@ class CreateCargosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cargos');
+        Schema::dropIfExists('faxes_more_info');
     }
 }

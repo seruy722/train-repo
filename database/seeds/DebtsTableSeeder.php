@@ -34,7 +34,6 @@ class DebtsTableSeeder extends Seeder
                 'created_at' => $faker->dateTime($max = 'now', $timezone = null),
                 'type' => $type,
                 'sum' => $summa,
-                'client' => $randClient['name'],
                 'client_id' => $randClient['id'],
                 'notation' => $faker->sentence($nbWords = 3, $variableNbWords = true),
                 'commission' => $faker->numberBetween($min = 1, $max = 1000),

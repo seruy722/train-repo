@@ -18,10 +18,7 @@ class PricesTableSeeder extends Seeder
         DB::statement("SET foreign_key_checks=1");
 
         $faker = Faker\Factory::create();
-        $clients = User::all()->toArray();
-        for ($i = 0; $i < 1000; $i++) {
-            $randNumber = rand(1, 1000);
-            $randClient = $clients[$randNumber];
+        for ($i = 0; $i < 2000; $i++) {
 
             DB::table('prices')->insert([
                 'client_id' => $i+1,

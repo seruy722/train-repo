@@ -4,6 +4,23 @@ import moment from 'moment';
 const dateFormat = 'DD-MM-YYYY';
 
 /**
+ *
+ * @param obj
+ * @return {*}
+ */
+export function needDate (obj) {
+    return _.forEach(obj, (result, item, index) => {
+        if (moment(item, 'YYYY-MM-DD HH:mm:ss').isValid()) {
+            result[index] = item.substr(0, 10).split('-').reverse().join('-');
+        }
+
+        result[index] = item;
+
+        return result;
+    }, {});
+}
+
+/**
  * Возвращает текущую дату
  *
  * @return {string}
@@ -73,7 +90,7 @@ export function currentMonth () {
 /**
  * Возвращает начальную и конечную дату переданного месяца
  *
- * @param monthYearObj
+ * @param monthYear
  * @return {{startDate: string, endDate: string}}
  */
 export function startEndDateOfMonth (monthYear) {

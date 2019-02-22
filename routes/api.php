@@ -55,6 +55,8 @@ Route::group(['middleware' => 'auth:api'], function () {
 //    Route::post('cargo/saveProfit', 'CargoController@store');
     // FAXES
     Route::get('faxes', 'FaxesController@index');
+    Route::post('faxes/storeFax', 'FaxesMoreInfosController@store');
+    Route::post('faxes/faxData', 'FaxesMoreInfosController@dataForFaxCounted');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {
