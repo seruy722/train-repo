@@ -26,7 +26,6 @@
     "nuxt": "^2.4.5",
     "popper.js": "^1.14.7",
     "sweetalert2": "^8.2.6",
-    "vform": "^1.0.0",
     "vue": "^2.6.8",
     "vue-i18n": "^8.8.2",
     "vue-image-compressor": "^1.0.3",
