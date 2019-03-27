@@ -128,7 +128,7 @@
     export default {
         // Сохранение имен клиентов в cargo store
         async fetch ({ store }) {
-            const { data } = await axios.get('/clientNames').catch((errors) => {
+            const { data } = await axios.get('/clients').catch((errors) => {
                 console.error('Ошибка при запросе клиентов', errors);
             });
             const { clientsNames } = data;

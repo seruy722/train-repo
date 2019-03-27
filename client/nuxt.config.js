@@ -1,16 +1,16 @@
 require('dotenv').config();
 
-const polyfills = [
-    'Promise',
-    'Object.assign',
-    'Object.values',
-    'Array.prototype.find',
-    'Array.prototype.findIndex',
-    'Array.prototype.includes',
-    'String.prototype.includes',
-    'String.prototype.startsWith',
-    'String.prototype.endsWith'
-];
+// const polyfills = [
+//     'Promise',
+//     'Object.assign',
+//     'Object.values',
+//     'Array.prototype.find',
+//     'Array.prototype.findIndex',
+//     'Array.prototype.includes',
+//     'String.prototype.includes',
+//     'String.prototype.startsWith',
+//     'String.prototype.endsWith'
+// ];
 
 module.exports = {
     mode: 'spa',
@@ -27,12 +27,12 @@ module.exports = {
         title: process.env.APP_NAME,
         titleTemplate: '%s - ' + process.env.APP_NAME,
         meta: [
-            {charset: 'utf-8'},
-            {name: 'viewport', content: 'width=device-width, initial-scale=1'},
-            {hid: 'description', name: 'description', content: 'Cargo007'}
+            { charset: 'utf-8' },
+            { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+            { hid: 'description', name: 'description', content: 'Cargo007' },
         ],
         link: [
-            {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'},
+            { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
             {
                 rel: 'stylesheet',
                 type: 'text/css',
@@ -40,31 +40,28 @@ module.exports = {
             },
         ],
         script: [
-            {src: `https://cdn.polyfill.io/v2/polyfill.min.js?features=${polyfills.join(',')}`},
-            {src: 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js'},
-        ]
+            // { src: `https://cdn.polyfill.io/v2/polyfill.min.js?features=${polyfills.join(',')}` },
+            { src: 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js' },
+        ],
     },
 
-    loading: {color: '#007bff'},
+    loading: { color: '#007bff' },
 
     router: {
         middleware: ['check-auth'],
     },
 
     css: [
-        {src: '~assets/sass/app.scss', lang: 'scss'},
+        { src: '~assets/sass/app.scss', lang: 'scss' },
         { src: '~/assets/css/main.css', lang: 'css' },
-        { src: '~/assets/css/app.styl', lang: 'styl' }
+        { src: '~/assets/css/app.styl', lang: 'styl' },
     ],
 
     plugins: [
-        '~plugins/i18n',
-        '~plugins/vform',
         '~plugins/axios',
-        '~plugins/fontawesome',
         '~plugins/nuxt-client-init',
         '~plugins/vuetify',
-        {src: '~plugins/bootstrap', ssr: false},
+        // {src: '~plugins/bootstrap', ssr: false},
         '~/plugins/vue-snotify',
     ],
 
@@ -75,5 +72,5 @@ module.exports = {
 
     build: {
         extractCSS: true,
-    }
+    },
 };

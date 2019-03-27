@@ -1,7 +1,6 @@
 <template>
     <div data-vue-component-name="DatePicker">
         <v-menu
-            ref="menu1"
             v-model="menu"
             :close-on-content-click="false"
             :nudge-right="40"
@@ -12,17 +11,18 @@
             max-width="290px"
             min-width="290px"
         >
-            <v-text-field
-                slot="activator"
-                v-model="dateFormatted"
-                :label="datePickerSettings.label || 'Дата'"
-                :error-messages="checkError('pickerDate')"
-                persistent-hint
-                prepend-icon="event"
-                readonly
-                clearable
-                @blur="date = parseDate(dateFormatted)"
-            ></v-text-field>
+            <template v-slot:activator="{ on }">
+                <v-text-field
+                    v-model="dateFormatted"
+                    :label="datePickerSettings.label || 'Дата'"
+                    :error-messages="checkError('pickerDate')"
+                    persistent-hint
+                    prepend-icon="event"
+                    readonly
+                    clearable
+                    v-on="on"
+                ></v-text-field>
+            </template>
 
             <v-date-picker
                 v-model="date"
@@ -37,6 +37,7 @@
 
 <script>
     import checkErrorMixin from '~/mixins/checkError';
+    import { needFormatDate } from '~/utils/dates';
 
     export default {
         name: 'DatePicker',
@@ -56,13 +57,14 @@
             },
         },
         data: () => ({
+            // date: needFormatDate(new Date().toISOString()),
             date: new Date().toISOString().substr(0, 10),
             menu: false,
         }),
         computed: {
             dateFormatted: {
                 get () {
-                    return this.value || null;
+                    return needFormatDate(this.value);
                 },
                 set (val) {
                     this.$emit('update:value', val);
@@ -72,26 +74,17 @@
 
         watch: {
             date () {
-                this.dateFormatted = this.formatDate(this.date);
+                // console.log('DATE', this.dateFormatted);
+                this.dateFormatted = needFormatDate(this.date);
             },
             errorDate (error) {
                 this.changeErrors({ pickerDate: error });
             },
         },
-
-        methods: {
-            formatDate (date) {
-                if (!date) return null;
-
-                const [year, month, day] = date.split('-');
-                return `${day}-${month}-${year}`;
-            },
-            parseDate (date) {
-                if (!date) return null;
-
-                const [day, month, year] = date.split('-');
-                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-            },
+        created () {
+            if (!this.value) {
+                this.dateFormatted = this.date;
+            }
         },
     };
 </script>

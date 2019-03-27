@@ -70,7 +70,7 @@ export function formatDate (data, enterFormat, needFormat) {
  * @return {*}
  */
 export function numberFormat (number) {
-    return new Intl.NumberFormat('ru-RU').format(number);
+    return new Intl.NumberFormat('ru-RU').format(_.toNumber(number));
 }
 
 

@@ -25,9 +25,32 @@ export function needDate (obj) {
  *
  * @return {string}
  */
-export function today () {
-    return new Date().toISOString().substr(0, 10).split('-').reverse().join('-');
-}
+export const today = () => new Date().toISOString().substr(0, 10).split('-').reverse().join('-');
+
+/**
+ *Возвращает отформатированную дату
+ *
+ * @param date
+ * @return {*}
+ */
+export const needFormatDate = (date) => {
+    if (isDate(date)) {
+        const arr = date.substr(0, 10).split('-');
+        if (_.head(arr).length === 4) {
+            return arr.reverse().join('-');
+        }
+        return arr.join('-');
+    }
+    return date;
+};
+
+/**
+ * Проверяет, что это дата
+ *
+ * @param date
+ * @return {boolean}
+ */
+export const isDate = date => !_.isNaN(Date.parse(date));
 
 /**
  * Возвращает завтрашнюю дату

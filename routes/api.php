@@ -39,7 +39,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('getLogList', 'LogController@index');
     // USERS
     Route::get('users', 'UserController@index');
-    Route::get('clientNames', 'UserController@getClientsNames');
+    Route::get('clients', 'UserController@getClients');
+    Route::get('clients/clientsNames', 'UserController@getClientsNames');
     Route::post('users/saveUpdate', 'UserController@store');
     Route::post('users/delete', 'UserController@destroy');
     Route::post('users/deleteFoto', 'UserController@deleteFoto');
@@ -55,8 +56,20 @@ Route::group(['middleware' => 'auth:api'], function () {
 //    Route::post('cargo/saveProfit', 'CargoController@store');
     // FAXES
     Route::get('faxes', 'FaxesController@index');
+    Route::get('faxes/faxesNames', 'FaxesController@getFaxesNames');
+    Route::post('faxes/delete', 'FaxesController@destroyFaxes');
     Route::post('faxes/storeFax', 'FaxesMoreInfosController@store');
     Route::post('faxes/faxData', 'FaxesMoreInfosController@dataForFaxCounted');
+    Route::post('faxes/updateData', 'FaxesMoreInfosController@updateFaxData');
+    Route::post('faxes/destroyFaxData', 'FaxesMoreInfosController@destroyFaxEntries');
+    Route::post('faxes/moveEntries', 'FaxesMoreInfosController@changeEntriesFaxID');
+    Route::post('faxes/updateCategoriesData', 'FaxPriceCategoriesData@updateFaxCategoriesData');
+    Route::post('faxes/categoriesData', 'FaxPriceCategoriesData@getFaxCategoriesData');
+    Route::post('faxes/download', 'FaxesController@downloadOriginalFax');
+    Route::post('faxes/load', 'FaxesController@downloadOriginalFax');
+    Route::get('fax/download', 'FaxesMoreInfosController@export');
+    // CATEGORIES
+    Route::get('faxes/categoriesNames', 'FaxCategoriesController@index');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

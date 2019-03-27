@@ -7,134 +7,120 @@
 
             <v-toolbar>
                 <v-toolbar-title class="text-xs-center title blue--text">Факсы</v-toolbar-title>
+
                 <v-spacer></v-spacer>
+
                 <Search :value.sync="search"/>
             </v-toolbar>
 
             <v-toolbar>
-                <v-toolbar-items v-show="selected.length">
-                    <v-flex xs12>
-                        <v-btn outline fab small color="indigo">
-                            <v-icon dark>edit</v-icon>
-                        </v-btn>
-                    </v-flex>
-
-                    <v-flex xs12>
-                        <v-btn outline fab small color="error">
-                            <v-icon dark>delete</v-icon>
-                        </v-btn>
-                    </v-flex>
-                </v-toolbar-items>
-
                 <v-spacer></v-spacer>
                 <!--Диалог загрузки факса-->
-                <template>
-                    <div class="text-xs-center">
-                        <DefaultButton
-                            @clickButton="openCloseDialog(true)"
-                            :defaultButtonSettings="$_defaultButtonAddFaxSettings"
-                        />
+                <DialogAddFax
+                    :click-savesin-edit-dialog="clickSaveInEditDialog"
+                />
+                <!--<template>-->
+                <!--<div class="text-xs-center">-->
+                <!--<RectangleBtn-->
+                <!--v-show="!clickSaveInEditDialog"-->
+                <!--:title="'Добавить'"-->
+                <!--@clickRectangleBtn="openCloseDialog(true)"-->
+                <!--/>-->
 
-                        <v-dialog
-                            v-model="dialog"
-                            persistent
-                            max-width="500"
-                        >
-                            <v-card>
-                                <v-card-title
-                                    class="headline grey lighten-2"
-                                    primary-title
-                                >
-                                    Загрузка факса
-                                </v-card-title>
+                <!--<RectangleBtn-->
+                <!--v-show="clickSaveInEditDialog"-->
+                <!--@clickRectangleBtn="updateFaxData"-->
+                <!--/>-->
 
-                                <v-card-text>
-                                    <v-container>
-                                        <v-layout row wrap>
-                                            <!--<LinksList :value="test">-->
-                                            <!--<div slot="link" slot-scope="{ link, markBtn, value}">-->
-                                            <!--&lt;!&ndash;<star-icon v-show="link.bookmarked"></star-icon>&ndash;&gt;-->
-                                            <!--<a :href="link.href">-->
-                                            <!--{{ link.title }}-->
-                                            <!--</a>-->
-                                            <!--<span>{{ value }}</span>-->
-                                            <!--<button v-show="link.bookmarked" @click="markBtn(link)">Bookmark</button>-->
-                                            <!--</div>-->
-                                            <!--</LinksList>-->
+                <!--<v-dialog-->
+                <!--v-model="dialog"-->
+                <!--persistent-->
+                <!--max-width="500"-->
+                <!--&gt;-->
+                <!--<v-card>-->
+                <!--<v-card-title-->
+                <!--class="headline grey lighten-2"-->
+                <!--primary-title-->
+                <!--&gt;-->
+                <!--Загрузка факса-->
+                <!--</v-card-title>-->
 
-                                            <v-flex xs12 sm12 md12>
-                                                <DatePicker
-                                                    :value.sync="dateOfDeparture"
-                                                    :errorDate="faxData.errorDate"
-                                                    :datePickerSettings="$_dateOfDeparturePickerSettings"
-                                                />
-                                            </v-flex>
+                <!--<v-card-text>-->
+                <!--<v-container>-->
+                <!--<v-layout row wrap>-->
+                <!--<v-flex xs12 sm12 md12>-->
+                <!--<DatePicker-->
+                <!--:value.sync="dateOfDeparture"-->
+                <!--:errorDate="faxData.errorDate"-->
+                <!--:datePickerSettings="$_dateOfDeparturePickerSettings"-->
+                <!--/>-->
+                <!--</v-flex>-->
 
-                                            <v-flex xs12 sm12 md12>
-                                                <v-text-field
-                                                    v-model.trim="faxData.faxName"
-                                                    :error-messages="checkError('faxName')"
-                                                    clearable
-                                                    label="Имя файла"
-                                                    autofocus
-                                                ></v-text-field>
-                                            </v-flex>
+                <!--<v-flex xs12 sm12 md12>-->
+                <!--<v-text-field-->
+                <!--v-model.trim="faxData.faxName"-->
+                <!--:error-messages="checkError('faxName')"-->
+                <!--clearable-->
+                <!--label="Имя файла"-->
+                <!--autofocus-->
+                <!--&gt;</v-text-field>-->
+                <!--</v-flex>-->
 
-                                            <v-flex xs12 sm6 md6>
-                                                <ButtonUploadFile
-                                                    :file.sync="fileForUpload"
-                                                    :buttonUploadFileSettings="$_buttonUploadFileSettings"
-                                                />
-                                            </v-flex>
+                <!--<v-flex xs12 sm6 md6>-->
+                <!--<ButtonUploadFile-->
+                <!--:file.sync="fileForUpload"-->
+                <!--:buttonUploadFileSettings="$_buttonUploadFileSettings"-->
+                <!--/>-->
+                <!--</v-flex>-->
 
-                                            <v-flex xs12 sm6 md6>
-                                                <v-text-field
-                                                    v-model="faxData.fileInfo"
-                                                    :error-messages="checkError('uploadedFile')"
-                                                    label="Имя загружаемого файла"
-                                                    readonly
-                                                ></v-text-field>
-                                            </v-flex>
+                <!--<v-flex xs12 sm6 md6>-->
+                <!--<v-text-field-->
+                <!--v-model="faxData.fileInfo"-->
+                <!--:error-messages="checkError('uploadedFile')"-->
+                <!--label="Имя загружаемого файла"-->
+                <!--readonly-->
+                <!--&gt;</v-text-field>-->
+                <!--</v-flex>-->
 
-                                        </v-layout>
-                                    </v-container>
+                <!--</v-layout>-->
+                <!--</v-container>-->
 
-                                </v-card-text>
+                <!--</v-card-text>-->
 
-                                <v-divider></v-divider>
+                <!--<v-divider></v-divider>-->
 
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
+                <!--<v-card-actions>-->
+                <!--<v-spacer></v-spacer>-->
 
-                                    <DefaultButton
-                                        @clickButton="cancelUploadFile"
-                                        :defaultButtonSettings="$_defaultButtonCancelSettings"
-                                    />
+                <!--<DefaultButton-->
+                <!--@clickButton="cancelUploadFile"-->
+                <!--:defaultButtonSettings="$_defaultButtonCancelSettings"-->
+                <!--/>-->
 
-                                    <DefaultButton
-                                        :defaultButtonSettings="$_defaultButtonSendFileToServerSettings"
-                                        :disabledButton="validSensor"
-                                        @clickButton="sendFileToServer"
-                                    />
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
-                    </div>
-                </template>
+                <!--<DefaultButton-->
+                <!--:defaultButtonSettings="$_defaultButtonSendFileToServerSettings"-->
+                <!--:disabledButton="validSensor"-->
+                <!--@clickButton="sendFileToServer"-->
+                <!--/>-->
+                <!--</v-card-actions>-->
+                <!--</v-card>-->
+                <!--</v-dialog>-->
+                <!--</div>-->
+                <!--</template>-->
             </v-toolbar>
 
             <v-data-table
                 v-model="selected"
-                :headers="headers"
+                :headers="mainTableHeaders"
                 :search="search"
-                :items="faxesData"
+                :items="faxes"
                 :pagination.sync="pagination"
                 select-all
                 item-key="id"
                 disable-initial-sort
                 class="elevation-1"
             >
-                <template slot="headers" slot-scope="props">
+                <template v-slot:headers="props">
                     <tr>
                         <th>
                             <v-checkbox
@@ -156,11 +142,13 @@
                         </th>
                     </tr>
                 </template>
-                <template slot="items" slot-scope="props">
+
+                <template v-slot:items="props">
                     <tr
-                        :class="props.item.uploaded_to_table_cargos ? 'tr_green__bg' : 'tr_red__bg'"
+                        :class="props.item.uploaded_to_table_cargos_date ? 'tr_green__bg' : 'tr_red__bg'"
+                        class="table__tr_show_hide_tr_control_panel"
                         :active="props.selected"
-                        @click="props.selected = !props.selected"
+                        @click.stop="props.selected = !props.selected"
                     >
                         <td>
                             <v-checkbox
@@ -171,20 +159,197 @@
                             ></v-checkbox>
                         </td>
                         <td class="text-xs-center">
-                            <router-link :to="{name: 'home-faxes-counted', params: {faxID: props.item.id, faxName: props.item.fax_name}}">
-                                {{ props.item.fax_name }}
+                            <router-link
+                                :to="{name: 'home-faxes-counted', params: {faxID: props.item.id, faxName: props.item.fax_name}}"
+                                @click.native="$event.stopImmediatePropagation()">
+                                {{ props.item.fax_name | upperFirst }}
                             </router-link>
                         </td>
-                        <td class="text-xs-center">{{ props.item.date_departure }}</td>
-                        <td class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date ?
-                            props.item.uploaded_to_table_cargos_date : '----' }}
+                        <!--<td class="text-xs-center">{{ props.item.date_departure | formatDate }}</td>-->
+                        <td class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
                         </td>
-                        <td class="text-xs-center">{{ props.item.uploaded_to_table_cargos ? 'Да': 'Нет' }}</td>
-                        <td class="text-xs-center">{{ props.item.created_at }}</td>
+                        <td class="text-xs-center">{{ props.item.air_or_car | convertBoolToAirOrCar }}</td>
+                        <!--<td class="text-xs-center">{{ props.item.created_at | formatDate }}</td>-->
+                        <ControlPanelFaxes
+                            :item="props.item"
+                            :selected="selected"
+                            :destroy="true"
+                            :edit="true"
+                            :expandProps="props"
+                            :download="true"
+                            class="faxes_table_control_panel"
+                        />
                     </tr>
                 </template>
+                <!--Expand-->
+                <template v-slot:expand="props">
+                    <div class="ml-4 mb-5">
+                        <v-data-table
+                            :headers="expandTableHeaders"
+                            :items="[props.item]"
+                        >
+                            <template v-slot:items="props">
+                                <tr>
+                                    <td class="text-xs-center">
+                                        <v-edit-dialog
+                                            :return-value.sync="props.item.fax_name"
+                                            large
+                                            lazy
+                                            persistent
+                                            @save="updateFaxDataEditDialog(props.item)"
+                                            @cancel="cancel"
+                                            @close="close"
+                                        >
+                                            <div>{{ props.item.fax_name | upperFirst }}</div>
+                                            <template v-slot:input>
+                                                <div class="mt-3 title">Update Iron</div>
+                                            </template>
+                                            <template v-slot:input>
+                                                <v-text-field
+                                                    v-model="props.item.fax_name"
+                                                    label="Edit"
+                                                    single-line
+                                                    counter
+                                                    autofocus
+                                                ></v-text-field>
+                                            </template>
+                                        </v-edit-dialog>
+                                    </td>
 
-                <template slot="no-results">
+                                    <td class="text-xs-center">
+                                        <v-edit-dialog
+                                            :return-value.sync="props.item.date_departure"
+                                            large
+                                            lazy
+                                            persistent
+                                            @save="updateFaxDataEditDialog(props.item)"
+                                            @cancel="cancel"
+                                            @close="close"
+                                        >
+                                            <div>{{ props.item.date_departure | formatDate }}</div>
+                                            <template v-slot:input>
+                                                <div class="mt-3 title">Update Iron</div>
+                                            </template>
+                                            <template v-slot:input>
+                                                <DatePicker
+                                                    :value.sync="props.item.date_departure"
+                                                    :errorDate="faxData.errorDate"
+                                                    :datePickerSettings="$_dateOfDeparturePickerSettings"
+                                                />
+                                            </template>
+                                        </v-edit-dialog>
+                                    </td>
+
+                                    <td class="text-xs-center">
+                                        <v-edit-dialog
+                                            :return-value.sync="props.item.uploaded_to_table_cargos_date"
+                                            large
+                                            lazy
+                                            persistent
+                                            @save="updateFaxDataEditDialog(props.item)"
+                                            @cancel="cancel"
+                                            @close="close"
+                                        >
+                                            <div>{{ props.item.uploaded_to_table_cargos_date | formatDate }}</div>
+                                            <template v-slot:input>
+                                                <div class="mt-3 title">Update Iron</div>
+                                            </template>
+                                            <template v-slot:input>
+                                                <DatePicker
+                                                    :value.sync="props.item.uploaded_to_table_cargos_date"
+                                                    :errorDate="faxData.errorDate"
+                                                    :datePickerSettings="$_dateOfDeparturePickerSettings"
+                                                />
+                                                <!--<v-text-field-->
+                                                <!--v-model="props.item.uploaded_to_table_cargos_date"-->
+                                                <!--label="Edit"-->
+                                                <!--single-line-->
+                                                <!--counter-->
+                                                <!--autofocus-->
+                                                <!--&gt;</v-text-field>-->
+                                            </template>
+                                        </v-edit-dialog>
+                                    </td>
+
+                                    <td class="text-xs-center">
+                                        <v-edit-dialog
+                                            :return-value.sync="props.item.air_or_car"
+                                            large
+                                            lazy
+                                            persistent
+                                            @save="updateFaxDataEditDialog(props.item)"
+                                            @cancel="cancel"
+                                            @close="close"
+                                        >
+                                            <div>{{ props.item.air_or_car | convertBoolToAirOrCar }}</div>
+                                            <template v-slot:input>
+                                                <div class="mt-3 title">Update Iron</div>
+                                            </template>
+                                            <template v-slot:input>
+                                                <v-select
+                                                    v-model.number="props.item.air_or_car"
+                                                    :items="airOrCarList"
+                                                    type="number"
+                                                    label="Транспорт"
+                                                ></v-select>
+                                            </template>
+                                        </v-edit-dialog>
+                                    </td>
+
+                                    <td class="text-xs-center">
+                                        <v-edit-dialog
+                                            :return-value.sync="props.item.created_at"
+                                            large
+                                            lazy
+                                            persistent
+                                            @save="updateFaxDataEditDialog(props.item)"
+                                            @cancel="cancel"
+                                            @close="close"
+                                        >
+                                            <div>{{ props.item.created_at | formatDate }}</div>
+                                            <template v-slot:input>
+                                                <div class="mt-3 title">Update Iron</div>
+                                            </template>
+                                            <template v-slot:input>
+                                                <DatePicker
+                                                    :value.sync="props.item.created_at"
+                                                    :errorDate="faxData.errorDate"
+                                                    :datePickerSettings="$_dateOfDeparturePickerSettings"
+                                                />
+                                                <!--<v-text-field-->
+                                                <!--v-model="props.item.uploaded_to_table_cargos_date"-->
+                                                <!--label="Edit"-->
+                                                <!--single-line-->
+                                                <!--counter-->
+                                                <!--autofocus-->
+                                                <!--&gt;</v-text-field>-->
+                                            </template>
+                                        </v-edit-dialog>
+                                    </td>
+                                </tr>
+                            </template>
+                        </v-data-table>
+
+                        <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+                            <RectangleBtn
+                                v-show="clickSaveInEditDialog"
+                                :color="'cyan'"
+                                @clickRectangleBtn="updateFaxData"
+                            />
+
+                            <v-spacer></v-spacer>
+
+                            <RectangleBtn
+                                v-show="clickSaveInEditDialog"
+                                :title="'Закрыть'"
+                                :color="'red'"
+                                @clickRectangleBtn="snack = false"
+                            />
+                        </v-snackbar>
+                    </div>
+                </template>
+
+                <template v-slot:no-results>
                     <v-alert :value="true" color="error" icon="warning">
                         Поиск по "{{ search }}" не дал результатов.
                     </v-alert>
@@ -196,19 +361,32 @@
 </template>
 
 <script>
-    // import { mapGetters } from 'vuex';
     import axios from 'axios';
-    import { today } from '~/utils/dates';
+    import { today, needFormatDate } from '~/utils/dates';
     import checkErrorMixin from '~/mixins/checkError';
-    // import Swal from 'sweetalert2';
+    import { mapGetters } from 'vuex';
 
     export default {
         name: 'Faxes',
+        filters: {
+            formatDate (value) {
+                return needFormatDate(value) || '00-00-0000';
+            },
+            convertBoolToAirOrCar (value) {
+                return value ? 'Авиа' : 'Машина';
+            },
+            upperFirst (value) {
+                return _.upperFirst(value);
+            },
+        },
         components: {
             Search: () => import('~/components/Search'),
             ButtonUploadFile: () => import('~/components/Buttons/ButtonUploadFile'),
             DefaultButton: () => import('~/components/Buttons/DefaultButton'),
             DatePicker: () => import('~/components/Pickers/DatePicker'),
+            ControlPanelFaxes: () => import('~/components/Table/ControlPanelFaxes'),
+            RectangleBtn: () => import('~/components/Buttons/RectangleBtn'),
+            DialogAddFax: () => import('~/components/Dialogs/DialogAddFax'),
         },
         mixins: [checkErrorMixin],
         data () {
@@ -239,16 +417,45 @@
             };
 
             this.$_dateOfDeparturePickerSettings = {
-                label: 'Дата выезда',
+                label: 'Дата отправки',
             };
 
+            this.expandTableHeaders = [
+                { text: 'Название факса', sortable: false, align: 'center', value: 'fax_name' },
+                { text: 'Дата отправки', sortable: false, align: 'center', value: 'date_departure' },
+                {
+                    text: 'Дата загрузки в базу',
+                    sortable: false,
+                    align: 'center',
+                    value: 'uploaded_to_table_cargos_date',
+                },
+                { text: 'Транспорт', sortable: false, align: 'center', value: 'air_or_car' },
+                { text: 'Дата добавления', sortable: false, align: 'center', value: 'created_at' },
+            ];
+
+            this.mainTableHeaders = [
+                { text: 'Название факса', align: 'center', value: 'fax_name' },
+                {
+                    text: 'Дата загрузки в базу',
+                    align: 'center',
+                    value: 'uploaded_to_table_cargos_date',
+                },
+                { text: 'Транспорт', align: 'center', value: 'air_or_car' },
+            ];
+
             return {
-                test: 'SFDGGDJJD',
+                airOrCarList: [0, 1],
+                clickSaveInEditDialog: false,
+                snack: false,
+                snackColor: '',
+                snackText: '',
+                expand: false,
                 faxData: {
                     faxName: '',
                     fileInfo: '',
                     errorDate: '',
                 },
+                faxes: [],
                 dateOfDeparture: today(),
                 fileForUpload: new FormData(),
                 search: '',
@@ -258,25 +465,62 @@
                     sortBy: 'name',
                 },
                 selected: [],
-                headers: [
-                    { text: 'Название факса', align: 'center', value: 'fax_name' },
-                    { text: 'Дата выезда', align: 'center', value: 'date_departure' },
-                    { text: 'Дата загрузки в базу', align: 'center', value: 'uploaded_to_table_cargos_date' },
-                    { text: 'Загружен в базу', align: 'center', value: 'uploaded_to_table_cargos' },
-                    { text: 'Дата добавления', align: 'center', value: 'created_at' },
-                ],
             };
+        },
+        computed: {
+            ...mapGetters({
+                getFaxes: 'fax/getFaxes',
+            }),
         },
         watch: {
             fileForUpload (formData) {
                 this.setFileInfo(formData);
             },
+            getFaxes () {
+                this.cloneFaxData();
+            },
         },
-        asyncData () {
-            return axios.get('faxes')
-                .then(res => ({ faxesData: res.data.faxesData }));
+        async fetch ({ store }) {
+            try {
+                if (_.isEmpty(store.getters['fax/getFaxes'])) {
+                    //     Запрос данных всех факсов
+                    const { data } = await axios.get('faxes');
+                    const { faxesData = [] } = data;
+                    // console.log('allFaxes', faxesData);
+
+                    store.dispatch('fax/setFaxes', faxesData);
+                }
+            } catch (e) {
+                console.error(`Произошла ошибка при запросе всех факсов - ${e}`);
+            } finally {
+                console.log('Completed request for get faxes.');
+            }
+        },
+        created () {
+            this.cloneFaxData();
         },
         methods: {
+            cloneFaxData () {
+                this.faxes = _.cloneDeep(this.getFaxes);
+            },
+            updateFaxData () {
+                this.clickSaveInEditDialog = false;
+                this.snack = false;
+                console.log('UPDATE', this.faxes);
+            },
+            updateFaxDataEditDialog () {
+                this.clickSaveInEditDialog = true;
+
+                this.snack = true;
+                this.snackColor = 'primary';
+                this.snackText = 'Сохранено';
+            },
+            cancel () {
+
+            },
+            close () {
+                this.clickSaveInEditDialog = true;
+            },
             addPropsToFormData () {
                 this.fileForUpload.append('dateOfDeparture', this.dateOfDeparture);
                 this.fileForUpload.append('faxName', this.faxData.faxName);
@@ -288,7 +532,7 @@
                 if (this.selected.length) {
                     this.selected = [];
                 } else {
-                    this.selected = this.faxesData.slice();
+                    this.selected = this.getFaxes.slice();
                 }
             },
             changeSort (column) {
@@ -310,14 +554,13 @@
                 if (this.validationData()) {
                     this.addPropsToFormData();
 
-                    await axios.post('faxes/storeFax', this.fileForUpload).then((response) => {
-                        const { data } = response;
-                        const { status } = data;
+                    try {
+                        const { data } = await axios.post('faxes/storeFax', this.fileForUpload);
+                        // const { data } = response;
+                        const { status, fax = [] } = data;
                         if (status) {
-                            const { fax } = data;
-                            console.log('DATA', data);
-                            this.addFaxToTableAfterSaveOnServer(fax);
-
+                            // console.log('DATA', data);
+                            this.$store.dispatch('fax/addFax', fax);
                             this.openCloseDialog(false);
                             this.clearData();
 
@@ -327,19 +570,12 @@
                                 closeOnClick: true,
                                 pauseOnHover: true,
                             });
-                        } else {
-                            const { error, exception, row } = data;
-                            this.$snotify.warning(error, {
-                                timeout: 3000,
-                                showProgressBar: true,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                            });
-                            console.error(`Ошибка - ${error}, Строка записи - ${row}, Exception - ${_.last(exception.errorInfo)}`);
                         }
-                    }).catch((errors) => {
-                        this.changeErrors(errors.response.data.errors);
-                    });
+                    } catch (e) {
+                        console.error(`Произошла ошибка при загрузки факса на сервер - ${e}`);
+                    } finally {
+                        console.log('Completed request to upload fax on server.');
+                    }
                 }
                 this.loadingDisabledBtn(false);
             },
@@ -348,9 +584,6 @@
             },
             loadingDisabledBtn (bool) {
                 this.validSensor = bool;
-            },
-            addFaxToTableAfterSaveOnServer (fax) {
-                this.faxesData.unshift(fax);
             },
             validationData () {
                 const errorsObj = {};
@@ -385,3 +618,21 @@
     };
 
 </script>
+<style lang="scss">
+    .table__tr_show_hide_tr_control_panel {
+        position: relative;
+
+        .faxes_table_control_panel {
+            position: absolute;
+            margin-top: 10px;
+            right: 10%;
+            display: none;
+        }
+
+        &:hover {
+            .faxes_table_control_panel {
+                display: block;
+            }
+        }
+    }
+</style>
