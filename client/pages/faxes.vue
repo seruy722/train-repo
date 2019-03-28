@@ -17,96 +17,8 @@
                 <v-spacer></v-spacer>
                 <!--Диалог загрузки факса-->
                 <DialogAddFax
-                    :click-savesin-edit-dialog="clickSaveInEditDialog"
+                    :click-save-in-edit-dialog="clickSaveInEditDialog"
                 />
-                <!--<template>-->
-                <!--<div class="text-xs-center">-->
-                <!--<RectangleBtn-->
-                <!--v-show="!clickSaveInEditDialog"-->
-                <!--:title="'Добавить'"-->
-                <!--@clickRectangleBtn="openCloseDialog(true)"-->
-                <!--/>-->
-
-                <!--<RectangleBtn-->
-                <!--v-show="clickSaveInEditDialog"-->
-                <!--@clickRectangleBtn="updateFaxData"-->
-                <!--/>-->
-
-                <!--<v-dialog-->
-                <!--v-model="dialog"-->
-                <!--persistent-->
-                <!--max-width="500"-->
-                <!--&gt;-->
-                <!--<v-card>-->
-                <!--<v-card-title-->
-                <!--class="headline grey lighten-2"-->
-                <!--primary-title-->
-                <!--&gt;-->
-                <!--Загрузка факса-->
-                <!--</v-card-title>-->
-
-                <!--<v-card-text>-->
-                <!--<v-container>-->
-                <!--<v-layout row wrap>-->
-                <!--<v-flex xs12 sm12 md12>-->
-                <!--<DatePicker-->
-                <!--:value.sync="dateOfDeparture"-->
-                <!--:errorDate="faxData.errorDate"-->
-                <!--:datePickerSettings="$_dateOfDeparturePickerSettings"-->
-                <!--/>-->
-                <!--</v-flex>-->
-
-                <!--<v-flex xs12 sm12 md12>-->
-                <!--<v-text-field-->
-                <!--v-model.trim="faxData.faxName"-->
-                <!--:error-messages="checkError('faxName')"-->
-                <!--clearable-->
-                <!--label="Имя файла"-->
-                <!--autofocus-->
-                <!--&gt;</v-text-field>-->
-                <!--</v-flex>-->
-
-                <!--<v-flex xs12 sm6 md6>-->
-                <!--<ButtonUploadFile-->
-                <!--:file.sync="fileForUpload"-->
-                <!--:buttonUploadFileSettings="$_buttonUploadFileSettings"-->
-                <!--/>-->
-                <!--</v-flex>-->
-
-                <!--<v-flex xs12 sm6 md6>-->
-                <!--<v-text-field-->
-                <!--v-model="faxData.fileInfo"-->
-                <!--:error-messages="checkError('uploadedFile')"-->
-                <!--label="Имя загружаемого файла"-->
-                <!--readonly-->
-                <!--&gt;</v-text-field>-->
-                <!--</v-flex>-->
-
-                <!--</v-layout>-->
-                <!--</v-container>-->
-
-                <!--</v-card-text>-->
-
-                <!--<v-divider></v-divider>-->
-
-                <!--<v-card-actions>-->
-                <!--<v-spacer></v-spacer>-->
-
-                <!--<DefaultButton-->
-                <!--@clickButton="cancelUploadFile"-->
-                <!--:defaultButtonSettings="$_defaultButtonCancelSettings"-->
-                <!--/>-->
-
-                <!--<DefaultButton-->
-                <!--:defaultButtonSettings="$_defaultButtonSendFileToServerSettings"-->
-                <!--:disabledButton="validSensor"-->
-                <!--@clickButton="sendFileToServer"-->
-                <!--/>-->
-                <!--</v-card-actions>-->
-                <!--</v-card>-->
-                <!--</v-dialog>-->
-                <!--</div>-->
-                <!--</template>-->
             </v-toolbar>
 
             <v-data-table
@@ -233,8 +145,7 @@
                                             <template v-slot:input>
                                                 <DatePicker
                                                     :value.sync="props.item.date_departure"
-                                                    :errorDate="faxData.errorDate"
-                                                    :datePickerSettings="$_dateOfDeparturePickerSettings"
+                                                    :date-picker-settings="$_dateOfDeparturePickerSettings"
                                                 />
                                             </template>
                                         </v-edit-dialog>
@@ -257,8 +168,7 @@
                                             <template v-slot:input>
                                                 <DatePicker
                                                     :value.sync="props.item.uploaded_to_table_cargos_date"
-                                                    :errorDate="faxData.errorDate"
-                                                    :datePickerSettings="$_dateOfDeparturePickerSettings"
+                                                    :date-pickerp-settings="$_dateOfDeparturePickerSettings"
                                                 />
                                                 <!--<v-text-field-->
                                                 <!--v-model="props.item.uploaded_to_table_cargos_date"-->
@@ -313,8 +223,7 @@
                                             <template v-slot:input>
                                                 <DatePicker
                                                     :value.sync="props.item.created_at"
-                                                    :errorDate="faxData.errorDate"
-                                                    :datePickerSettings="$_dateOfDeparturePickerSettings"
+                                                    :date-picker-settings="$_dateOfDeparturePickerSettings"
                                                 />
                                                 <!--<v-text-field-->
                                                 <!--v-model="props.item.uploaded_to_table_cargos_date"-->
@@ -362,8 +271,7 @@
 
 <script>
     import axios from 'axios';
-    import { today, needFormatDate } from '~/utils/dates';
-    import checkErrorMixin from '~/mixins/checkError';
+    import { needFormatDate } from '~/utils/dates';
     import { mapGetters } from 'vuex';
 
     export default {
@@ -381,41 +289,12 @@
         },
         components: {
             Search: () => import('~/components/Search'),
-            ButtonUploadFile: () => import('~/components/Buttons/ButtonUploadFile'),
-            DefaultButton: () => import('~/components/Buttons/DefaultButton'),
             DatePicker: () => import('~/components/Pickers/DatePicker'),
             ControlPanelFaxes: () => import('~/components/Table/ControlPanelFaxes'),
             RectangleBtn: () => import('~/components/Buttons/RectangleBtn'),
             DialogAddFax: () => import('~/components/Dialogs/DialogAddFax'),
         },
-        mixins: [checkErrorMixin],
         data () {
-            this.$_buttonUploadFileSettings = {
-                color: 'blue-grey',
-                class: 'white--text',
-                icon: 'cloud_upload',
-            };
-
-            this.$_defaultButtonCancelSettings = {
-                color: 'red',
-                flat: 'flat',
-                outline: 'outline',
-                title: 'Отмена',
-            };
-
-            this.$_defaultButtonSendFileToServerSettings = {
-                color: 'primary',
-                flat: 'flat',
-                outline: 'outline',
-                title: 'Загрузить',
-            };
-
-            this.$_defaultButtonAddFaxSettings = {
-                color: 'green',
-                dark: true,
-                title: 'Добавить',
-            };
-
             this.$_dateOfDeparturePickerSettings = {
                 label: 'Дата отправки',
             };
@@ -450,17 +329,8 @@
                 snackColor: '',
                 snackText: '',
                 expand: false,
-                faxData: {
-                    faxName: '',
-                    fileInfo: '',
-                    errorDate: '',
-                },
                 faxes: [],
-                dateOfDeparture: today(),
-                fileForUpload: new FormData(),
                 search: '',
-                dialog: false,
-                validSensor: false,
                 pagination: {
                     sortBy: 'name',
                 },
@@ -506,7 +376,6 @@
             updateFaxData () {
                 this.clickSaveInEditDialog = false;
                 this.snack = false;
-                console.log('UPDATE', this.faxes);
             },
             updateFaxDataEditDialog () {
                 this.clickSaveInEditDialog = true;
@@ -520,13 +389,6 @@
             },
             close () {
                 this.clickSaveInEditDialog = true;
-            },
-            addPropsToFormData () {
-                this.fileForUpload.append('dateOfDeparture', this.dateOfDeparture);
-                this.fileForUpload.append('faxName', this.faxData.faxName);
-            },
-            setFileInfo (formData) {
-                this.faxData.fileInfo = `${formData.get('fileName')} [${_.round(formData.get('fileSize') / 1024)} кб]`;
             },
             toggleAll () {
                 if (this.selected.length) {
@@ -542,77 +404,6 @@
                     this.pagination.sortBy = column;
                     this.pagination.descending = false;
                 }
-            },
-            cancelUploadFile () {
-                this.openCloseDialog(false);
-                this.clearData();
-                this.changeErrors({});
-            },
-            async sendFileToServer () {
-                this.loadingDisabledBtn(true);
-
-                if (this.validationData()) {
-                    this.addPropsToFormData();
-
-                    try {
-                        const { data } = await axios.post('faxes/storeFax', this.fileForUpload);
-                        // const { data } = response;
-                        const { status, fax = [] } = data;
-                        if (status) {
-                            // console.log('DATA', data);
-                            this.$store.dispatch('fax/addFax', fax);
-                            this.openCloseDialog(false);
-                            this.clearData();
-
-                            this.$snotify.success('Факс успешно добавлен.', {
-                                timeout: 3000,
-                                showProgressBar: true,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                            });
-                        }
-                    } catch (e) {
-                        console.error(`Произошла ошибка при загрузки факса на сервер - ${e}`);
-                    } finally {
-                        console.log('Completed request to upload fax on server.');
-                    }
-                }
-                this.loadingDisabledBtn(false);
-            },
-            openCloseDialog (bool) {
-                this.dialog = bool;
-            },
-            loadingDisabledBtn (bool) {
-                this.validSensor = bool;
-            },
-            validationData () {
-                const errorsObj = {};
-                if (!this.faxData.fileInfo) {
-                    errorsObj.fileInfo = 'Добавте файл.';
-                } else {
-                    delete errorsObj.fileInfo;
-                }
-
-                if (!this.faxData.faxName) {
-                    errorsObj.faxName = 'Введите имя файла.';
-                } else {
-                    delete errorsObj.faxName;
-                }
-
-                if (!this.dateOfDeparture) {
-                    this.faxData.errorDate = 'Выберите дату выезда';
-                } else {
-                    this.faxData.errorDate = '';
-                }
-
-                this.changeErrors(errorsObj);
-
-                return _.isEmpty(errorsObj) && this.dateOfDeparture;
-            },
-            clearData () {
-                _.forIn(this.faxData, (item, key, obj) => {
-                    obj[key] = '';
-                });
             },
         },
     };

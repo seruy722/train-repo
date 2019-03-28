@@ -33,7 +33,7 @@
                                 <v-layout row wrap>
                                     <v-flex xs12 sm12 md12>
                                         <DatePicker
-                                            :value.sync="dateOfDeparture"
+                                            :value.sync="faxData.dateOfDeparture"
                                             :error-date="faxData.errorDate"
                                             :date-picker-settings="$_dateOfDeparturePickerSettings"
                                         />
@@ -47,6 +47,23 @@
                                             label="Имя файла"
                                             autofocus
                                         ></v-text-field>
+                                    </v-flex>
+
+                                    <v-flex xs12 sm12 md12>
+                                        <!--<v-switch-->
+                                        <!--v-model="switchTransport"-->
+                                        <!--:label="`Транспорт: ${switchTransport? 'Авиа': 'Машина'}`"-->
+                                        <!--&gt;</v-switch>-->
+                                        <v-select
+                                            v-model="faxData.selectedTransportItem"
+                                            :items="transportItems"
+                                            :error-messages="checkError('selectedTransportItem')"
+                                            item-text="title"
+                                            item-value="id"
+                                            label="Транспорт"
+                                            return-object
+                                            single-line
+                                        ></v-select>
                                     </v-flex>
 
                                     <v-flex xs12 sm6 md6>
@@ -145,7 +162,16 @@
             };
 
             return {
-                dateOfDeparture: today(),
+                transportItems: [
+                    {
+                        id: 0,
+                        title: 'Машина',
+                    }, {
+                        id: 1,
+                        title: 'Авиа',
+                    },
+                ],
+                // dateOfDeparture: today(),
                 fileForUpload: new FormData(),
                 dialog: false,
                 validSensor: false,
@@ -153,6 +179,8 @@
                     faxName: '',
                     fileInfo: '',
                     errorDate: '',
+                    selectedTransportItem: {},
+                    dateOfDeparture: today(),
                 },
             };
         },
@@ -202,7 +230,8 @@
                 this.changeErrors({});
             },
             addPropsToFormData () {
-                this.fileForUpload.append('dateOfDeparture', this.dateOfDeparture);
+                this.fileForUpload.append('dateOfDeparture', this.faxData.dateOfDeparture);
+                this.fileForUpload.append('transport', this.faxData.selectedTransportItem.id);
                 this.fileForUpload.append('faxName', this.faxData.faxName);
             },
             setFileInfo (formData) {
@@ -215,10 +244,8 @@
                 this.validSensor = bool;
             },
             validationData () {
-                console.log(this.faxData);
                 const errorsObj = {};
                 if (!this.faxData.fileInfo) {
-                    console.log('fileInfo');
                     errorsObj.fileInfo = 'Добавте файл.';
                 } else {
                     delete errorsObj.fileInfo;
@@ -230,16 +257,21 @@
                     delete errorsObj.faxName;
                 }
 
-                if (!this.dateOfDeparture) {
-                    this.faxData.errorDate = 'Выберите дату выезда';
+                if (!this.faxData.dateOfDeparture) {
+                    this.faxData.errorDate = 'Выберите дату отправки';
                 } else {
                     this.faxData.errorDate = '';
                 }
 
+                if (_.isEmpty(this.faxData.selectedTransportItem)) {
+                    errorsObj.selectedTransportItem = 'Выберите транспорт';
+                } else {
+                    delete errorsObj.selectedTransportItem;
+                }
+                console.log(this.faxData);
                 this.changeErrors(errorsObj);
-                console.log(errorsObj);
 
-                return _.isEmpty(errorsObj) && this.dateOfDeparture;
+                return _.isEmpty(errorsObj);
             },
             clearData () {
                 _.forIn(this.faxData, (item, key, obj) => {

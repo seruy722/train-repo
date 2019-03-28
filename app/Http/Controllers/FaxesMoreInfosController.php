@@ -36,7 +36,8 @@ class FaxesMoreInfosController extends Controller
         $this->validate($request, [
             'uploadedFile' => 'required|file|max:10240||mimes:xls,xlsx,csv',
             'faxName' => 'required|string|min:3|max:255',
-            'dateOfDeparture' => 'required|date|max:255'
+            'dateOfDeparture' => 'required|date|max:255',
+            'transport' => 'required|numeric'
         ]);
 
         // Класс доп функций
@@ -60,7 +61,7 @@ class FaxesMoreInfosController extends Controller
 
         // Добавление факса
         $fileExtention = $request->file('uploadedFile')->getClientOriginalExtension();
-        $arrForCreateFax = ['fax_name' => $cleanedData['faxName'] . '.' . $fileExtention, 'date_departure' => $FormatDatesClass->formatServerDate($cleanedData['dateOfDeparture'])];
+        $arrForCreateFax = ['fax_name' => $cleanedData['faxName'] . '.' . $fileExtention, 'date_departure' => $FormatDatesClass->formatServerDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
         $fax = Fax::create($arrForCreateFax);
 
         $formatedDatesFax = $FormatDatesClass->formatDatesFields($fax->toArray(), ['created_at', 'date_departure']);
@@ -209,7 +210,8 @@ class FaxesMoreInfosController extends Controller
         return response()->json(['status' => true]);
     }
 
-        public function changeEntriesFaxID(Request $request){
+    public function changeEntriesFaxID(Request $request)
+    {
         $this->validate($request, [
             'entriesID' => 'required|array',
             'faxID' => 'required|numeric',
@@ -220,7 +222,7 @@ class FaxesMoreInfosController extends Controller
 
         foreach ($faxEntries as $value) {
             FaxesMoreInfos::where('id', $value)->update([
-                'fax_id'=>$faxID
+                'fax_id' => $faxID
             ]);
         }
 

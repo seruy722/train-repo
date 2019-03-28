@@ -36,9 +36,6 @@
                 default: false,
             },
         },
-        created () {
-            console.log('DISA', this.disabledButton);
-        },
     };
 </script>
 
