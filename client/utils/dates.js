@@ -25,7 +25,20 @@ export function needDate (obj) {
  *
  * @return {string}
  */
-export const today = () => new Date().toISOString().substr(0, 10).split('-').reverse().join('-');
+export const today = () => {
+    const dateToday = new Date();
+    return `${dateToday.getFullYear()}-${dateToday.getMonth()}-${dateToday.getDate()}`;
+};
+
+/**
+ * Возвращает текущую дату
+ *
+ * @return {string}
+ */
+export const notFormatedToday = () => {
+    const dateToday = new Date();
+    return `${dateToday.toISOString().substr(0, 10)} ${dateToday.toLocaleTimeString()}`;
+};
 
 /**
  *Возвращает отформатированную дату

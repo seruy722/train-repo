@@ -20,6 +20,7 @@
                     prepend-icon="event"
                     readonly
                     clearable
+                    autofocus
                     v-on="on"
                 ></v-text-field>
             </template>
@@ -45,7 +46,7 @@
         props: {
             value: {
                 type: String,
-                default: '',
+                default: new Date().toISOString().substr(0, 10),
             },
             datePickerSettings: {
                 type: Object,
@@ -57,7 +58,6 @@
             },
         },
         data: () => ({
-            // date: needFormatDate(new Date().toISOString()),
             date: new Date().toISOString().substr(0, 10),
             menu: false,
         }),
@@ -73,15 +73,15 @@
         },
 
         watch: {
-            date () {
-                // console.log('DATE', this.dateFormatted);
-                this.dateFormatted = needFormatDate(this.date);
+            date (val) {
+                this.dateFormatted = val;
             },
             errorDate (error) {
                 this.changeErrors({ pickerDate: error });
             },
         },
         created () {
+            console.log('this.value', this.value);
             if (!this.value) {
                 this.dateFormatted = this.date;
             }

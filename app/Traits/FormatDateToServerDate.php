@@ -12,6 +12,9 @@ trait FormatDateToServerDate
      */
     public function formatServerDate($date)
     {
-        return date("Y-m-d H:i:s", strtotime($date));
+
+        $serverTime = date('H:i:s');
+        $fullDate = $date . ' ' . $serverTime;
+        return date("Y-m-d H:i:s", strtotime($fullDate));
     }
 }

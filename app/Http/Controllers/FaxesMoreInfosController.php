@@ -61,7 +61,7 @@ class FaxesMoreInfosController extends Controller
 
         // Добавление факса
         $fileExtention = $request->file('uploadedFile')->getClientOriginalExtension();
-        $arrForCreateFax = ['fax_name' => $cleanedData['faxName'] . '.' . $fileExtention, 'date_departure' => $FormatDatesClass->formatServerDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
+        $arrForCreateFax = ['fax_name' => $cleanedData['faxName'] . '.' . $fileExtention, 'date_departure' => $this->formatServerDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
         $fax = Fax::create($arrForCreateFax);
 
         $formatedDatesFax = $FormatDatesClass->formatDatesFields($fax->toArray(), ['created_at', 'date_departure']);

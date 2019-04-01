@@ -6,10 +6,8 @@ use App\FaxesMoreInfos;
 use App\FaxPriceForCategory;
 use Illuminate\Http\Request;
 use App\Fax;
-use App\Utils\FormatDatesClass;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -18,12 +16,14 @@ class FaxesController extends Controller
 
     public function index()
     {
-//        $FormatDatesClass = new FormatDatesClass('d-m-y');
         $faxesData = DB::table('faxes')->orderBy('date_departure', "DESC")->get();
+        $arr = $faxesData->toArray();
+        foreach ($arr as $item) {
+            $item->date_departure = date("c", strtotime($item->date_departure));
+            $item->created_at = date("c", strtotime($item->created_at));
+        }
 
-//        $formatedDatesArr = $FormatDatesClass->formatDatesFields($faxesData->toArray(), ['created_at', 'date_departure', 'uploaded_to_table_cargos_date']);
-
-        return response()->json(['status' => true, 'faxesData' => $faxesData]);
+        return response()->json(['status' => true, 'faxesData' => $faxesData, 'date'=>date('c')]);
     }
 
     public function getFaxesNames()

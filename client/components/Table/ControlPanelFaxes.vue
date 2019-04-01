@@ -8,14 +8,9 @@
                 <v-tooltip bottom>
 
                     <template v-slot:activator="{ on }">
-                        <v-icon
-                            dark
-                            color="cyan"
-                            v-on="on"
-                            @click.stop="openCloseFaxesExpandPanel"
-                        >
-                            edit
-                        </v-icon>
+                        <v-btn v-on="on" flat icon color="cyan" @click.stop="openCloseFaxesExpandPanel">
+                            <v-icon>edit</v-icon>
+                        </v-btn>
                     </template>
 
                     <span>Редактировать</span>
@@ -25,14 +20,9 @@
             <div v-if="download" class="faxes_control_panel__button">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                        <v-icon
-                            dark
-                            color="green"
-                            v-on="on"
-                            @click.stop="downloadExcle"
-                        >
-                            get_app
-                        </v-icon>
+                        <v-btn v-on="on" flat icon color="green" @click.stop="downloadExcle">
+                            <v-icon>get_app</v-icon>
+                        </v-btn>
                     </template>
 
                     <span>Excel</span>
@@ -43,14 +33,9 @@
                 <v-tooltip bottom>
 
                     <template v-slot:activator="{ on }">
-                        <v-icon
-                            dark
-                            color="red"
-                            v-on="on"
-                            @click.stop="destroyEntries"
-                        >
-                            delete
-                        </v-icon>
+                        <v-btn v-on="on" flat icon color="red" @click.stop="destroyEntries">
+                            <v-icon>delete</v-icon>
+                        </v-btn>
                     </template>
 
                     <span>Удалить</span>
@@ -181,13 +166,8 @@
         background-color: #ebeef0;
 
         .faxes_control_panel__button_wraper {
-            width: 100px;
             display: flex;
-            justify-content: space-between;
-
-            .faxes_control_panel__button:hover{
-                background-color: #dde0e2;
-            }
+            justify-content: space-around;
         }
     }
 

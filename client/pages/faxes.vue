@@ -163,20 +163,13 @@
                                         >
                                             <div>{{ props.item.uploaded_to_table_cargos_date | formatDate }}</div>
                                             <template v-slot:input>
-                                                <div class="mt-3 title">Update Iron</div>
+                                                <div class="mt-3 title">Редактирование</div>
                                             </template>
                                             <template v-slot:input>
                                                 <DatePicker
                                                     :value.sync="props.item.uploaded_to_table_cargos_date"
-                                                    :date-pickerp-settings="$_dateOfDeparturePickerSettings"
+                                                    :date-picker-settings="$_dateOfDeparturePickerSettings"
                                                 />
-                                                <!--<v-text-field-->
-                                                <!--v-model="props.item.uploaded_to_table_cargos_date"-->
-                                                <!--label="Edit"-->
-                                                <!--single-line-->
-                                                <!--counter-->
-                                                <!--autofocus-->
-                                                <!--&gt;</v-text-field>-->
                                             </template>
                                         </v-edit-dialog>
                                     </td>
@@ -193,14 +186,18 @@
                                         >
                                             <div>{{ props.item.air_or_car | convertBoolToAirOrCar }}</div>
                                             <template v-slot:input>
-                                                <div class="mt-3 title">Update Iron</div>
+                                                <div class="mt-3 title">Редактирование</div>
                                             </template>
                                             <template v-slot:input>
                                                 <v-select
                                                     v-model.number="props.item.air_or_car"
-                                                    :items="airOrCarList"
+                                                    :items="transportItems"
+                                                    item-text="title"
+                                                    item-value="id"
+                                                    hide-selected
                                                     type="number"
                                                     label="Транспорт"
+                                                    single-line
                                                 ></v-select>
                                             </template>
                                         </v-edit-dialog>
@@ -323,7 +320,6 @@
             ];
 
             return {
-                airOrCarList: [0, 1],
                 clickSaveInEditDialog: false,
                 snack: false,
                 snackColor: '',
@@ -340,6 +336,7 @@
         computed: {
             ...mapGetters({
                 getFaxes: 'fax/getFaxes',
+                transportItems: 'settings/transportItems',
             }),
         },
         watch: {
@@ -355,8 +352,9 @@
                 if (_.isEmpty(store.getters['fax/getFaxes'])) {
                     //     Запрос данных всех факсов
                     const { data } = await axios.get('faxes');
-                    const { faxesData = [] } = data;
-                    // console.log('allFaxes', faxesData);
+                    const { faxesData = [], date = null } = data;
+
+                    console.log('date', date);
 
                     store.dispatch('fax/setFaxes', faxesData);
                 }
@@ -377,12 +375,25 @@
                 this.clickSaveInEditDialog = false;
                 this.snack = false;
             },
-            updateFaxDataEditDialog () {
+            addItemToSendDataArrayForUpdate (item) {
+                const newItem = _.clone(item);
+                console.log('newItem', newItem);
+                // delete newItem.clientItemsArray;
+                // const itemIndex = _.findIndex(this.sendDataToUpdate, { id: newItem.id });
+                //
+                // if (itemIndex !== -1) {
+                //     this.sendDataToUpdate.splice(itemIndex, 1, newItem);
+                // } else {
+                //     this.sendDataToUpdate.push(newItem);
+                // }
+            },
+            updateFaxDataEditDialog (item) {
                 this.clickSaveInEditDialog = true;
-
                 this.snack = true;
                 this.snackColor = 'primary';
-                this.snackText = 'Сохранено';
+                this.snackText = 'Сохранить';
+
+                this.addItemToSendDataArrayForUpdate(item);
             },
             cancel () {
 
@@ -415,8 +426,7 @@
 
         .faxes_table_control_panel {
             position: absolute;
-            margin-top: 10px;
-            right: 10%;
+            right: 12%;
             display: none;
         }
 

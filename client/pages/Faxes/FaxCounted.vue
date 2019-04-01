@@ -71,6 +71,7 @@
                 item-key="name"
                 class="elevation-1"
             >
+
                 <template v-slot:items="props">
                     <tr
                         :class="{['table__tr-bold_text table__tr-bg_color']: props.item.brand}"
@@ -86,9 +87,9 @@
                                 <template v-slot:badge>
                                     <span>Бренд</span>
                                 </template>
-                                <span>{{ props.item.name }}</span>
+                                <span>{{ props.item.name | clientFormat }}</span>
                             </v-badge>
-                            <span v-if="!props.item.brand">{{ props.item.name }}</span>
+                            <span v-if="!props.item.brand">{{ props.item.name | clientFormat }}</span>
                         </td>
 
                         <td
@@ -189,7 +190,7 @@
                                             @close="close"
                                             @open="openClientsNamesEditDialog"
                                         >
-                                            <div>{{ props.item.name }}</div>
+                                            <div>{{ props.item.name | clientFormat }}</div>
                                             <template v-slot:input>
                                                 <div class="mt-3 title">Клиент</div>
                                             </template>
@@ -317,6 +318,7 @@
                                             <template v-slot:input>
                                                 <v-text-field
                                                     v-model.number="props.item.for_place"
+                                                    v-change="props.item.for_place"
                                                     label="Edit"
                                                     type="number"
                                                     single-line
@@ -596,9 +598,39 @@
         components: {
             ControlPanelFaxEntries: () => import('~/components/Table/ControlPanelFaxEntries'),
         },
+        directives: {
+            change: {
+                twoWay: true,
+                bind: function (el, binding, vnode) {
+                    console.log('bind');
+                },
+                // Когда привязанный элемент вставлен в DOM...
+                inserted: function (el, binding, vnode) {
+                    // console.log('el', el);
+                    // console.log('binding', binding);
+                    // console.log('vnode', vnode);
+                },
+                update: function (el, binding, vnode) {
+                    console.log('el', el);
+                    console.log('binding', binding);
+                    console.log('vnode', vnode);
+                    // const res = el.querySelector('input');
+                    // res.value = 55;
+                    // console.log(res);
+                    // console.log(res.value);
+                },
+            },
+        },
         filters: {
             numFormat (val) {
                 return numberFormat(val) || 0;
+            },
+            clientFormat (val) {
+                if (_.includes(val, '/')) {
+                    const endIndex = val.indexOf('/');
+                    return val.substr(endIndex + 1);
+                }
+                return val;
             },
         },
         data () {
@@ -646,7 +678,7 @@
                 { text: 'Вес', align: 'center', value: 'kg' },
                 { text: 'За кг', align: 'center', sortable: false },
                 { text: 'За место', align: 'center', sortable: false },
-                { text: 'Сумма', align: 'center', value: 'fax_id' },
+                { text: 'Сумма', align: 'center', value: 'sum' },
             ];
 
             this.$_totalFaxData = {
@@ -768,6 +800,9 @@
             this.setSelectedColumn(this.$_mainTableHeaders);
         },
         methods: {
+            key(){
+                return 58;
+            },
             startCounter () {
                 const counterUndo = setInterval(() => {
                     this.counter = this.counter - 1;

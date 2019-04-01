@@ -12,7 +12,7 @@
 
                 <RectangleBtn
                     v-show="clickSaveInEditDialog"
-                    @clickRectangleBtn="updateFaxData"
+                    @click="$emit('clickRectangleBtn')"
                 />
 
                 <v-dialog
@@ -50,10 +50,6 @@
                                     </v-flex>
 
                                     <v-flex xs12 sm12 md12>
-                                        <!--<v-switch-->
-                                        <!--v-model="switchTransport"-->
-                                        <!--:label="`Транспорт: ${switchTransport? 'Авиа': 'Машина'}`"-->
-                                        <!--&gt;</v-switch>-->
                                         <v-select
                                             v-model="faxData.selectedTransportItem"
                                             :items="transportItems"
@@ -61,7 +57,6 @@
                                             item-text="title"
                                             item-value="id"
                                             label="Транспорт"
-                                            return-object
                                             single-line
                                         ></v-select>
                                     </v-flex>
@@ -114,6 +109,7 @@
     import axios from 'axios';
     import checkErrorMixin from '~/mixins/checkError';
     import { today } from '~/utils/dates';
+    import { mapGetters } from 'vuex';
 
     export default {
         name: 'DialogAddFax',
@@ -162,16 +158,6 @@
             };
 
             return {
-                transportItems: [
-                    {
-                        id: 0,
-                        title: 'Машина',
-                    }, {
-                        id: 1,
-                        title: 'Авиа',
-                    },
-                ],
-                // dateOfDeparture: today(),
                 fileForUpload: new FormData(),
                 dialog: false,
                 validSensor: false,
@@ -179,10 +165,15 @@
                     faxName: '',
                     fileInfo: '',
                     errorDate: '',
-                    selectedTransportItem: {},
+                    selectedTransportItem: NaN,
                     dateOfDeparture: today(),
                 },
             };
+        },
+        computed: {
+            ...mapGetters({
+                transportItems: 'settings/transportItems',
+            }),
         },
         watch: {
             fileForUpload (formData) {
@@ -222,7 +213,7 @@
                 this.loadingDisabledBtn(false);
             },
             updateFaxData () {
-
+                this.clickSaveInEditDialog = false;
             },
             cancelUploadFile () {
                 this.openCloseDialog(false);
@@ -230,8 +221,9 @@
                 this.changeErrors({});
             },
             addPropsToFormData () {
+                console.log(this.faxData.dateOfDeparture);
                 this.fileForUpload.append('dateOfDeparture', this.faxData.dateOfDeparture);
-                this.fileForUpload.append('transport', this.faxData.selectedTransportItem.id);
+                this.fileForUpload.append('transport', this.faxData.selectedTransportItem);
                 this.fileForUpload.append('faxName', this.faxData.faxName);
             },
             setFileInfo (formData) {
@@ -263,7 +255,7 @@
                     this.faxData.errorDate = '';
                 }
 
-                if (_.isEmpty(this.faxData.selectedTransportItem)) {
+                if (_.isNaN(this.faxData.selectedTransportItem)) {
                     errorsObj.selectedTransportItem = 'Выберите транспорт';
                 } else {
                     delete errorsObj.selectedTransportItem;
@@ -275,7 +267,12 @@
             },
             clearData () {
                 _.forIn(this.faxData, (item, key, obj) => {
-                    obj[key] = '';
+                    if (key !== 'selectedTransportItem') {
+                        obj[key] = '';
+                    } else {
+                        obj[key] = NaN;
+                    }
+
                 });
             },
         },

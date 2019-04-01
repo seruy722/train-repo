@@ -1,5 +1,6 @@
 <template>
     <div data-component-name="Home">
+
         <v-app id="inspire">
             <v-navigation-drawer
                 v-if="showAdminData"
@@ -102,6 +103,7 @@
                     </v-img>
                 </v-avatar>
                 <!--МЕНЮ-->
+                <!--<Connectivity/>-->
                 <home-nav></home-nav>
             </v-toolbar>
             <v-content>
@@ -122,11 +124,13 @@
     import HomeNav from '~/components/Navs/HomeNav';
     import navClickMixin from '~/mixins/navClick';
     import logout from '~/mixins/logout';
+    import Connectivity from '~/components/Connectivity';
 
     export default {
         mixins: [navClickMixin, logout],
         components: {
-            HomeNav // Меню навигации
+            HomeNav, // Меню навигации
+            // Connectivity,
         },
         middleware: 'auth',
         showAdminData: false,

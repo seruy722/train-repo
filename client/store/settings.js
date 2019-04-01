@@ -50,6 +50,15 @@ export const state = () => ({
             title: 'Выбрать неделю',
         },
     ],
+    transportItems: [
+        {
+            id: 0,
+            title: 'Машина',
+        }, {
+            id: 1,
+            title: 'Авиа',
+        },
+    ],
 });
 
 // getters
@@ -60,4 +69,5 @@ export const getters = {
     adminRole: state => state.adminRole,
     allClientsObj: state => state.allClientsObj,
     selectDatesItems: state => state.selectDatesItems,
+    transportItems: state => state.transportItems,
 };
