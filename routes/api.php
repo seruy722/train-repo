@@ -61,13 +61,14 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('faxes/storeFax', 'FaxesMoreInfosController@store');
     Route::post('faxes/faxData', 'FaxesMoreInfosController@dataForFaxCounted');
     Route::post('faxes/updateData', 'FaxesMoreInfosController@updateFaxData');
+    Route::post('faxes/updateFaxData', 'FaxesController@updateData');
     Route::post('faxes/destroyFaxData', 'FaxesMoreInfosController@destroyFaxEntries');
     Route::post('faxes/moveEntries', 'FaxesMoreInfosController@changeEntriesFaxID');
     Route::post('faxes/updateCategoriesData', 'FaxPriceCategoriesData@updateFaxCategoriesData');
     Route::post('faxes/categoriesData', 'FaxPriceCategoriesData@getFaxCategoriesData');
     Route::post('faxes/download', 'FaxesController@downloadOriginalFax');
     Route::post('faxes/load', 'FaxesController@downloadOriginalFax');
-    Route::get('fax/download', 'FaxesMoreInfosController@export');
+    Route::post('fax/download', 'FaxesMoreInfosController@export');
     // CATEGORIES
     Route::get('faxes/categoriesNames', 'FaxCategoriesController@index');
 });

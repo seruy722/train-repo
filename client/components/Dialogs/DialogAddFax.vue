@@ -7,12 +7,14 @@
                 <RectangleBtn
                     v-show="!clickSaveInEditDialog"
                     :title="'Добавить'"
-                    @clickRectangleBtn="openCloseDialog(true)"
+                    :event="'openCloseAddFaxDialog'"
+                    @openCloseAddFaxDialog="openCloseAddFaxDialog(true)"
                 />
-
+                <!--$emit('saveData')-->
                 <RectangleBtn
                     v-show="clickSaveInEditDialog"
-                    @click="$emit('clickRectangleBtn')"
+                    :event="event"
+                    @[event]="$emit(event)"
                 />
 
                 <v-dialog
@@ -108,7 +110,7 @@
 <script>
     import axios from 'axios';
     import checkErrorMixin from '~/mixins/checkError';
-    import { today } from '~/utils/dates';
+    import { today, formatDateToServerDate } from '~/utils/dates';
     import { mapGetters } from 'vuex';
 
     export default {
@@ -124,6 +126,10 @@
             clickSaveInEditDialog: {
                 type: Boolean,
                 default: false,
+            },
+            event: {
+                type: String,
+                required: true,
             },
         },
         data () {
@@ -179,22 +185,33 @@
             fileForUpload (formData) {
                 this.setFileInfo(formData);
             },
+            event (val) {
+                console.log('event', val);
+            },
         },
         methods: {
+            ssss(){
+              console.log('ss');
+            },
+            updateFaxData(){
+                console.log('UP');
+            },
             async sendFileToServer () {
                 this.loadingDisabledBtn(true);
 
                 if (this.validationData()) {
                     this.addPropsToFormData();
-
+                    console.log('this.faxData.dateOfDeparture', formatDateToServerDate(this.faxData.dateOfDeparture));
                     try {
                         const { data } = await axios.post('faxes/storeFax', this.fileForUpload);
-                        // const { data } = response;
-                        const { status, fax = [] } = data;
+                        const { status, fax = [], groupedData = [] } = data;
                         if (status) {
-                            // console.log('DATA', data);
+                            // console.log('groupedData', groupedData);
+
                             this.$store.dispatch('fax/addFax', fax);
-                            this.openCloseDialog(false);
+                            this.$store.dispatch('fax/setGroupedData', groupedData);
+
+                            this.openCloseAddFaxDialog(false);
                             this.clearData();
 
                             this.$snotify.success('Факс успешно добавлен.', {
@@ -216,20 +233,21 @@
                 this.clickSaveInEditDialog = false;
             },
             cancelUploadFile () {
-                this.openCloseDialog(false);
+                this.openCloseAddFaxDialog(false);
                 this.clearData();
                 this.changeErrors({});
+                this.loadingDisabledBtn(false);
             },
             addPropsToFormData () {
                 console.log(this.faxData.dateOfDeparture);
-                this.fileForUpload.append('dateOfDeparture', this.faxData.dateOfDeparture);
+                this.fileForUpload.append('dateOfDeparture', formatDateToServerDate(this.faxData.dateOfDeparture));
                 this.fileForUpload.append('transport', this.faxData.selectedTransportItem);
                 this.fileForUpload.append('faxName', this.faxData.faxName);
             },
             setFileInfo (formData) {
                 this.faxData.fileInfo = `${formData.get('fileName')} [${_.round(formData.get('fileSize') / 1024)} кб]`;
             },
-            openCloseDialog (bool) {
+            openCloseAddFaxDialog (bool) {
                 this.dialog = bool;
             },
             loadingDisabledBtn (bool) {

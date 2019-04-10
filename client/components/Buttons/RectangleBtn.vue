@@ -5,7 +5,7 @@
         <v-btn
             :color="color"
             :flat="flat"
-            @click="$emit('clickRectangleBtn')"
+            @click="$emit(event)"
         >
             {{ title }}
         </v-btn>
@@ -27,6 +27,10 @@
             flat: {
                 type: Boolean,
                 default: false,
+            },
+            event: {
+                type: String,
+                required: true,
             },
         },
     };

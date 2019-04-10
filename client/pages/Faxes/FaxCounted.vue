@@ -676,8 +676,8 @@
                 { text: 'Клиент', align: 'center', value: 'name' },
                 { text: 'Мест', align: 'center', value: 'place' },
                 { text: 'Вес', align: 'center', value: 'kg' },
-                { text: 'За кг', align: 'center', sortable: false },
-                { text: 'За место', align: 'center', sortable: false },
+                { text: 'За кг', align: 'center', value: 'for_kg' },
+                { text: 'За место', align: 'center', value: 'for_place' },
                 { text: 'Сумма', align: 'center', value: 'sum' },
             ];
 
@@ -768,24 +768,29 @@
             },
         },
         async fetch ({ store, params }) {
-            const faxID = _.get(params, 'faxID') || Cookies.get('faxID');
-            console.log('faxID', faxID);
+            const faxID = _.toNumber(_.get(params, 'faxID') || Cookies.get('faxID'));
+            const paramsID = _.toNumber(_.get(params, 'faxID'));
+            const faxDataID = _.toNumber(_.get(_.head(store.getters['fax/getFaxData']), 'fax_id'));
+            const tableCategoriesDataID = _.toNumber(_.get(_.head(store.getters['fax/getTableCategoriesData']), 'fax_id'));
 
             try {
-                if (_.isEmpty(store.getters['fax/getFaxData']) || _.toNumber(_.get(params, 'faxID')) !== _.toNumber(Cookies.get('faxID'))) {
-                    //     Запрос данных по факсу
+                if (_.isEmpty(store.getters['fax/getFaxData']) || faxDataID !== paramsID) {
+                    console.log('Запрос данных по факсу');
+                    // Запрос данных по факсу
                     const { data: faxInfoData } = await axios.post('faxes/faxData', { faxID });
                     const { groupedData = [] } = faxInfoData;
 
                     store.dispatch('fax/setGroupedData', groupedData);
                 }
 
-                // Запрос данных категорий по факсу
-                const { data: faxCategoriesData } = await axios.post('faxes/categoriesData', { faxID });
-                console.log('faxCategoriesData', faxCategoriesData);
-                const { tableCategoriesData = [] } = faxCategoriesData;
+                if (_.isEmpty(store.getters['fax/getTableCategoriesData']) || tableCategoriesDataID !== paramsID) {
+                    // Запрос данных категорий по факсу
+                    const { data: faxCategoriesData } = await axios.post('faxes/categoriesData', { faxID });
+                    // console.log('faxCategoriesData', faxCategoriesData);
+                    const { tableCategoriesData = [] } = faxCategoriesData;
 
-                store.dispatch('fax/setTableCategoriesData', tableCategoriesData);
+                    store.dispatch('fax/setTableCategoriesData', tableCategoriesData);
+                }
             } catch (e) {
                 console.error(`Произошла ошибка при выполнении стека запросов данных по факсу - ${e}`);
             } finally {
@@ -800,7 +805,7 @@
             this.setSelectedColumn(this.$_mainTableHeaders);
         },
         methods: {
-            key(){
+            key () {
                 return 58;
             },
             startCounter () {
@@ -859,6 +864,41 @@
             setSelectedColumn (array) {
                 this.selectedColumn = _.map(array, obj => obj.text);
             },
+
+            sendDataToExport (data, mainTableHeaders, selectedColumns) {
+                const cloneData = _.cloneDeep(data);
+
+                const mainTableHeadersValues = _.reduce(mainTableHeaders, (result, item) => {
+                    if (_.includes(selectedColumns, _.get(item, 'text'))) {
+                        result.push(item.value);
+                    }
+                    return result;
+                }, []);
+
+                _.forEach(cloneData, (item) => {
+                    _.forIn(item, (value, key) => {
+                        if (!_.includes(mainTableHeadersValues, key)) {
+                            delete item[key];
+                        }
+                    });
+                });
+                // _.forEach(cloneData, item => delete item.clientItemsArray);
+                console.log('cloneData', cloneData);
+                console.log('mainTableHeadersValues', mainTableHeadersValues);
+
+                return cloneData;
+            },
+
+            headersForExport (mainTableHeaders, selectedColumns) {
+                return _.reduce(mainTableHeaders, (result, item) => {
+                    const itemText = _.get(item, 'text');
+                    if (_.includes(selectedColumns, itemText)) {
+                        result.push(itemText);
+                    }
+                    return result;
+                }, []);
+            },
+
             async selectMenuItem (item) {
                 switch (item.id) {
                     // Скачивание файла оригинала факса
@@ -877,12 +917,12 @@
                                     const url = window.URL.createObjectURL(new Blob([response.data]));
                                     const link = document.createElement('a');
                                     link.href = url;
-                                    link.setAttribute('download', Cookies.get('faxName'));
+                                    link.setAttribute('download', Cookies.get('faxNameWithExt'));
                                     document.body.appendChild(link);
                                     link.click();
                                 } else {
                                     // BLOB FOR EXPLORER 11
-                                    window.navigator.msSaveOrOpenBlob(new Blob([response.data]), Cookies.get('faxName'));
+                                    window.navigator.msSaveOrOpenBlob(new Blob([response.data]), Cookies.get('faxNameWithExt'));
                                 }
                             });
                         } catch (e) {
@@ -893,7 +933,30 @@
 
                         break;
                     case 1:
-
+                        console.log('H', this.headersForExport(this.$_mainTableHeaders, this.selectedColumn));
+                        const ddt = this.faxData.sort((a, b) => (a.color > b.color) ? 1 : -1);
+                        axios({
+                            url: 'fax/download',
+                            method: 'POST',
+                            responseType: 'blob', // important
+                            data: {
+                                faxData: this.sendDataToExport(ddt, this.$_mainTableHeaders, this.selectedColumn),
+                                headers: this.headersForExport(this.$_mainTableHeaders, this.selectedColumn),
+                            },
+                        }).then((response) => {
+                            if (!window.navigator.msSaveOrOpenBlob) {
+                                // BLOB NAVIGATOR
+                                const url = window.URL.createObjectURL(new Blob([response.data]));
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.setAttribute('download', 'more.xlsx');
+                                document.body.appendChild(link);
+                                link.click();
+                            } else {
+                                // BLOB FOR EXPLORER 11
+                                window.navigator.msSaveOrOpenBlob(new Blob([response.data]), 'more.xlsx');
+                            }
+                        });
                         break;
                     case 2:
                         this.dialogSelectedColumn = true;
@@ -909,11 +972,12 @@
             },
 
             setCookies (params) {
-                const { faxID, faxName } = params;
+                const { faxID, faxName, fileExt } = params;
 
                 if (faxID) {
                     Cookies.set('faxID', faxID, { expires: 1 });
                     Cookies.set('faxName', faxName, { expires: 1 });
+                    Cookies.set('faxNameWithExt', `${faxName}.${fileExt}`, { expires: 1 });
                 }
             },
 
@@ -1160,7 +1224,7 @@
     /*border: 1px dashed lightgrey;*/
     /*}*/
     tr.table__tr_show_hide_tr_control_panel {
-    position: relative;
+        position: relative;
     }
 
     .table__tr_show_hide_tr_control_panel {
@@ -1171,8 +1235,8 @@
             right: 5%;
 
             /*.control_panel__button_wraper {*/
-                /*display: flex;*/
-                /*justify-content: space-between;*/
+            /*display: flex;*/
+            /*justify-content: space-between;*/
             /*}*/
         }
 
@@ -1185,6 +1249,7 @@
 
     .table__tr_show_hide_tr_control_panel {
         position: relative;
+
         .fax_table_control_panel {
             position: absolute;
             margin-top: 10px;

@@ -38,7 +38,7 @@
 
 <script>
     import checkErrorMixin from '~/mixins/checkError';
-    import { needFormatDate } from '~/utils/dates';
+    import { today, needFormatDate } from '~/utils/dates';
 
     export default {
         name: 'DatePicker',
@@ -46,7 +46,7 @@
         props: {
             value: {
                 type: String,
-                default: new Date().toISOString().substr(0, 10),
+                default: today(),
             },
             datePickerSettings: {
                 type: Object,
@@ -58,7 +58,7 @@
             },
         },
         data: () => ({
-            date: new Date().toISOString().substr(0, 10),
+            date: today(),
             menu: false,
         }),
         computed: {
@@ -74,6 +74,7 @@
 
         watch: {
             date (val) {
+                // console.log('VAL', val);
                 this.dateFormatted = val;
             },
             errorDate (error) {
@@ -81,7 +82,7 @@
             },
         },
         created () {
-            console.log('this.value', this.value);
+            // console.log('this.value', this.value);
             if (!this.value) {
                 this.dateFormatted = this.date;
             }

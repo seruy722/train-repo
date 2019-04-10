@@ -20,15 +20,33 @@ export function needDate (obj) {
     }, {});
 }
 
+export const reverseDate = date => new Date(date).toLocaleDateString().replace(/\./g, '-');
+
+
+export const getDateFromStr = () => new Date().toJSON().substr(0, 10);
+
 /**
  * Возвращает текущую дату
  *
  * @return {string}
  */
-export const today = () => {
-    const dateToday = new Date();
-    return `${dateToday.getFullYear()}-${dateToday.getMonth()}-${dateToday.getDate()}`;
+export const today = () => new Date().toLocaleDateString().split('.').reverse().join('-');
+
+
+export const formatDateToServerDate = (date) => {
+    if (isDate(date)) {
+        // const needDate = new Date(`${date} ${timeNow()}`);
+        // console.log('needDate', needDate);
+        // return `${needDate.toJSON().substr(0, 10)}`;
+        return new Date(`${date} ${timeNow()}`).toISOString();
+    }
+    return date;
 };
+
+
+function timeNow () {
+    return new Date().toLocaleTimeString();
+}
 
 /**
  * Возвращает текущую дату
@@ -46,16 +64,7 @@ export const notFormatedToday = () => {
  * @param date
  * @return {*}
  */
-export const needFormatDate = (date) => {
-    if (isDate(date)) {
-        const arr = date.substr(0, 10).split('-');
-        if (_.head(arr).length === 4) {
-            return arr.reverse().join('-');
-        }
-        return arr.join('-');
-    }
-    return date;
-};
+export const needFormatDate = date => isDate(date) ? new Date(date).toLocaleDateString().replace(/\./g, '-') : date;
 
 /**
  * Проверяет, что это дата

@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Cargo;
 use App\Category;
 use App\Exports\FaxesDataExport;
+use App\Exports\FaxExport;
+use App\File;
 use App\Price;
 use Illuminate\Http\Request;
 use App\Imports\FaxesImport;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use App\FaxesMoreInfos;
 use App\Fax;
 use App\User;
-use App\Traits\FormatDateToServerDate;
 use App\Traits\CleanData;
-use App\Utils\FormatDatesClass;
+use App\Traits\FormatDate;
 
 class FaxesMoreInfosController extends Controller
 {
-    use CleanData, FormatDateToServerDate;
+    use CleanData, FormatDate;
 
     public function dataForFaxCounted(Request $request)
     {
@@ -41,30 +43,40 @@ class FaxesMoreInfosController extends Controller
         ]);
 
         // Класс доп функций
-        $FormatDatesClass = new FormatDatesClass('d-m-y');
+//        $FormatDatesClass = new FormatDatesClass('d-m-y');
         $file = $request->file('uploadedFile');
 
         $cleanedData = $this->clean((array)$request->all());
 
         // Сохранение файла на сервере
         if ($request->hasFile('uploadedFile')) {
-            $fileExtention = $file->getClientOriginalExtension();
-            $fileName = $request->faxName . '.' . $fileExtention;
+            $fileExtension = $file->getClientOriginalExtension();
+//            $fileName = $request->faxName . '.' . $fileExtension;
+            $fileName = 'Fax' . $this->formatDateForSaveFile() . $fileExtension;
+            $fileHash = Hash::make($request->faxName);
+            $fileUrl = 'faxes/'. $fileHash;
+
+            $savedFileData = File::create([
+                'file_name' => $request->faxName,
+                'file_hash_name' => $fileHash,
+                'file_size' => $file->getSize(),
+                'file_ext' => $fileExtension,
+                'url'=>$fileUrl,
+            ]);
 
 
-            if (Storage::disk('local')->exists('faxes/' . $fileName)) {
-                return response()->json(['status' => false, 'fileName' => $fileName, 'pathToFile' => Storage::url($fileName), 'error' => 'Файл с таким именем уже существует.']);
+            if (Storage::disk('local')->exists($fileUrl)) {
+                return response()->json(['status' => false, 'fileName' => $fileName, 'pathToFile' => Storage::url($fileHash), 'error' => 'Файл с таким именем уже существует.']);
             } else {
-                Storage::putFileAs('faxes', $file, $fileName);
+                Storage::putFileAs('faxes', $file, $fileHash);
             }
         }
 
         // Добавление факса
-        $fileExtention = $request->file('uploadedFile')->getClientOriginalExtension();
-        $arrForCreateFax = ['fax_name' => $cleanedData['faxName'] . '.' . $fileExtention, 'date_departure' => $this->formatServerDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
+        $arrForCreateFax = ['file_id'=>$savedFileData->id,'fax_name' => $request->faxName, 'date_departure' => $this->formatDateToMySqlDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
         $fax = Fax::create($arrForCreateFax);
 
-        $formatedDatesFax = $FormatDatesClass->formatDatesFields($fax->toArray(), ['created_at', 'date_departure']);
+//        $formatedDatesFax = $FormatDatesClass->formatDatesFields($fax->toArray(), ['created_at', 'date_departure']);
 
         // Загрузка данных файла на сервер
         $ImportedFaxArray = Excel::toArray(new FaxesImport, $file);
@@ -127,8 +139,8 @@ class FaxesMoreInfosController extends Controller
                 }
             }
         }
-        $fullFaxInfo = FaxesMoreInfos::where('fax_id', $fax->id)->get();
-        return response()->json(['status' => true, 'fax' => $formatedDatesFax, 'fullFaxInfo' => $fullFaxInfo]);
+//        $fullFaxInfo = FaxesMoreInfos::where('fax_id', $fax->id)->get();
+        return response()->json(['status' => true, 'fax' => $fax, 'groupedData' => $this->sampledData($fax->id)]);
     }
 
 
@@ -230,8 +242,15 @@ class FaxesMoreInfosController extends Controller
 
     }
 
-    public function export()
+//    public function export()
+//    {
+//        return Excel::download(new FaxesDataExport(), 'users.xlsx');
+//    }
+
+    public function export(Request $request)
     {
-        return Excel::download(new FaxesDataExport(), 'users.xlsx');
+//        $res = new FaxExport($request->only('faxData'), $request->only('headers'));
+//        return response()->json(['status' => $res->check()]);
+        return Excel::download(new FaxExport($request->faxData, $request->only('headers')), 'users.xlsx');
     }
 }

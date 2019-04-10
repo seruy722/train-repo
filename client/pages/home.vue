@@ -103,7 +103,6 @@
                     </v-img>
                 </v-avatar>
                 <!--МЕНЮ-->
-                <!--<Connectivity/>-->
                 <home-nav></home-nav>
             </v-toolbar>
             <v-content>
@@ -124,7 +123,6 @@
     import HomeNav from '~/components/Navs/HomeNav';
     import navClickMixin from '~/mixins/navClick';
     import logout from '~/mixins/logout';
-    import Connectivity from '~/components/Connectivity';
 
     export default {
         mixins: [navClickMixin, logout],

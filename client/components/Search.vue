@@ -1,16 +1,18 @@
 <template>
-    <v-text-field
-        ref="search"
-        v-model="search"
-        append-icon="search"
-        label="Поиск"
-        single-line
-        hide-details
-    ></v-text-field>
+    <div data-vue-component-name="Search">
+        <v-text-field
+            v-model="search"
+            append-icon="search"
+            label="Поиск"
+            single-line
+            hide-details
+        ></v-text-field>
+    </div>
 </template>
 
 <script>
     export default {
+        name: 'Search',
         props: {
             value: {
                 type: String,

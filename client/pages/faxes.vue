@@ -6,7 +6,7 @@
         <v-container fluid>
 
             <v-toolbar>
-                <v-toolbar-title class="text-xs-center title blue--text">Факсы</v-toolbar-title>
+                <v-toolbar-title class="text-xs-center title blue--text"> Факсы</v-toolbar-title>
 
                 <v-spacer></v-spacer>
 
@@ -18,6 +18,8 @@
                 <!--Диалог загрузки факса-->
                 <DialogAddFax
                     :click-save-in-edit-dialog="clickSaveInEditDialog"
+                    :event="'updateFaxData'"
+                    @updateFaxData="updateFaxData"
                 />
             </v-toolbar>
 
@@ -72,12 +74,12 @@
                         </td>
                         <td class="text-xs-center">
                             <router-link
-                                :to="{name: 'home-faxes-counted', params: {faxID: props.item.id, faxName: props.item.fax_name}}"
+                                :to="{name: 'home-faxes-counted', params: {faxID: props.item.id, faxName: props.item.fax_name, fileExt: props.item.file_ext}}"
                                 @click.native="$event.stopImmediatePropagation()">
                                 {{ props.item.fax_name | upperFirst }}
                             </router-link>
                         </td>
-                        <!--<td class="text-xs-center">{{ props.item.date_departure | formatDate }}</td>-->
+                        <td class="text-xs-center">{{ props.item.date_departure | formatDate }}</td>
                         <td class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
                         </td>
                         <td class="text-xs-center">{{ props.item.air_or_car | convertBoolToAirOrCar }}</td>
@@ -240,7 +242,8 @@
                             <RectangleBtn
                                 v-show="clickSaveInEditDialog"
                                 :color="'cyan'"
-                                @clickRectangleBtn="updateFaxData"
+                                :event="'updateFaxData'"
+                                @updateFaxData="updateFaxData"
                             />
 
                             <v-spacer></v-spacer>
@@ -249,7 +252,8 @@
                                 v-show="clickSaveInEditDialog"
                                 :title="'Закрыть'"
                                 :color="'red'"
-                                @clickRectangleBtn="snack = false"
+                                :event="'closeSnackBar'"
+                                @closeSnackBar="snack = false"
                             />
                         </v-snackbar>
                     </div>
@@ -312,6 +316,11 @@
             this.mainTableHeaders = [
                 { text: 'Название факса', align: 'center', value: 'fax_name' },
                 {
+                    text: 'Дата отправки',
+                    align: 'center',
+                    value: 'date_departure',
+                },
+                {
                     text: 'Дата загрузки в базу',
                     align: 'center',
                     value: 'uploaded_to_table_cargos_date',
@@ -331,6 +340,7 @@
                     sortBy: 'name',
                 },
                 selected: [],
+                updateData: [],
             };
         },
         computed: {
@@ -352,9 +362,10 @@
                 if (_.isEmpty(store.getters['fax/getFaxes'])) {
                     //     Запрос данных всех факсов
                     const { data } = await axios.get('faxes');
-                    const { faxesData = [], date = null } = data;
+                    const { faxesData = [], date = [] } = data;
 
                     console.log('date', date);
+                    console.log('faxesData', faxesData);
 
                     store.dispatch('fax/setFaxes', faxesData);
                 }
@@ -368,24 +379,50 @@
             this.cloneFaxData();
         },
         methods: {
+            async updateFaxDataOnServer () {
+                console.log('sendData', this.updateData);
+                try {
+                    const { data } = await axios.post('faxes/updateFaxData', this.updateData);
+
+                    const { status = false } = data;
+
+                    if (status) {
+                        // this.updateTableData = false;
+                        // this.$store.dispatch('fax/setGroupedData', groupedData);
+
+                        this.$snotify.success('Данные факса успешно обновлены.', {
+                            timeout: 3000,
+                            showProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                        });
+                    }
+                } catch (e) {
+                    console.error(`Ошибка при обновлении основных данных факса - ${e}`);
+                } finally {
+                    console.log('Request completed for update main fax data.');
+                }
+            },
             cloneFaxData () {
                 this.faxes = _.cloneDeep(this.getFaxes);
             },
             updateFaxData () {
+                console.log('UPDATE');
                 this.clickSaveInEditDialog = false;
                 this.snack = false;
+                this.updateFaxDataOnServer();
             },
             addItemToSendDataArrayForUpdate (item) {
                 const newItem = _.clone(item);
-                console.log('newItem', newItem);
-                // delete newItem.clientItemsArray;
-                // const itemIndex = _.findIndex(this.sendDataToUpdate, { id: newItem.id });
-                //
-                // if (itemIndex !== -1) {
-                //     this.sendDataToUpdate.splice(itemIndex, 1, newItem);
-                // } else {
-                //     this.sendDataToUpdate.push(newItem);
-                // }
+
+                const itemIndex = _.findIndex(this.updateData, { id: newItem.id });
+
+                if (itemIndex !== -1) {
+                    this.updateData.splice(itemIndex, 1, newItem);
+                } else {
+                    this.updateData.push(newItem);
+                }
+                console.log('updateData', this.updateData);
             },
             updateFaxDataEditDialog (item) {
                 this.clickSaveInEditDialog = true;
