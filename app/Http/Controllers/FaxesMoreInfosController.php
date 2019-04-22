@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Cargo;
 use App\Category;
 use App\Exports\FaxesDataExport;
-use App\Exports\FaxExport;
 use App\File;
 use App\Price;
 use Illuminate\Http\Request;
@@ -242,15 +240,10 @@ class FaxesMoreInfosController extends Controller
 
     }
 
-//    public function export()
-//    {
-//        return Excel::download(new FaxesDataExport(), 'users.xlsx');
-//    }
-
     public function export(Request $request)
     {
-//        $res = new FaxExport($request->only('faxData'), $request->only('headers'));
+//        $res = new FaxExport($request->faxData, $request->only('headers'), $request->faxID, $request->categories);
 //        return response()->json(['status' => $res->check()]);
-        return Excel::download(new FaxExport($request->faxData, $request->only('headers')), 'users.xlsx');
+        return Excel::download(new FaxesDataExport($request->faxData, $request->only('headers'), $request->faxID, $request->categories), 'users.xlsx');
     }
 }

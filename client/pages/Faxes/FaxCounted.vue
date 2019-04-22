@@ -200,6 +200,7 @@
                                                     v-model="props.item.name"
                                                     :items="getClientsNames"
                                                     :rules="[v => !!v || 'Обьязательное поле.']"
+                                                    :loading="selectLoading"
                                                     label="Клиент"
                                                     hide-selected
                                                 ></v-combobox>
@@ -318,7 +319,6 @@
                                             <template v-slot:input>
                                                 <v-text-field
                                                     v-model.number="props.item.for_place"
-                                                    v-change="props.item.for_place"
                                                     label="Edit"
                                                     type="number"
                                                     single-line
@@ -408,6 +408,7 @@
                                                 <v-select
                                                     v-model="props.item.category_name"
                                                     :items="getCategoriesNames"
+                                                    :loading="selectLoading"
                                                     label="Категория"
                                                 ></v-select>
                                             </template>
@@ -494,11 +495,11 @@
                         </v-data-table>
 
                         <v-snackbar v-model.lazy="snack" :timeout="6000" :color="snackColor">
-                            <v-badge left color="purple">
-                                <template v-slot:badge>
-                                    <span>{{ counter }}</span>
-                                </template>
-                            </v-badge>
+                            <!--<v-badge left color="purple">-->
+                                <!--<template v-slot:badge>-->
+                                    <!--<span>{{ counter }}</span>-->
+                                <!--</template>-->
+                            <!--</v-badge>-->
 
                             <v-btn
                                 v-show="updateTableData"
@@ -598,29 +599,6 @@
         components: {
             ControlPanelFaxEntries: () => import('~/components/Table/ControlPanelFaxEntries'),
         },
-        directives: {
-            change: {
-                twoWay: true,
-                bind: function (el, binding, vnode) {
-                    console.log('bind');
-                },
-                // Когда привязанный элемент вставлен в DOM...
-                inserted: function (el, binding, vnode) {
-                    // console.log('el', el);
-                    // console.log('binding', binding);
-                    // console.log('vnode', vnode);
-                },
-                update: function (el, binding, vnode) {
-                    console.log('el', el);
-                    console.log('binding', binding);
-                    console.log('vnode', vnode);
-                    // const res = el.querySelector('input');
-                    // res.value = 55;
-                    // console.log(res);
-                    // console.log(res.value);
-                },
-            },
-        },
         filters: {
             numFormat (val) {
                 return numberFormat(val) || 0;
@@ -704,7 +682,7 @@
 
             return {
                 // faxNames: [],
-
+                selectLoading: true,
                 dialog: false,
                 counter: 6,
                 isLoadedDataToMainTable: false,
@@ -786,7 +764,7 @@
                 if (_.isEmpty(store.getters['fax/getTableCategoriesData']) || tableCategoriesDataID !== paramsID) {
                     // Запрос данных категорий по факсу
                     const { data: faxCategoriesData } = await axios.post('faxes/categoriesData', { faxID });
-                    // console.log('faxCategoriesData', faxCategoriesData);
+                    console.log('faxCategoriesData', faxCategoriesData);
                     const { tableCategoriesData = [] } = faxCategoriesData;
 
                     store.dispatch('fax/setTableCategoriesData', tableCategoriesData);
@@ -798,6 +776,7 @@
             }
         },
         created () {
+            console.log('CREATED');
             this.setFaxData();
             this.calcSumClientInFaxData(this.faxData);
             this.callStackForCategoriesTable();
@@ -877,7 +856,7 @@
 
                 _.forEach(cloneData, (item) => {
                     _.forIn(item, (value, key) => {
-                        if (!_.includes(mainTableHeadersValues, key)) {
+                        if (!_.includes(mainTableHeadersValues, key) && key !== 'brand' && key !== 'category_id') {
                             delete item[key];
                         }
                     });
@@ -899,7 +878,30 @@
                 }, []);
             },
 
-            async selectMenuItem (item) {
+            sortData (data, field) {
+                return data.sort((a, b) => a[field] - b[field]);
+            },
+
+            getBrandClientNames (data) {
+                // console.log('DATA', this.faxData);
+                // const arrNames = [];
+                // _.forEach(data, (item) => {
+                //     const obj = {};
+                //     if (item.brand) {
+                //         obj.name = item.name;
+                //         obj.kg = item.kg;
+                //         obj.place = item.place;
+                //
+                //         arrNames.push(obj);
+                //     }
+                // });
+                //
+                // return arrNames;
+
+                // return _.get(data, '[0].fax_id')
+            },
+
+            selectMenuItem (item) {
                 switch (item.id) {
                     // Скачивание файла оригинала факса
                     case 0:
@@ -933,15 +935,28 @@
 
                         break;
                     case 1:
-                        console.log('H', this.headersForExport(this.$_mainTableHeaders, this.selectedColumn));
-                        const ddt = this.faxData.sort((a, b) => (a.color > b.color) ? 1 : -1);
+                        // console.log('H', this.headersForExport(this.$_mainTableHeaders, this.selectedColumn));
+                        console.log('FFX', this.headersForExport(this.$_mainTableHeaders, this.selectedColumn));
+                        console.log('BRANDS', this.getBrandClientNames(this.faxData));
+                        console.log('tableCategoriesItems', this.tableCategoriesItems);
+                        if (_.isEmpty(this.selectedColumn)) {
+                            this.$snotify.warning('Выберите столбцы для експорта', {
+                                timeout: 3000,
+                                showProgressBar: true,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                            });
+                            return false;
+                        }
                         axios({
                             url: 'fax/download',
                             method: 'POST',
                             responseType: 'blob', // important
                             data: {
-                                faxData: this.sendDataToExport(ddt, this.$_mainTableHeaders, this.selectedColumn),
+                                faxData: this.sendDataToExport(this.sortData(this.faxData, 'name'), this.$_mainTableHeaders, this.selectedColumn),
                                 headers: this.headersForExport(this.$_mainTableHeaders, this.selectedColumn),
+                                faxID: Cookies.get('faxID'),
+                                categories: this.tableCategoriesItems,
                             },
                         }).then((response) => {
                             if (!window.navigator.msSaveOrOpenBlob) {
@@ -949,12 +964,12 @@
                                 const url = window.URL.createObjectURL(new Blob([response.data]));
                                 const link = document.createElement('a');
                                 link.href = url;
-                                link.setAttribute('download', 'more.xlsx');
+                                link.setAttribute('download', Cookies.get('faxNameWithExt'));
                                 document.body.appendChild(link);
                                 link.click();
                             } else {
                                 // BLOB FOR EXPLORER 11
-                                window.navigator.msSaveOrOpenBlob(new Blob([response.data]), 'more.xlsx');
+                                window.navigator.msSaveOrOpenBlob(new Blob([response.data]), Cookies.get('faxNameWithExt'));
                             }
                         });
                         break;
@@ -1027,6 +1042,7 @@
                     } catch (e) {
                         console.error(`Произошла ошибка при запросе данных о клиентах - ${e}`);
                     } finally {
+                        this.selectLoading = false;
                         console.log('Completed request for get clients names.');
                     }
                 }
@@ -1042,6 +1058,7 @@
                     } catch (e) {
                         console.error(`Произошла ошибка при запросе данных о категория факса - ${e}`);
                     } finally {
+                        this.selectLoading = false;
                         console.log('Completed request for get fax categories.');
                     }
                 }
