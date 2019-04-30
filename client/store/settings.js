@@ -59,6 +59,15 @@ export const state = () => ({
             title: 'Авиа',
         },
     ],
+    commonItems: [
+        {
+            id: 0,
+            title: 'НЕТ',
+        }, {
+            id: 1,
+            title: 'ДА',
+        },
+    ],
 });
 
 // getters
@@ -70,4 +79,5 @@ export const getters = {
     allClientsObj: state => state.allClientsObj,
     selectDatesItems: state => state.selectDatesItems,
     transportItems: state => state.transportItems,
+    commonItems: state => state.commonItems,
 };

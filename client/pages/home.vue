@@ -156,6 +156,7 @@
                     ],
                 },
                 { icon: 'email', text: 'Email доступы', path: '/emails' },
+                { icon: 'send', text: 'Рассылка', path: '/mailing' },
                 { icon: 'exit_to_app', text: 'Выход', path: '/logout' },
             ],
         }),

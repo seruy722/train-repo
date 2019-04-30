@@ -23,7 +23,7 @@ class FaxesController extends Controller
     {
         $faxesData = DB::table('faxes')
             ->orderBy('date_departure', 'DESC')
-            ->join('files', 'faxes.file_id', '=', 'files.id' )
+            ->join('files', 'faxes.file_id', '=', 'files.id')
             ->select('faxes.*', 'files.file_ext')
             ->get();
 //        $faxesData = DB::table('faxes')->orderBy('date_departure', "DESC")->get();
@@ -46,7 +46,7 @@ class FaxesController extends Controller
         $data = $request->all();
         foreach ($data as $item) {
             $arrValue = (object)$item;
-            $arrForCreateFax = ['fax_name' => $arrValue->{'fax_name'}, 'date_departure' => $this->formatDateToMySqlDate($arrValue->{'date_departure'}), 'air_or_car' => !!$arrValue->{'air_or_car'}, 'uploaded_to_table_cargos_date' => $this->formatDateToMySqlDate($arrValue->{'uploaded_to_table_cargos_date'})];
+            $arrForCreateFax = ['fax_name' => $arrValue->{'fax_name'}, 'date_departure' => $this->formatDateToMySqlDate($arrValue->{'date_departure'}), 'air_or_car' => !!$arrValue->{'air_or_car'}, 'uploaded_to_table_cargos_date' => $this->formatDateToMySqlDate($arrValue->{'uploaded_to_table_cargos_date'}), 'paid' => $arrValue->{'paid'}];
             Fax::where('id', $arrValue->{'id'})->update($arrForCreateFax);
         }
         return response()->json(['status' => true]);
@@ -89,12 +89,16 @@ class FaxesController extends Controller
 
         $faxesIDS = $request->faxesIDS;
 
-        Fax::destroy($faxesIDS);
-
-        foreach ($faxesIDS as $value) {
-            FaxesMoreInfos::where('fax_id', $value)->delete();
-            FaxPriceForCategory::where('fax_id', $value)->delete();
+        foreach ($faxesIDS as $id) {
+            $fax = Fax::find($id);
+            if ($fax) {
+                $d2 = FaxesMoreInfos::where('fax_id', $id)->delete();
+                $d1 = FaxPriceForCategory::where('fax_id', $id)->delete();
+                $d3 = File::where('id', $fax->file_id)->delete();
+            }
         }
+
+        Fax::destroy($faxesIDS);
 
         return response()->json(['status' => true]);
     }

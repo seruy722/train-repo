@@ -63,6 +63,7 @@ module.exports = {
         '~plugins/vuetify',
         // {src: '~plugins/bootstrap', ssr: false},
         '~/plugins/vue-snotify',
+        '~/plugins/register',
     ],
 
     modules: [

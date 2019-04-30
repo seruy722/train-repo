@@ -59,7 +59,7 @@
 
                 <template v-slot:items="props">
                     <tr
-                        :class="props.item.uploaded_to_table_cargos_date ? 'tr_green__bg' : 'tr_red__bg'"
+                        :class="[props.item.paid ? 'tr_green__bg':'tr_red__bg']"
                         class="table__tr_show_hide_tr_control_panel"
                         :active="props.selected"
                         @click.stop="props.selected = !props.selected"
@@ -80,9 +80,10 @@
                             </router-link>
                         </td>
                         <td class="text-xs-center">{{ props.item.date_departure | formatDate }}</td>
-                        <td class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
+                        <td :class="props.item.uploaded_to_table_cargos_date ? 'tr_yellow__bg' : ''" class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
                         </td>
                         <td class="text-xs-center">{{ props.item.air_or_car | convertBoolToAirOrCar }}</td>
+                        <td class="text-xs-center">{{ props.item.paid }}</td>
                         <!--<td class="text-xs-center">{{ props.item.created_at | formatDate }}</td>-->
                         <ControlPanelFaxes
                             :item="props.item"
@@ -207,6 +208,35 @@
 
                                     <td class="text-xs-center">
                                         <v-edit-dialog
+                                            :return-value.sync="props.item.paid"
+                                            large
+                                            lazy
+                                            persistent
+                                            @save="updateFaxDataEditDialog(props.item)"
+                                            @cancel="cancel"
+                                            @close="close"
+                                        >
+                                            <div>{{ props.item.paid | convertCommonItems }}</div>
+                                            <template v-slot:input>
+                                                <div class="mt-3 title">Редактирование</div>
+                                            </template>
+                                            <template v-slot:input>
+                                                <v-select
+                                                    v-model.number="props.item.paid"
+                                                    :items="commonItems"
+                                                    item-text="title"
+                                                    item-value="id"
+                                                    hide-selected
+                                                    type="number"
+                                                    label="Оплачен"
+                                                    single-line
+                                                ></v-select>
+                                            </template>
+                                        </v-edit-dialog>
+                                    </td>
+
+                                    <td class="text-xs-center">
+                                        <v-edit-dialog
                                             :return-value.sync="props.item.created_at"
                                             large
                                             lazy
@@ -278,14 +308,11 @@
     export default {
         name: 'Faxes',
         filters: {
-            formatDate (value) {
-                return needFormatDate(value) || '00-00-0000';
-            },
             convertBoolToAirOrCar (value) {
                 return value ? 'Авиа' : 'Машина';
             },
-            upperFirst (value) {
-                return _.upperFirst(value);
+            convertCommonItems (value) {
+                return value ? 'ДА' : 'НЕТ';
             },
         },
         components: {
@@ -310,6 +337,7 @@
                     value: 'uploaded_to_table_cargos_date',
                 },
                 { text: 'Транспорт', sortable: false, align: 'center', value: 'air_or_car' },
+                { text: 'Оплачен', sortable: false, align: 'center', value: 'paid' },
                 { text: 'Дата добавления', sortable: false, align: 'center', value: 'created_at' },
             ];
 
@@ -326,6 +354,7 @@
                     value: 'uploaded_to_table_cargos_date',
                 },
                 { text: 'Транспорт', align: 'center', value: 'air_or_car' },
+                { text: 'Оплачен', align: 'center', value: 'paid' },
             ];
 
             return {
@@ -347,6 +376,7 @@
             ...mapGetters({
                 getFaxes: 'fax/getFaxes',
                 transportItems: 'settings/transportItems',
+                commonItems: 'settings/commonItems',
             }),
         },
         watch: {
@@ -471,6 +501,10 @@
             .faxes_table_control_panel {
                 display: block;
             }
+        }
+
+        .tr_yellow__bg{
+            background-color: #FFFF00;
         }
     }
 </style>

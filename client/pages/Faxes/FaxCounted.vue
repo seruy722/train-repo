@@ -110,14 +110,68 @@
                             :class="{'table__td-hide': !selectedColumn.includes('За кг')}"
                             class="text-xs-center table__td-color-text table__tr-bold_text"
                         >
-                            {{ props.item.for_kg }}
+                            <v-edit-dialog
+                                :return-value.sync="props.item.for_kg"
+                                large
+                                lazy
+                                persistent
+                                @save="saveCommonPriceForClient(props.item, 'for_kg', props.item.for_kg)"
+                                @cancel="cancelInCategoriesTable"
+
+                                @close="closeInCategoriesTable"
+                            >
+                                <div class="table__td-color-text table__tr-bold_text">{{ props.item.for_kg }}</div>
+
+                                <template v-slot:input>
+                                    <div class="mt-3 title">Цена за кг</div>
+                                </template>
+
+                                <template v-slot:input>
+                                    <v-text-field
+                                        v-model.number="props.item.for_kg"
+                                        label="Edit"
+                                        type="number"
+                                        single-line
+                                        counter
+                                        autofocus
+                                    ></v-text-field>
+                                </template>
+
+                            </v-edit-dialog>
                         </td>
 
                         <td
                             :class="{'table__td-hide': !selectedColumn.includes('За место')}"
                             class="text-xs-center table__td-color-text table__tr-bold_text"
                         >
-                            {{ props.item.for_place }}
+                            <v-edit-dialog
+                                :return-value.sync="props.item.for_place"
+                                large
+                                lazy
+                                persistent
+                                @save="saveCommonPriceForClient(props.item, 'for_place', props.item.for_place)"
+                                @cancel="cancelInCategoriesTable"
+
+                                @close="closeInCategoriesTable"
+                            >
+                                <div class="table__td-color-text table__tr-bold_text">{{ props.item.for_place }}</div>
+
+                                <template v-slot:input>
+                                    <div class="mt-3 title">Цена за место</div>
+                                </template>
+
+                                <template v-slot:input>
+                                    <v-text-field
+                                        v-model.number="props.item.for_place"
+                                        label="Edit"
+                                        type="number"
+                                        single-line
+                                        counter
+                                        autofocus
+                                    ></v-text-field>
+                                </template>
+
+                            </v-edit-dialog>
                         </td>
 
                         <td
@@ -268,7 +322,7 @@
                                     </td>
                                     <td class="text-xs-center">
                                         <v-edit-dialog
-                                            :return-value.sync="props.item.for_kg"
+                                            :return-value="props.item.for_kg"
                                             large
                                             lazy
                                             persistent
@@ -331,6 +385,62 @@
                                     </td>
                                     <td class="text-xs-center">
                                         <v-edit-dialog
+                                            :return-value.sync="props.item.category_name"
+                                            large
+                                            lazy
+                                            persistent
+                                            @save="changeItemInFaxDataTeble(props.item)"
+                                            @cancel="cancel"
+                                            @close="close"
+                                            @open="openCategoriesNamesEditDialog"
+                                        >
+                                            <div>{{ props.item.category_name }}</div>
+
+                                            <template v-slot:input>
+                                                <div class="mt-3 title">Категория</div>
+                                            </template>
+
+                                            <template v-slot:input>
+                                                <v-select
+                                                    v-model="props.item.category_name"
+                                                    :items="getCategoriesNames"
+                                                    :loading="selectLoading"
+                                                    label="Категория"
+                                                ></v-select>
+                                            </template>
+
+                                        </v-edit-dialog>
+                                    </td>
+                                    <td class="text-xs-center">
+                                        <v-edit-dialog
+                                            :return-value.sync="props.item.brand"
+                                            large
+                                            lazy
+                                            persistent
+                                            @save="changeItemInFaxDataTeble(props.item)"
+                                            @cancel="cancel"
+
+                                            @close="close"
+                                        >
+                                            <div>{{ props.item.brand }}</div>
+
+                                            <template v-slot:input>
+                                                <div class="mt-3 title">Бренд</div>
+                                            </template>
+
+                                            <template v-slot:input>
+                                                <v-select
+                                                    v-model.number="props.item.brand"
+                                                    :items="brandSelectItems"
+                                                    type="number"
+                                                    label="Бренд"
+                                                ></v-select>
+                                            </template>
+
+                                        </v-edit-dialog>
+                                    </td>
+                                    <td class="text-xs-center">
+                                        <v-edit-dialog
                                             :return-value.sync="props.item.shop"
                                             large
                                             lazy
@@ -383,62 +493,6 @@
                                                     counter
                                                     autofocus
                                                 ></v-text-field>
-                                            </template>
-
-                                        </v-edit-dialog>
-                                    </td>
-                                    <td class="text-xs-center">
-                                        <v-edit-dialog
-                                            :return-value.sync="props.item.category_name"
-                                            large
-                                            lazy
-                                            persistent
-                                            @save="changeItemInFaxDataTeble(props.item)"
-                                            @cancel="cancel"
-                                            @close="close"
-                                            @open="openCategoriesNamesEditDialog"
-                                        >
-                                            <div>{{ props.item.category_name }}</div>
-
-                                            <template v-slot:input>
-                                                <div class="mt-3 title">Категория</div>
-                                            </template>
-
-                                            <template v-slot:input>
-                                                <v-select
-                                                    v-model="props.item.category_name"
-                                                    :items="getCategoriesNames"
-                                                    :loading="selectLoading"
-                                                    label="Категория"
-                                                ></v-select>
-                                            </template>
-
-                                        </v-edit-dialog>
-                                    </td>
-                                    <td class="text-xs-center">
-                                        <v-edit-dialog
-                                            :return-value.sync="props.item.brand"
-                                            large
-                                            lazy
-                                            persistent
-                                            @save="changeItemInFaxDataTeble(props.item)"
-                                            @cancel="cancel"
-
-                                            @close="close"
-                                        >
-                                            <div>{{ props.item.brand }}</div>
-
-                                            <template v-slot:input>
-                                                <div class="mt-3 title">Бренд</div>
-                                            </template>
-
-                                            <template v-slot:input>
-                                                <v-select
-                                                    v-model.number="props.item.brand"
-                                                    :items="brandSelectItems"
-                                                    type="number"
-                                                    label="Бренд"
-                                                ></v-select>
                                             </template>
 
                                         </v-edit-dialog>
@@ -518,7 +572,8 @@
         </template>
 
         <!--Таблица сводки по категориям-->
-        <div class="table_categories">
+        <!--<div class="table_categories">-->
+            <v-flex xs12 sm8 md6 class="table_categories">
             <v-data-table
                 :headers="$_tableCategoriesHeaders"
                 :items="tableCategoriesItems"
@@ -583,8 +638,9 @@
             >
                 Сохранить
             </v-btn>
+            </v-flex>
         </div>
-    </div>
+    <!--</div>-->
 
 </template>
 
@@ -633,10 +689,10 @@
                 { text: 'Вес', align: 'center', sortable: false },
                 { text: 'За кг', align: 'center', sortable: false },
                 { text: 'За место', align: 'center', sortable: false },
-                { text: 'Магазин', align: 'center', sortable: false },
-                { text: 'Опись вложения', align: 'center', sortable: false },
                 { text: 'Категория', align: 'center', sortable: false },
                 { text: 'Бренд', align: 'center', sortable: false },
+                { text: 'Магазин', align: 'center', sortable: false },
+                { text: 'Опись вложения', align: 'center', sortable: false },
                 { text: 'Примечания', align: 'center', sortable: false },
             ];
 
@@ -678,6 +734,7 @@
                 { id: 0, title: 'Скачать оригинал' },
                 { id: 1, title: 'В excel' },
                 { id: 2, title: 'Настройки' },
+                { id: 3, title: 'Рассылка' },
             ];
 
             return {
@@ -776,7 +833,7 @@
             }
         },
         created () {
-            console.log('CREATED');
+            // console.log('CREATED');
             this.setFaxData();
             this.calcSumClientInFaxData(this.faxData);
             this.callStackForCategoriesTable();
@@ -976,6 +1033,9 @@
                     case 2:
                         this.dialogSelectedColumn = true;
                         break;
+                    case 3:
+                        this.sendingMessagesData(this.faxData);
+                        break;
                     default:
                         console.error(`Обьект выбора меню - ${item}`);
                 }
@@ -984,6 +1044,22 @@
             openCloseExpandedPanel (val) {
                 _.set(val, 'expanded', !val.expanded);
                 _.set(val, 'selected', !val.selected);
+            },
+
+            async sendingMessagesData (arr) {
+                console.log('ARR', arr);
+                const func = data => _.reduce(data, (result, item) => {
+                    const obj = {};
+                    const { name, sum, client_id} = item;
+                    obj.name = name;
+                    obj.sum = sum;
+                    obj.client_id = client_id;
+                    result.push(obj);
+                    return result;
+                }, []);
+
+                const { data } = await axios.post('users/sendData', func(arr));
+                console.log('RS_AX', data);
             },
 
             setCookies (params) {
@@ -1077,6 +1153,16 @@
                 this.snack = true;
                 this.snackColor = 'success';
                 this.snackText = 'Сохранено';
+            },
+            async saveCommonPriceForClient (item, prop, price) {
+                const elms = _.get(item, 'clientItemsArray');
+                _.forEach(elms, (elem) => {
+                    _.set(elem, prop, price);
+                    this.changeItemInFaxDataTeble(elem);
+                });
+                // console.log('this.faxData', this.faxData);
+                console.log('client_id', elms);
+                console.log('item', item);
             },
             cancel () {
                 this.startCounter();

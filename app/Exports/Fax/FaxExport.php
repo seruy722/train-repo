@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exports;
+namespace App\Exports\Fax;
 
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;

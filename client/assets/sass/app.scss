@@ -6,15 +6,18 @@
     background-color: $main-color-bg;
     color: $text-color;
 }
+
 // Цвет фона кнопок
 .btn-bg-color {
     background-color: $btn-bg-color;
 }
+
 // Главный блок страниц (для растягивания его на всю страницу)
 .main {
     width: 95%;
     height: 100%;
 }
+
 // Скрытие инпута выбора файла
 .display-none_input {
     display: none;
@@ -33,4 +36,8 @@
 // Рамка для строк таблиц
 .tr_border {
     border: $tr_border;
+}
+
+.tr_yellow__bg {
+    border: $tr_yellow__bg;
 }
