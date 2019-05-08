@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Cargo;
 use App\Category;
 use App\Exports\Fax\FaxesDataExport;
 use App\Exports\RSS\RssExport;
@@ -33,131 +34,231 @@ class FaxesMoreInfosController extends Controller
         return response()->json(['status' => true, 'groupedData' => $this->sampledData($request->faxID)]);
     }
 
+//    public function store(Request $request)
+//    {
+//        $this->validate($request, [
+//            'uploadedFile' => 'required|file|max:10240||mimes:xls,xlsx,csv',
+//            'faxName' => 'required|string|min:3|max:255',
+//            'dateOfDeparture' => 'required|date|max:255',
+//            'transport' => 'required|numeric'
+//        ]);
+//
+//        // Класс доп функций
+////        $FormatDatesClass = new FormatDatesClass('d-m-y');
+//        $file = $request->file('uploadedFile');
+//
+//        $cleanedData = $this->clean((array)$request->all());
+//
+//        // Сохранение файла на сервере
+//        if ($request->hasFile('uploadedFile')) {
+//            $fileExtension = $file->getClientOriginalExtension();
+////            $fileName = $request->faxName . '.' . $fileExtension;
+//            $fileName = 'Fax' . $this->formatDateForSaveFile() . $fileExtension;
+//            $fileHash = 'факс ' . date("Y-m-d") . '_' . microtime(true);
+//            $fileUrl = 'faxes/' . $fileHash;
+//
+//            $savedFileData = File::create([
+//                'file_name' => $request->faxName,
+//                'file_hash_name' => $fileHash,
+//                'file_size' => $file->getSize(),
+//                'file_ext' => $fileExtension,
+//                'url'=>$fileUrl,
+//            ]);
+//
+//
+//            if (Storage::disk('local')->exists($fileUrl)) {
+//                return response()->json(['status' => false, 'fileName' => $fileName, 'pathToFile' => Storage::url($fileHash), 'error' => 'Файл с таким именем уже существует.']);
+//            } else {
+//                Storage::putFileAs('faxes', $file, $fileHash);
+//            }
+//        }
+//
+//        // Добавление факса
+//        $arrForCreateFax = ['file_id'=>$savedFileData->id,'fax_name' => $request->faxName, 'date_departure' => $this->formatDateToMySqlDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
+//        $fax = Fax::create($arrForCreateFax);
+//
+////        $formatedDatesFax = $FormatDatesClass->formatDatesFields($fax->toArray(), ['created_at', 'date_departure']);
+//
+//        // Загрузка данных файла на сервер
+//        $ImportedFaxArray = Excel::toArray(new FaxesImport, $file);
+////        return response()->json(['status' => true, 'elem'=>$ImportedFaxArray]);
+//        foreach ($ImportedFaxArray as $item) {
+//            foreach ($item as $key => $elem) {
+////                return response()->json(['status' => true, 'elem'=>$elem]);
+//                $cleanedElem = $this->clean($elem);
+//                // Пропускаем первые 2 строки
+//                if ($key === 0 || $key === 1) {
+//                    continue;
+//                }
+//                // Если все поля пустые выходим из итерации
+//                if (!$cleanedElem[0] && !$cleanedElem[1] && !$cleanedElem[2] && !$cleanedElem[3] && !$cleanedElem[4] && !$cleanedElem[5] && !$cleanedElem[6] && !$cleanedElem[7] && !$cleanedElem[8]) {
+//                    break;
+//                }
+//                // Если первые 5 полей пустые - то дописываем к предыдущей записи товары
+//                if (!$cleanedElem[0] && !$cleanedElem[1] && !$cleanedElem[2] && !$cleanedElem[3] && !$cleanedElem[4]) {
+//                    $lastEntry = FaxesMoreInfos::orderBy('id', 'desc')->first();
+//                    $things = json_decode($lastEntry->name_of_things);
+//                    $things->{$cleanedElem[5]} = $cleanedElem[6];
+//                    $lastEntry->name_of_things = json_encode($things);
+//                    $lastEntry->save();
+//                } else {
+//                    // Обрезаем из имени клиента приставку 007/
+//                    $startPos = stripos($cleanedElem[1], '007/');
+//                    $userName = substr($cleanedElem[1], $startPos + 4);
+//                    if (!is_numeric($startPos)) {
+//                        $userName = $cleanedElem[1];
+//                    }
+//
+//                    $client = User::firstOrCreate(['name' => $userName], ['password' => 'default']);
+//                    $prices = Price::where('client_id', $client->id)->first();
+////                    return response()->json(['status' => true, 'elem'=>$prices]);
+////                    $category = Price::where('category_name', $client->id)->first();
+//
+//                    // Категория
+//                    $category = Category::firstOrCreate(['category_name'=> $cleanedElem[8]]);
+//                    $brandInNotation = $cleanedElem[7] ? stripos($cleanedElem[7], 'Бренд') !== false : false;
+//                    $brandInCategory = $cleanedElem[8] ? stripos($cleanedElem[8], 'Бренд') !== false : false;
+//                    $brand = $brandInNotation || $brandInCategory;
+//
+//
+//                    if ($brand && $prices) {
+//                        $forKg = $prices->for_kg_brand;
+//                        $forPlace = $prices->for_place_brand;
+//                    } else if (!$brand && $prices) {
+//                        $forKg = $prices->for_kg;
+//                        $forPlace = $prices->for_place;
+//                    } else {
+//                        $forKg = 0;
+//                        $forPlace = 0;
+//                    }
+////                    return response()->json(['status' => false, 'elem7'=> stripos($cleanedElem[8], 'Бренд') !== false]);
+//                    try {
+//                        FaxesMoreInfos::create([
+//                            'code' => (string)$cleanedElem[0],
+//                            'place' => (int)$cleanedElem[2],
+//                            'kg' => (float)$cleanedElem[3],
+//                            'client_id' => (int)$client->id,
+//                            'fax_id' => (int)$fax->id,
+//                            'brand' => $brand,
+//                            'shop' => (string)$cleanedElem[4],
+//                            'for_kg' => (float)$forKg,
+//                            'for_place' => (float)$forPlace,
+//                            'name_of_things' => json_encode([$cleanedElem[5] => (int)$cleanedElem[6]]),
+//                            'notation' => (string)$cleanedElem[7],
+//                            'category_id' => (int)$category->id,
+//                        ]);
+//                    } catch (\Exception $e) {
+//                        return response()->json(['status' => false, 'error' => 'Ошибка при записи данных.', 'row' => $cleanedElem, 'exception' => $e]);
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Данные факса с расширением
+//        $file = File::where('id', $fax->file_id)->first();
+//        $fax->file_ext = $file->file_ext;
+////        $fullFaxInfo = FaxesMoreInfos::where('fax_id', $fax->id)->get();
+//        return response()->json(['status' => true, 'fax' => $fax, 'groupedData' => $this->sampledData($fax->id)]);
+//    }
+
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'uploadedFile' => 'required|file|max:10240||mimes:xls,xlsx,csv',
-            'faxName' => 'required|string|min:3|max:255',
-            'dateOfDeparture' => 'required|date|max:255',
-            'transport' => 'required|numeric'
-        ]);
+//        $this->validate($request, [
+//            'uploadedFile' => 'required|file|max:10240||mimes:xls,xlsx,csv',
+//            'faxName' => 'required|string|min:3|max:255',
+//            'dateOfDeparture' => 'required|date|max:255',
+//            'transport' => 'required|numeric'
+//        ]);
 
         // Класс доп функций
 //        $FormatDatesClass = new FormatDatesClass('d-m-y');
         $file = $request->file('uploadedFile');
 
-        $cleanedData = $this->clean((array)$request->all());
+//        $cleanedData = $this->clean((array)$request->all());
 
         // Сохранение файла на сервере
-        if ($request->hasFile('uploadedFile')) {
-            $fileExtension = $file->getClientOriginalExtension();
-//            $fileName = $request->faxName . '.' . $fileExtension;
-            $fileName = 'Fax' . $this->formatDateForSaveFile() . $fileExtension;
-            $fileHash = 'факс ' . date("Y-m-d") . '_' . microtime(true);
-            $fileUrl = 'faxes/' . $fileHash;
-
-            $savedFileData = File::create([
-                'file_name' => $request->faxName,
-                'file_hash_name' => $fileHash,
-                'file_size' => $file->getSize(),
-                'file_ext' => $fileExtension,
-                'url'=>$fileUrl,
-            ]);
-
-
-            if (Storage::disk('local')->exists($fileUrl)) {
-                return response()->json(['status' => false, 'fileName' => $fileName, 'pathToFile' => Storage::url($fileHash), 'error' => 'Файл с таким именем уже существует.']);
-            } else {
-                Storage::putFileAs('faxes', $file, $fileHash);
-            }
-        }
+//        if ($request->hasFile('uploadedFile')) {
+//            $fileExtention = $file->getClientOriginalExtension();
+//            $fileName = $request->faxName . '.' . $fileExtention;
+//
+//            $savedFileData = File::create([
+//                'file_name' => $request->faxName,
+//                'file_hash_name' => Hash::make($request->faxName),
+//                'file_size' => $file->getSize(),
+//                'file_ext' => $fileExtention,
+//                'url'=>'faxes/'. Hash::make($request->faxName),
+//            ]);
+//
+//
+//            if (Storage::disk('local')->exists('faxes/' . $fileName)) {
+//                return response()->json(['status' => false, 'fileName' => $fileName, 'pathToFile' => Storage::url($fileName), 'error' => 'Файл с таким именем уже существует.']);
+//            } else {
+//                Storage::putFileAs('faxes', $file, $fileName);
+//            }
+//        }
 
         // Добавление факса
-        $arrForCreateFax = ['file_id'=>$savedFileData->id,'fax_name' => $request->faxName, 'date_departure' => $this->formatDateToMySqlDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
-        $fax = Fax::create($arrForCreateFax);
+//        $fileExtention = $request->file('uploadedFile')->getClientOriginalExtension();
+//        $arrForCreateFax = ['file_id'=>$savedFileData->id,'fax_name' => $cleanedData['faxName'] . '.' . $fileExtention, 'date_departure' => $this->formatDateToMySqlDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
+//        $fax = Fax::create($arrForCreateFax);
 
 //        $formatedDatesFax = $FormatDatesClass->formatDatesFields($fax->toArray(), ['created_at', 'date_departure']);
-
+        DB::table('cargos')->truncate();
         // Загрузка данных файла на сервер
         $ImportedFaxArray = Excel::toArray(new FaxesImport, $file);
-//        return response()->json(['status' => true, 'elem'=>$ImportedFaxArray]);
         foreach ($ImportedFaxArray as $item) {
             foreach ($item as $key => $elem) {
-//                return response()->json(['status' => true, 'elem'=>$elem]);
                 $cleanedElem = $this->clean($elem);
-                // Пропускаем первые 2 строки
-                if ($key === 0 || $key === 1) {
-                    continue;
-                }
-                // Если все поля пустые выходим из итерации
-                if (!$cleanedElem[0] && !$cleanedElem[1] && !$cleanedElem[2] && !$cleanedElem[3] && !$cleanedElem[4] && !$cleanedElem[5] && !$cleanedElem[6] && !$cleanedElem[7] && !$cleanedElem[8]) {
-                    break;
-                }
-                // Если первые 5 полей пустые - то дописываем к предыдущей записи товары
-                if (!$cleanedElem[0] && !$cleanedElem[1] && !$cleanedElem[2] && !$cleanedElem[3] && !$cleanedElem[4]) {
-                    $lastEntry = FaxesMoreInfos::orderBy('id', 'desc')->first();
-                    $things = json_decode($lastEntry->name_of_things);
-                    $things->{$cleanedElem[5]} = $cleanedElem[6];
-                    $lastEntry->name_of_things = json_encode($things);
-                    $lastEntry->save();
-                } else {
-                    // Обрезаем из имени клиента приставку 007/
-                    $startPos = stripos($cleanedElem[1], '007/');
-                    $userName = substr($cleanedElem[1], $startPos + 4);
-                    if (!is_numeric($startPos)) {
-                        $userName = $cleanedElem[1];
-                    }
-
-                    $client = User::firstOrCreate(['name' => $userName], ['password' => 'default']);
-                    $prices = Price::where('client_id', $client->id)->first();
-//                    return response()->json(['status' => true, 'elem'=>$prices]);
-//                    $category = Price::where('category_name', $client->id)->first();
-
-                    // Категория
-                    $category = Category::firstOrCreate(['category_name'=> $cleanedElem[8]]);
-                    $brandInNotation = $cleanedElem[7] ? stripos($cleanedElem[7], 'Бренд') !== false : false;
-                    $brandInCategory = $cleanedElem[8] ? stripos($cleanedElem[8], 'Бренд') !== false : false;
-                    $brand = $brandInNotation || $brandInCategory;
-
-
-                    if ($brand && $prices) {
-                        $forKg = $prices->for_kg_brand;
-                        $forPlace = $prices->for_place_brand;
-                    } else if (!$brand && $prices) {
-                        $forKg = $prices->for_kg;
-                        $forPlace = $prices->for_place;
-                    } else {
-                        $forKg = 0;
-                        $forPlace = 0;
-                    }
-//                    return response()->json(['status' => false, 'elem7'=> stripos($cleanedElem[8], 'Бренд') !== false]);
-                    try {
-                        FaxesMoreInfos::create([
-                            'code' => (string)$cleanedElem[0],
-                            'place' => (int)$cleanedElem[2],
-                            'kg' => (float)$cleanedElem[3],
-                            'client_id' => (int)$client->id,
-                            'fax_id' => (int)$fax->id,
-                            'brand' => $brand,
-                            'shop' => (string)$cleanedElem[4],
-                            'for_kg' => (float)$forKg,
-                            'for_place' => (float)$forPlace,
-                            'name_of_things' => json_encode([$cleanedElem[5] => (int)$cleanedElem[6]]),
-                            'notation' => (string)$cleanedElem[7],
-                            'category_id' => (int)$category->id,
-                        ]);
-                    } catch (\Exception $e) {
-                        return response()->json(['status' => false, 'error' => 'Ошибка при записи данных.', 'row' => $cleanedElem, 'exception' => $e]);
-                    }
+//                return response()->json(['$cleanedElem'=>$cleanedElem]);
+                if ($cleanedElem[1] === 'Расход') {
+                    Cargo::create([
+                        'type' => (string)$cleanedElem[1],
+                        'fax' => (string)$cleanedElem[3],
+                        'created_at' => date("Y-m-d H:i:s", strtotime($cleanedElem[0])),
+                        'client_id' => 0,
+                    ]);
                 }
             }
         }
 
-        // Данные факса с расширением
-        $file = File::where('id', $fax->file_id)->first();
-        $fax->file_ext = $file->file_ext;
-//        $fullFaxInfo = FaxesMoreInfos::where('fax_id', $fax->id)->get();
-        return response()->json(['status' => true, 'fax' => $fax, 'groupedData' => $this->sampledData($fax->id)]);
+        $clients = Cargo::all();
+        $arrClients = [];
+        foreach ($clients->groupBy('fax') as $key => $value) {
+
+            $isNeed = true;
+//            if (date('Y-m', strtotime($value['created_at'])) < '2019-03') {
+//                array_push($arrClients, $value);
+//            }
+            foreach ($value as $item) {
+                if (date('Y-m-d', strtotime($item->created_at)) > '2019-02-01') {
+                    $isNeed = false;
+//                    array_push($arrClients, $key);
+                    break;
+                }
+            }
+            if ($isNeed) {
+                array_push($arrClients, $value);
+            }
+        }
+//        return response()->json(['status' => true, 'clients' => $arrClients]);
+        DB::table('cargos')->truncate();
+//
+        foreach ($arrClients as $value) {
+            foreach ($value as $item) {
+                $clien = Cargo::where('fax', $item['fax'])->first();
+                if (!$clien) {
+                    Cargo::create([
+                        'type' => $item['type'],
+                        'fax' => $item['fax'],
+                        'client_id' => 0,
+                        'created_at' => $item['created_at'],
+                    ]);
+                }
+            }
+        }
+//
+////        $fullFaxInfo = FaxesMoreInfos::where('fax_id', $fax->id)->get();
+//        return response()->json(['status' => true, 'clients' => $arrClients]);
     }
 
 
@@ -196,7 +297,7 @@ class FaxesMoreInfosController extends Controller
                 $clientID = $client->id;
             }
 
-            $prices = Price::firstOrCreate(['client_id'=> $clientID]);
+            $prices = Price::firstOrCreate(['client_id' => $clientID]);
 //            return response()->json(['status' => false, 'ARR'=>$prices]);
             $brand = (boolean)$arrvalue['brand'];
 
@@ -287,7 +388,7 @@ class FaxesMoreInfosController extends Controller
     {
 //        $res = new FaxExport($request->faxData, $request->only('headers'), $request->faxID, $request->categories);
 //        return response()->json(['status' => $res->check()]);
-        return Excel::download(new FaxesDataExport($request->faxData, $request->only('headers'), $request->faxID, $request->categories), 'users.xlsx');
+        return Excel::download(new RssExport(), 'users.xlsx');
     }
 
 //    public function export(Request $request)

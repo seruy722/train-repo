@@ -2,21 +2,22 @@
 
 namespace App\Exports\RSS;
 
-use Maatwebsite\Excel\Concerns\FromArray;
+use App\Cargo;
+use Maatwebsite\Excel\Concerns\FromCollection;
 
-class RssExport implements FromArray
+class RssExport implements FromCollection
 {
-    protected $data;
-
-    public function __construct(array $data)
-    {
-        $this->data = $data;
-    }
+//    protected $data;
+//
+//    public function __construct(array $data)
+//    {
+//        $this->data = $data;
+//    }
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function array(): array
+    public function collection()
     {
-        return $this->data;
+        return Cargo::all();
     }
 }
