@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class FaxCommonData implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize, WithEvents
 {
-    protected $headers = ['Код', 'Клиент', 'Мест', 'Вес', 'Магазин', 'Опись вложения','Город/клиента'];
+    protected $headers = ['Код', 'Клиент', 'Мест', 'Вес', 'Магазин', 'Категория', 'Город/клиента', 'Опись вложения'];
     protected $faxID;
     protected $data;
     protected $countEntries;
@@ -32,7 +32,8 @@ class FaxCommonData implements FromCollection, WithTitle, WithHeadings, ShouldAu
         $this->categories = $this->deleteEntriesFromCategories($categories);
     }
 
-    public function deleteEntriesFromCategories(array $categories){
+    public function deleteEntriesFromCategories(array $categories)
+    {
         array_splice($categories, -3);
         $categorySequence = ['category_name' => '', 'place' => 0, 'kg' => 0];
         $newArr = [];
@@ -48,13 +49,14 @@ class FaxCommonData implements FromCollection, WithTitle, WithHeadings, ShouldAu
         return $newArr;
     }
 
-    public function getDataFromTable(){
-        $dataTable =  DB::table('faxes_more_info')
+    public function getDataFromTable()
+    {
+        $dataTable = DB::table('faxes_more_info')
             ->where('fax_id', $this->faxID)
             ->join('users', 'faxes_more_info.client_id', '=', 'users.id')
-            ->select('faxes_more_info.code', 'users.name', 'faxes_more_info.place', 'faxes_more_info.kg', 'faxes_more_info.shop', 'faxes_more_info.name_of_things', 'faxes_more_info.notation')
-            ->get()
-        ;
+            ->join('categories', 'faxes_more_info.category_id', '=', 'categories.id')
+            ->select('faxes_more_info.code', 'users.name', 'faxes_more_info.place', 'faxes_more_info.kg', 'faxes_more_info.shop', 'categories.category_name', 'faxes_more_info.notation', 'faxes_more_info.name_of_things')
+            ->get();
         $sorted = $dataTable->sortBy('name');
 
         return $sorted;
@@ -66,11 +68,13 @@ class FaxCommonData implements FromCollection, WithTitle, WithHeadings, ShouldAu
         return $this->data;
     }
 
-    public function countEntries(){
+    public function countEntries()
+    {
         return $this->data->count();
     }
 
-    public function countSum($data, string $field){
+    public function countSum($data, string $field)
+    {
         return $data->sum($field);
     }
 
@@ -88,9 +92,9 @@ class FaxCommonData implements FromCollection, WithTitle, WithHeadings, ShouldAu
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                $headerEntry = 'A1:G1';
-                $footerEntry = 'A'.($this->countEntries + $this->moreEntries).':G'. ($this->countEntries + $this->moreEntries);
-                $cellRange = 'A1:G' . ($this->countEntries + $this->moreEntries);
+                $headerEntry = 'A1:H1';
+                $footerEntry = 'A' . ($this->countEntries + $this->moreEntries) . ':H' . ($this->countEntries + $this->moreEntries);
+                $cellRange = 'A1:H' . ($this->countEntries + $this->moreEntries);
                 $callPlace = 'C' . ($this->countEntries + $this->moreEntries);
                 $callKg = 'D' . ($this->countEntries + $this->moreEntries);
 
@@ -103,10 +107,10 @@ class FaxCommonData implements FromCollection, WithTitle, WithHeadings, ShouldAu
                 $event->sheet->getDelegate()->getCell($callKg)->setValue($this->sumKg);
 
                 // CATEGORIES
-                $categoriesCellRange = 'A'.($this->countEntries + $this->moreEntries + 4).':C'. ($this->countEntries + $this->moreEntries + count($this->categories)+4);
-                $cellCategoriesKg = 'C'. ($this->countEntries + $this->moreEntries + count($this->categories)+4);
-                $cellCategoriesPlace = 'B'. ($this->countEntries + $this->moreEntries + count($this->categories) +4);
-                $cellCategoriesFooter = 'A'.($this->countEntries + $this->moreEntries + count($this->categories)+4).':C'. ($this->countEntries + $this->moreEntries + count($this->categories) +4);
+                $categoriesCellRange = 'A' . ($this->countEntries + $this->moreEntries + 4) . ':C' . ($this->countEntries + $this->moreEntries + count($this->categories) + 4);
+                $cellCategoriesKg = 'C' . ($this->countEntries + $this->moreEntries + count($this->categories) + 4);
+                $cellCategoriesPlace = 'B' . ($this->countEntries + $this->moreEntries + count($this->categories) + 4);
+                $cellCategoriesFooter = 'A' . ($this->countEntries + $this->moreEntries + count($this->categories) + 4) . ':C' . ($this->countEntries + $this->moreEntries + count($this->categories) + 4);
 
                 $arrCat = $this->categories;
                 array_unshift($arrCat, array(''), array(''), array(''));
