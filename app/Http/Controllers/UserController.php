@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use http\Env\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\User;
 
@@ -19,7 +20,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $allUsers = User::orderBy('name')->get();
+        $allUsers = User::orderBy('created_at', 'DESC')->get();
         return response()->json(['status' => true, 'users' => $allUsers]);
     }
 
@@ -42,7 +43,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
 //        return response()->json(['status' => true,'item' => $request->all()]);
-        $array = (array)$request->only('name', 'email', 'password', 'set_photo_url', 'role', 'code');
+        $array = (array)$request->only('name', 'email', 'password', 'set_photo_url', 'role', 'code', 'sex', 'phone', 'city');
         $this->cleanData($array);
 
         $type = $request->type;
@@ -79,6 +80,9 @@ class UserController extends Controller
                     'password' => 'required|min:6|max:255',
                     'role' => 'required|max:255',
                     'code' => 'max:255',
+                    'sex' => 'max:255',
+                    'city' => 'max:255',
+                    'phone' => 'max:255',
                 ]);
 
                 $user = User::create($array);
@@ -129,15 +133,40 @@ class UserController extends Controller
         $user = User::find($request->id);
         if ($user->set_photo_url) {
             $fileName = substr($user->set_photo_url, strpos($user->set_photo_url, '/') + 1);
-            $exists = Storage::disk('images')->exists($this->folderNameForSaveImage. '/' . $fileName);
+            $exists = Storage::disk('images')->exists($this->folderNameForSaveImage . '/' . $fileName);
 
             if ($exists) {
-                Storage::disk('images')->delete($this->folderNameForSaveImage. '/' . $fileName);
+                Storage::disk('images')->delete($this->folderNameForSaveImage . '/' . $fileName);
             }
             $user->set_photo_url = null;
             $user->save();
             return response()->json(['status' => true, 'user' => $user]);
         }
+    }
+
+    public function getClients()
+    {
+        $clientsNames = User::all(['name', 'id'])->toArray();
+
+        return response()->json(['status' => true, 'clientsNames' => $clientsNames]);
+    }
+
+    public function getClientsNames()
+    {
+        $clientsNames = User::pluck('name');
+        $newClientsArr = array_map(function (string $value) {
+            $startPos = stripos($value, '007/');
+            if (is_numeric($startPos)) {
+                return substr($value, $startPos + 4);
+            }
+
+            return $value;
+
+        }, $clientsNames->all());
+
+        sort($newClientsArr, SORT_NATURAL);
+
+        return response()->json(['status' => true, 'clientsNames' => $newClientsArr]);
     }
 
     /**
@@ -188,5 +217,25 @@ class UserController extends Controller
             $user->delete();
             return response()->json(['status' => true]);
         }
+        return response()->json(['status' => false]);
+    }
+
+    public function getUsersNumberForSendingMessages(Request $request)
+    {
+        $data = $request->toArray();
+//        return response()->json(['status' => true, 'data' => $data]);
+        $newArr = [];
+        foreach ($data as $item) {
+            $user = User::find($item['client_id']);
+            $item['client_id'] = $user->phone;
+            array_push($newArr, ['phone' => $user->phone, 'name' => $user->name, 'sum' => $item['sum']]);
+//            foreach ($item as $key=> $elem) {
+//                $user = User::find($elem['client_id']);
+//                $elem['']
+//                array_push($newArr, [$user->phone=>$elem]);
+//            }
+
+        }
+        return response()->json(['status' => true, 'data' => $newArr]);
     }
 }

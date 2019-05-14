@@ -22,6 +22,7 @@ class CreateCargosTable extends Migration
             $table->integer('place')->default(0)->unsigned();
             $table->float('kg', 8, 2)->default(0)->unsigned();
             $table->string('fax')->nullable();
+            $table->boolean('brand')->default(false);
             $table->string('notation')->nullable();
             $table->timestamps();
         });

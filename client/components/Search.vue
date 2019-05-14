@@ -1,26 +1,38 @@
 <template>
-    <v-text-field
-        append-icon="search"
-        label="Поиск"
-        single-line
-        hide-details
-        ref="search"
-        v-model="search"
-    ></v-text-field>
+    <div data-vue-component-name="Search">
+        <v-text-field
+            v-model="search"
+            append-icon="search"
+            label="Поиск"
+            single-line
+            hide-details
+        ></v-text-field>
+    </div>
 </template>
 
 <script>
     export default {
-        props:['value'],
+        name: 'Search',
+        props: {
+            value: {
+                type: String,
+                default: '',
+            },
+        },
         computed: {
             search: {
                 get () {
                     return this.value;
                 },
                 set (val) {
-                    this.$emit('update:value', val);
-                }
-            }
-        }
-    }
+                    this.debouncedSearch(val);
+                },
+            },
+        },
+        methods: {
+            debouncedSearch: _.debounce(function (val) {
+                this.$emit('update:value', val);
+            }, 500),
+        },
+    };
 </script>

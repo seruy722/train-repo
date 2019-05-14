@@ -5,32 +5,38 @@
                 <span>Доход</span>
                 <v-icon>add</v-icon>
             </v-btn>
+
+            <v-spacer></v-spacer>
+
+            <v-flex xs12 sm2 md2>
+                <date-picker :value.sync="dateAdd"></date-picker>
+            </v-flex>
+
+            <v-flex xs12 sm3 md3>
+                <v-combobox
+                    v-model="currentClient"
+                    :items="clients"
+                    prepend-icon="people"
+                    label="Клиент"
+                    item-text="name"
+                    item-value="id"
+                    return-object
+                    disabled
+                ></v-combobox>
+            </v-flex>
         </v-card-actions>
 
         <v-container grid-list-sm class="pa-4">
-            <v-layout row wrap class="borderForEntry" v-for="(item, index) in getDataProfit" :key="index">
-
-                <!--ДАТА-->
-                <v-flex xs12 sm2 md2>
-                    <DatePicker :value.sync="item.date"></DatePicker>
-                </v-flex>
-
-                <v-flex xs12 sm2 md2>
-                    <v-text-field
-                        v-model="item.client"
-                        :error-messages="checkError('client')"
-                        prepend-icon="person"
-                        placeholder="Клиент"
-                        autofocus
-                    ></v-text-field>
-                </v-flex>
+            <v-layout row wrap v-for="(item, index) in getDataProfit" :key="index" class="borderForEntry">
 
                 <v-flex xs12 sm2 md2>
                     <v-text-field
                         v-model="item.sum"
                         :error-messages="checkError('sum')"
                         prepend-icon="monetization_on"
-                        placeholder="Сумма"
+                        autofocus
+                        type="number"
+                        label="Сумма"
                     ></v-text-field>
                 </v-flex>
 
@@ -39,7 +45,8 @@
                         v-model="item.sale"
                         :error-messages="checkError('sale')"
                         prepend-icon="money_off"
-                        placeholder="Скидка"
+                        type="number"
+                        label="Скидка"
                     ></v-text-field>
                 </v-flex>
 
@@ -48,13 +55,12 @@
                         v-model="item.notation"
                         :error-messages="checkError('notation')"
                         prepend-icon="notes"
-                        placeholder="Примечание"
+                        label="Примечание"
                     ></v-text-field>
                 </v-flex>
 
                 <v-flex xs12 sm1 md1>
                     <v-btn
-                        v-if="index > 0"
                         fab
                         small
                         dark
@@ -68,12 +74,11 @@
             </v-layout>
         </v-container>
 
-        <v-card-actions>
+        <v-card-actions v-if="dataProfit.length">
 
             <v-spacer></v-spacer>
 
             <v-btn
-                v-if="dataProfit.length"
                 :disabled="loadOnBtn"
                 :loading="loadOnBtn"
                 fab
@@ -102,64 +107,89 @@
 </template>
 <script>
     import axios from 'axios';
-    import DatePicker from '~/components/Cargo/Control/DatePicker/DatePicker';
+    import DatePicker from '~/components/Pickers/DatePicker.vue';
     import { formatDate } from '~/utils';
     import checkErrorMixin from '~/mixins/checkError';
+    import { mapGetters } from 'vuex';
 
     export default {
         components: {
-            DatePicker
+            DatePicker,
         },
         middleware: 'auth',
         mixins: [checkErrorMixin],
         data () {
             return {
-                search: '',
                 loadOnBtn: false, // Оверлей для кнопки
-                selected: [],
-                dataProfit: [
-                    {
-                        type: 'ОПЛАТА',
-                        client: null,
-                        date: null,
-                        sum: 0,
-                        sale: null,
-                        notation: null,
-                    }
-                ],
+                dataProfit: [],
                 defaultItem: {
                     type: 'ОПЛАТА',
-                    client: null,
-                    date: null,
-                    sum: 0,
+                    sum: null,
                     sale: null,
                     notation: null,
                 },
-            }
+            };
         },
         computed: {
+            ...mapGetters({
+                clients: 'cargo/clientsNames',
+                currentClient: 'cargo/getCurrentClient',
+                dateForAddEntry: 'cargo/getDateForAddEntry',
+
+            }),
             getDataProfit () {
                 return this.dataProfit;
             },
+            dateAdd: {
+                get:function () {
+                    return this.dateForAddEntry;
+                },
+                set:function (val) {
+                    this.$store.commit('cargo/SET_DATEFORADDENTRY', val);
+                },
+            },
+        },
+        created () {
+            this.addEmptyEntry();
         },
         methods: {
+            setDefaultValues () {
+                this.defaultItem.client = this.currentClient;
+                this.defaultItem.date = this.$store.getters['cargo/getcurrentDate'];
+            },
             clearAndCloseComponent () {
                 this.$store.commit('controlPanel/SET_OPENEDCOMPONENT', false);
-                const emptyDataPtofit = [];
-                emptyDataPtofit.push(_.assign({}, this.defaultItem));
-                this.dataProfit = emptyDataPtofit;
+                this.dataProfit = [];
+                this.addEmptyEntry();
             },
             deleteEntry (elem) {
                 const elemIndex = _.indexOf(this.dataProfit, elem);
                 this.dataProfit.splice(elemIndex, 1);
+
+                if (_.isEmpty(this.dataDebts)) {
+                    this.addEmptyEntry();
+                }
+            },
+            addValuesToEntries (props) {
+                return _.reduce(props, (result, item) => {
+                    result.push(_.assign(item, {
+                        client: this.currentClient,
+                        date: this.dateForAddEntry,
+                    }));
+                    return result;
+                }, []);
             },
             addEmptyEntry () {
+                this.setDefaultValues();
                 this.dataProfit.push(_.assign({}, this.defaultItem));
             },
             changeLoadBtn () {
                 this.loadOnBtn = !this.loadOnBtn;
             },
             async save () {
+                const sendData = this.addValuesToEntries(this.dataProfit);
+                console.log('sendData', sendData);
+                return;
                 this.changeLoadBtn();
                 this.changeErrors({});
 
@@ -172,36 +202,24 @@
                     }
                 });
 
-                // Проверяем массив на пустоту
-                if (_.isEmpty(clearDataProfit)) {
-                    this.$snotify.warning('Данные не заполнены', {
-                        timeout: 3000,
-                        showProgressBar: true,
-                        closeOnClick: true,
-                        pauseOnHover: true
-                    });
-
-                    return;
-                }
                 console.log(clearDataProfit);
 
                 await this.saveCargoProfitToServer(clearDataProfit).then((response) => {
                     const { status } = response.data;
-
 
                     if (status) {
                         this.changeLoadBtn();
                         let { cargoEntry } = response.data;
                         // Форматируем дату
                         cargoEntry = formatDate(cargoEntry, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
-                        _.forEach(cargoEntry, (item)=>{
+                        _.forEach(cargoEntry, (item) => {
                             this.$store.commit('cargo/ADD_ITEM', item);
 
                             this.$snotify.success('Запись успешно добавлена!', {
                                 timeout: 3000,
                                 showProgressBar: true,
                                 closeOnClick: true,
-                                pauseOnHover: true
+                                pauseOnHover: true,
                             });
                         });
 
@@ -233,7 +251,7 @@
                 return await axios.post('cargo/saveProfit', item);
             },
             async deleteItemFromServer (id) {
-                return await axios.post('blacklist/delete', {id});
+                return await axios.post('blacklist/delete', { id });
             },
         }
     }

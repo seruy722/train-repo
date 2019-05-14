@@ -1,15 +1,104 @@
 {
-  "root": true,
+  "extends": [
+    "airbnb",
+    "plugin:vue/recommended"
+  ],
+  "plugins": [
+    "import",
+    "vue"
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
   "parserOptions": {
     "parser": "babel-eslint",
-    "ecmaVersion": 2017,
-    "sourceType": "module"
+    "ecmaVersion": 8
   },
-  "extends": [
-    "plugin:vue/recommended",
-    "@vue/standard"
-  ],
   "rules": {
-    "vue/max-attributes-per-line": "off"
+    "indent": [
+      "off",
+      4
+    ],
+    "semi": [
+      "warn",
+      "always"
+    ],
+    "no-underscore-dangle": "off",
+    "prefer-template": "warn",
+    "comma-dangle": "warn",
+    "quote-props": "warn",
+    "max-len": [
+      "warn",
+      {
+        "code": 120
+      }
+    ],
+    "no-use-before-define": [
+      "off"
+    ],
+    "no-shadow": [
+      "off",
+      {
+        "builtinGlobals": true,
+        "hoist": "functions",
+        "allow": [
+          "done",
+          "e",
+          "event",
+          "resolve",
+          "reject"
+        ]
+      }
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "always",
+        "named": "always",
+        "asyncArrow": "always"
+      }
+    ],
+    "no-param-reassign": [
+      "warn",
+      {
+        "props": false
+      }
+    ],
+    "vue/html-indent": [
+      "warn",
+      4
+    ],
+    "vue/script-indent": [
+      "warn",
+      4,
+      {
+        "baseIndent": 1,
+        "switchCase": 1
+      }
+    ],
+    "key-spacing": [
+      "warn"
+    ],
+    "object-curly-spacing": [
+      "warn"
+    ],
+    "no-trailing-spaces": [
+      "off"
+    ],
+    "vue/html-self-closing": [
+      "warn",
+      {
+        "html": {
+          "normal": "never"
+        }
+      }
+    ],
+    "prefer-destructuring": [
+      "off"
+    ],
+    "class-methods-use-this": "off"
   }
 }
+

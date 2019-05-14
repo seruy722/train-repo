@@ -1,5 +1,6 @@
 <template>
     <div data-component-name="Home">
+
         <v-app id="inspire">
             <v-navigation-drawer
                 v-if="showAdminData"
@@ -118,22 +119,23 @@
 </template>
 
 <script>
-    import {mapGetters} from 'vuex';
-    import HomeNav from '~/components/HomeNav';
+    import { mapGetters } from 'vuex';
+    import HomeNav from '~/components/Navs/HomeNav';
     import navClickMixin from '~/mixins/navClick';
     import logout from '~/mixins/logout';
 
     export default {
         mixins: [navClickMixin, logout],
         components: {
-            HomeNav // Меню навигации
+            HomeNav, // Меню навигации
+            // Connectivity,
         },
         middleware: 'auth',
         showAdminData: false,
-        data: ()=>({
+        data: () => ({
             drawer: false,
             items: [
-                { icon: 'home', text: 'Главная', path: '/'},
+                { icon: 'home', text: 'Главная', path: '/' },
                 { icon: 'people_outline', text: 'Пользователи', path: '/users' },
                 {
                     icon: 'business',
@@ -141,7 +143,8 @@
                     model: false,
                     children: [
                         { icon: 'home', text: 'Карго', path: '/cargo' },
-                    ]
+                        { icon: 'home', text: 'Факсы', path: '/faxes' },
+                    ],
                 },
                 {
                     icon: 'people',
@@ -150,11 +153,12 @@
                     children: [
                         { icon: 'home', text: 'Главная', path: '/' },
                         { icon: 'list', text: 'Логи', path: '/logs' },
-                    ]
+                    ],
                 },
                 { icon: 'email', text: 'Email доступы', path: '/emails' },
-                { icon: 'exit_to_app', text: 'Выход', path: '/logout'}
-            ]
+                { icon: 'send', text: 'Рассылка', path: '/mailing' },
+                { icon: 'exit_to_app', text: 'Выход', path: '/logout' },
+            ],
         }),
         created () {
             this.checkAdminRole();

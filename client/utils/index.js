@@ -13,7 +13,7 @@ export function cookieFromRequest (req, key) {
     }
 
     const cookie = req.headers.cookie.split(';').find(
-        c => c.trim().startsWith(`${key}=`)
+        c => c.trim().startsWith(`${key}=`),
     );
 
     if (cookie) {
@@ -32,12 +32,12 @@ export function scrollBehavior (to, from, savedPosition) {
     let position = {};
 
     if (to.matched.length < 2) {
-        position = {x: 0, y: 0};
+        position = { x: 0, y: 0 };
     } else if (to.matched.some(r => r.components.default.options.scrollToTop)) {
-        position = {x: 0, y: 0};
+        position = { x: 0, y: 0 };
     }
     if (to.hash) {
-        position = {selector: to.hash};
+        position = { selector: to.hash };
     }
 
     return position;
@@ -64,64 +64,32 @@ export function formatDate (data, enterFormat, needFormat) {
     return data;
 }
 
+/**
+ * Функция форматирует число в читабельный вид
+ * @param number
+ * @return {*}
+ */
+export function numberFormat (number) {
+    return new Intl.NumberFormat('ru-RU').format(_.toNumber(number));
+}
+
 
 /**
- * Class for work with dates
- *
+ * Функция обратная функции numberFormat
+ * @param number
+ * @return {*}
  */
+export function numberUnformat (number) {
+    return _.chain(number).toString().split(' ').join('').toNumber();
+}
 
-export class Date {
-    constructor () {
-        this.month = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-        this.dateFormat = 'DD-MM-YYYY';
-    }
-
-    today () {
-        return moment().format(this.dateFormat);
-    }
-
-    tomorrow () {
-        return moment(new Date()).add(1, 'days').format(this.dateFormat);
-    }
-
-    yesterday () {
-        return moment(new Date()).add(-1, 'days').format(this.dateFormat);
-    }
-
-    next (date) {
-        return moment(date, this.dateFormat).add(1, 'days').format(this.dateFormat);
-    }
-
-    prev (date) {
-        return moment(date, this.dateFormat).add(-1, 'days').format(this.dateFormat);
-    }
-
-    isValid (date) {
-        return moment(date, this.dateFormat,true).isValid();
-    }
-
-    currentMonth () {
-        const month = moment().month();
-        return `${this.month[month]} ${moment().year()}`;
-    }
-
-    currentYear () {
-        return `${moment().year()} год`;
-    }
-
-    currentWeek () {
-        const startOfWeek = moment().startOf('isoweek').format('DD-MM');
-        const endOfWeek = moment().endOf('isoweek').format(this.dateFormat);
-        return `Нед. ${startOfWeek} - ${endOfWeek}`;
-    }
-
-    year(date){
-        return `${moment(date).year()} год`;
-    }
-
-    choiceWeek(date){
-        const monday = moment(date, this.dateFormat).startOf('isoweek').format(this.dateFormat);
-        const sunday = moment(date, this.dateFormat).endOf('isoweek').format(this.dateFormat);
-        return {monday, sunday};
-    }
+/**
+ * Проверяет существование клиента
+ *
+ * @param array
+ * @param clientObj
+ * @return {object}
+ */
+export function isClient (array, clientObj) {
+    return _.find(array, clientObj);
 }

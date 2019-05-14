@@ -1,18 +1,21 @@
 <template>
-
-    <div class="main" data-component-name="Cargo">
+    <div
+        class="main"
+        data-component-name="Cargo"
+    >
         <v-container fluid>
 
-            <v-toolbar color="white" dark>
+            <v-toolbar>
                 <v-toolbar-title class="text-xs-center title blue--text">{{ currentTable }}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <search :value.sync="search"></search>
             </v-toolbar>
 
             <v-toolbar flat color="white" evaluation-1>
-                <control-panel></control-panel>
-                <v-spacer></v-spacer>
-
                 <!--МЕНЮ ДОБАВЛЕНИЯ ЗАПИСЕЙ В КАРГО И ДОЛГИ-->
-                <cargo-debts-nav @click-nav="clickNav"></cargo-debts-nav>
+                <CargoDebtsNav @click-nav="clickNav"></CargoDebtsNav>
+                <v-spacer></v-spacer>
+                <control-panel></control-panel>
 
                 <!--<v-dialog v-model="dialog" width="800px">-->
 
@@ -99,15 +102,14 @@
                 <!--</v-card>-->
                 <!--</v-dialog>-->
             </v-toolbar>
-
             <!--ДОБАВЛЕНИЕ НОВЫХ ЗАПИСЕЙ В ТАБЛИЦУ-->
             <keep-alive v-if="openedComponent">
-                <component v-bind:is="dynamicComponent"></component>
+                <component :is="dynamicComponent"></component>
             </keep-alive>
 
             <!--CargoTable  и DebtsTable КОМПОНЕНТЫ-->
             <keep-alive>
-                <component v-bind:is="dynamicTableComponent"></component>
+                <component :is="dynamicTableComponent"></component>
             </keep-alive>
         </v-container>
     </div>
@@ -116,54 +118,89 @@
     import CargoProfit from '~/components/Cargo/CargoProfit';
     import CargoDebts from '~/components/Cargo/CargoDebts';
     import CargoTable from '~/components/Cargo/CargoTable';
-    import CargoDebtsNav from '~/components/Cargo/CargoDebtsNav';
-    import ControlPanel from '~/components/Cargo/Control/ControlPanel';
+    import DebtsTable from '~/components/Debts/DebtsTable';
+    import CargoDebtsNav from '~//components/Navs/CargoDebtsNav';
+    import ControlPanel from '~/components/ControlPanel.vue';
     import { mapGetters } from 'vuex';
     import axios from 'axios';
+    import Search from '~/components/Search';
 
     export default {
-        // async fetch ({store}) {
-        //     const { data } = await axios.get('cargo/clientsNames');
-        //     const clientsNamesList = data.data;
-        //
-        //     store.commit('cargo/SET_CLIENTSNAMES', clientsNamesList);
-        // },
+        // Сохранение имен клиентов в cargo store
+        async fetch ({ store }) {
+            const { data } = await axios.get('/clients').catch((errors) => {
+                console.error('Ошибка при запросе клиентов', errors);
+            });
+            const { clientsNames } = data;
+
+            // Добавление в список имен клиентов пункта "Все"
+            const allClientsObj = store.getters['settings/allClientsObj'];
+            clientsNames.unshift(allClientsObj);
+
+            store.commit('cargo/SET_CLIENT', allClientsObj);
+            store.dispatch('cargo/setClientsNames', clientsNames);
+        },
         components: {
             CargoProfit,
             CargoDebts,
             CargoTable,
             CargoDebtsNav,
-            ControlPanel
+            ControlPanel,
+            Search,
+            DebtsTable,
         },
         middleware: 'auth',
         head () {
-            return { title: `Карго и Долги` };
+            return { title: 'Карго и Долги' };
         },
         data: () => ({
             navElem: null,
+            search: '',
         }),
         computed: {
             ...mapGetters({
-                currentTable: 'controlPanel/getCurrentTable',
-                openedComponent: 'controlPanel/getOpenedComponent'
+                currentTable: 'cargo/getCurrentTable',
+                openedComponent: 'controlPanel/getOpenedComponent',
+                countObject: 'cargo/countObject',
+                currentClient: 'cargo/getCurrentClient',
             }),
+            // Добавление оплат и долгов в таблицу cargos
             dynamicComponent () {
                 if (this.openedComponent === 'ОПЛАТА' && this.currentTable === 'КАРГО') {
                     return 'CargoProfit';
-                } else if (this.openedComponent === 'ДОЛГ' && this.currentTable === 'КАРГО') {
+                }
+
+                if (this.openedComponent === 'ДОЛГ' && this.currentTable === 'КАРГО') {
                     return 'CargoDebts';
                 }
             },
+            // Смена таблиц КАРГО и ДОЛГИ
             dynamicTableComponent () {
                 if (this.currentTable === 'КАРГО') {
                     return 'CargoTable';
                 }
-            }
+                return 'DebtsTable';
+            },
         },
+        watch: {
+            search (val) {
+                this.$store.commit('controlPanel/SET_SEARCH', val);
+            },
+        },
+
         methods: {
             clickNav (type) {
-                this.$store.commit('controlPanel/SET_OPENEDCOMPONENT', type);
-            }
-        }
-    }
+                if (this.currentClient.name === 'Все') {
+                    this.$snotify.warning('Выберите клиента', {
+                        timeout: 3000,
+                        showProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                    });
+                } else {
+                    this.$store.commit('controlPanel/SET_OPENEDCOMPONENT', type);
+                }
+            },
+        },
+    };
 </script>

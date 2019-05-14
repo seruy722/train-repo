@@ -60,7 +60,7 @@
                                                                 </v-img>
                                                                 <input type="file" ref="profileimage"
                                                                        @change="updatePhoto"
-                                                                       class="profile-image-input">
+                                                                       class="display-none_input">
                                                             </v-card>
 
                                                         </v-flex>

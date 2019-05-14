@@ -1,29 +1,43 @@
 @import 'variables';
-@import '~bootstrap/scss/bootstrap';
-@import '~sweetalert2/src/sweetalert2';
-@import '@fortawesome/fontawesome/styles.css';
-
-@import 'elements/card';
-@import 'elements/navbar';
-@import 'elements/buttons';
-@import 'elements/transitions';
 @import "~vue-snotify/styles/material"; // Стили для оповещений
 
-
+// Главный цвет фона сайта
 .main_color-bg {
     background-color: $main-color-bg;
     color: $text-color;
 }
 
+// Цвет фона кнопок
 .btn-bg-color {
     background-color: $btn-bg-color;
 }
+
 // Главный блок страниц (для растягивания его на всю страницу)
 .main {
     width: 95%;
     height: 100%;
 }
+
 // Скрытие инпута выбора файла
-.profile-image-input {
+.display-none_input {
     display: none;
+}
+
+// Цвет фона строк табицы доходов
+.tr_green__bg {
+    background-color: $tr_green__bg;
+}
+
+// Цвет фона строк табицы долгов
+.tr_red__bg {
+    background-color: $tr_red__bg;
+}
+
+// Рамка для строк таблиц
+.tr_border {
+    border: $tr_border;
+}
+
+.tr_yellow__bg {
+    border: $tr_yellow__bg;
 }
