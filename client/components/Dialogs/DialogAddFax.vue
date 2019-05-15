@@ -42,6 +42,17 @@
                                     </v-flex>
 
                                     <v-flex xs12 sm12 md12>
+                                        <v-select
+                                            v-model="faxData.transporterID"
+                                            :items="transport"
+                                            item-text="name"
+                                            item-value="id"
+                                            label="Перевозчик"
+                                        >
+                                        </v-select>
+                                    </v-flex>
+
+                                    <v-flex xs12 sm12 md12>
                                         <v-text-field
                                             v-model.trim="faxData.faxName"
                                             :error-messages="checkError('faxName')"
@@ -173,12 +184,14 @@
                     errorDate: '',
                     selectedTransportItem: NaN,
                     dateOfDeparture: today(),
+                    transporterID: NaN,
                 },
             };
         },
         computed: {
             ...mapGetters({
                 transportItems: 'settings/transportItems',
+                transport: 'transporters/transporters',
             }),
         },
         watch: {
@@ -186,7 +199,30 @@
                 this.setFileInfo(formData);
             },
         },
+
+        created () {
+            this.getTransporters(this.transport);
+        },
+
         methods: {
+            async getTransporters (transportersData) {
+                if (_.isEmpty(transportersData)) {
+                    try {
+                        const { data } = await axios.get('transporters/all');
+                        const { status = false, transporters = [] } = data;
+
+                        if (status && !_.isEmpty(transporters)) {
+                            this.$store.dispatch('transporters/setTransporters', transporters);
+                            console.log('transporters', transporters);
+                        }
+                    } catch (e) {
+                        console.error(`Ошибка при запросе данных о перевозчиках - ${e}`);
+                    } finally {
+                        console.log('Completed request for get transporters');
+                    }
+                }
+                console.log('TTR', this.transport);
+            },
             async sendFileToServer () {
                 this.loadingDisabledBtn(true);
 
@@ -234,6 +270,8 @@
                 this.fileForUpload.append('dateOfDeparture', formatDateToServerDate(this.faxData.dateOfDeparture));
                 this.fileForUpload.append('transport', this.faxData.selectedTransportItem);
                 this.fileForUpload.append('faxName', this.faxData.faxName);
+                this.fileForUpload.append('transporterID', this.faxData.transporterID);
+                // console.log('FU', this.fileForUpload);
             },
             setFileInfo (formData) {
                 this.faxData.fileInfo = `${formData.get('fileName')} [${_.round(formData.get('fileSize') / 1024)} кб]`;

@@ -1108,7 +1108,7 @@
                         // console.log('categoriesData', categoriesData);
                         this.$store.dispatch('fax/setTableCategoriesData', categoriesData);
 
-                        this.$snotify.success('Данные по категория факса сохранены.', {
+                        this.$snotify.success('Данные по категориям факса сохранены.', {
                             timeout: 3000,
                             showProgressBar: true,
                             closeOnClick: true,

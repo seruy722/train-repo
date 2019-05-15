@@ -83,7 +83,7 @@
                         <td :class="props.item.uploaded_to_table_cargos_date ? 'tr_yellow__bg' : ''" class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
                         </td>
                         <td class="text-xs-center">{{ props.item.air_or_car | convertBoolToAirOrCar }}</td>
-                        <td class="text-xs-center">{{ props.item.paid }}</td>
+                        <td class="text-xs-center">{{ props.item.paid | convertCommonItems}}</td>
                         <!--<td class="text-xs-center">{{ props.item.created_at | formatDate }}</td>-->
                         <ControlPanelFaxes
                             :item="props.item"

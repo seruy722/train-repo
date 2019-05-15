@@ -72,6 +72,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('fax/download', 'FaxesMoreInfosController@export');
     // CATEGORIES
     Route::get('faxes/categoriesNames', 'FaxCategoriesController@index');
+
+    // TRANSPORTERS
+    Route::get('transporters/all', 'TransportersController@index');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

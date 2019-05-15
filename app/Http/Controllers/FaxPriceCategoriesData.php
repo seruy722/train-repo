@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Fax;
 use App\FaxPriceForCategory;
+use App\PriceForTransporter;
 use Illuminate\Http\Request;
 
 class FaxPriceCategoriesData extends Controller
@@ -31,11 +33,14 @@ class FaxPriceCategoriesData extends Controller
         ]);
         $data = $request->all();
         $faxID = $data[0]['fax_id'];
+        $fax = Fax::where('id', $faxID)->first();
+        $transporterID = $fax->transporter;
 
         foreach ($data as $item) {
             $arrvalue = (array)$item;
             $category = Category::firstOrCreate(['category_name' => $arrvalue['category_name']]);
             FaxPriceForCategory::updateOrCreate(['fax_id' => $arrvalue['fax_id'], 'category_id' => $category->id], ['category_id' => $category->id, 'fax_id' => $arrvalue['fax_id'], 'category_price' => $arrvalue['for_kg']]);
+            PriceForTransporter::updateOrCreate(['for_kg' => $arrvalue['for_kg'], 'category_id' => $category->id, 'transporter_id'=>$transporterID]);
         }
 
         $faxCategoriesData = FaxPriceForCategory::where('fax_id', $faxID)->get();

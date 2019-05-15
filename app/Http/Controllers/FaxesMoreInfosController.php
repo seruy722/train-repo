@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Exports\Fax\FaxesDataExport;
 use App\Exports\RSS\RssExport;
+use App\FaxPriceForCategory;
 use App\File;
 use App\Price;
+use App\PriceForTransporter;
+use App\Transporter;
 use Illuminate\Http\Request;
 use App\Imports\FaxesImport;
 use Illuminate\Support\Facades\DB;
@@ -61,7 +64,7 @@ class FaxesMoreInfosController extends Controller
                 'file_hash_name' => $fileHash,
                 'file_size' => $file->getSize(),
                 'file_ext' => $fileExtension,
-                'url'=>$fileUrl,
+                'url' => $fileUrl,
             ]);
 
 
@@ -71,12 +74,18 @@ class FaxesMoreInfosController extends Controller
                 Storage::putFileAs('faxes', $file, $fileHash);
             }
         }
-
+//        return response()->json(['status' => true, 'elem' => $cleanedData['transporterID']]);
         // Добавление факса
-        $arrForCreateFax = ['file_id'=>$savedFileData->id,'fax_name' => $request->faxName, 'date_departure' => $this->formatDateToMySqlDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
+        $arrForCreateFax = ['transporter' => (int)$cleanedData['transporterID'], 'file_id' => $savedFileData->id, 'fax_name' => $request->faxName, 'date_departure' => $this->formatDateToMySqlDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
         $fax = Fax::create($arrForCreateFax);
 
-//        $formatedDatesFax = $FormatDatesClass->formatDatesFields($fax->toArray(), ['created_at', 'date_departure']);
+        // Запись цен по категория за факс
+        $transporterPrice = PriceForTransporter::where('transporter_id', (int)$cleanedData['transporterID'])->get();
+        if($transporterPrice->isNotEmpty()){
+            foreach ($transporterPrice->toArray() as $item) {
+                FaxPriceForCategory::create(['fax_id' => $fax->id, 'category_id' => $item['category_id'], 'category_price' => $item['for_kg']]);
+            }
+        }
 
         // Загрузка данных файла на сервер
         $ImportedFaxArray = Excel::toArray(new FaxesImport, $file);
@@ -114,7 +123,7 @@ class FaxesMoreInfosController extends Controller
 //                    $category = Price::where('category_name', $client->id)->first();
 
                     // Категория
-                    $category = Category::firstOrCreate(['category_name'=> $cleanedElem[8]]);
+                    $category = Category::firstOrCreate(['category_name' => $cleanedElem[8]]);
                     $brandInNotation = $cleanedElem[7] ? stripos($cleanedElem[7], 'Бренд') !== false : false;
                     $brandInCategory = $cleanedElem[8] ? stripos($cleanedElem[8], 'Бренд') !== false : false;
                     $brand = $brandInNotation || $brandInCategory;
@@ -196,7 +205,7 @@ class FaxesMoreInfosController extends Controller
                 $clientID = $client->id;
             }
 
-            $prices = Price::firstOrCreate(['client_id'=> $clientID]);
+            $prices = Price::firstOrCreate(['client_id' => $clientID]);
 //            return response()->json(['status' => false, 'ARR'=>$prices]);
             $brand = (boolean)$arrvalue['brand'];
 
