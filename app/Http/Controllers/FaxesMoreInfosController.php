@@ -216,8 +216,27 @@ class FaxesMoreInfosController extends Controller
                 }
             }
 
-            $prices->save();
+            $changePrices = $arrvalue['changeValues'];
 
+            if ($changePrices['for_kg']) {
+                if ($brand) {
+                    $prices->for_kg_brand = (float)$arrvalue['for_kg'];
+                } else {
+                    $prices->for_kg = (float)$arrvalue['for_kg'];
+                }
+            }
+
+            if ($changePrices['for_place']) {
+                if ($brand) {
+                    $prices->for_place_brand = (float)$arrvalue['for_place'];
+                } else {
+                    $prices->for_place = (float)$arrvalue['for_place'];
+                }
+            }
+
+
+            $prices->save();
+//            return response()->json(['status' => true, 'groupedData' => [], 'dfsdf'=>$prices]);
 
             FaxesMoreInfos::where('id', $arrvalue['id'])->update([
                 'code' => (string)$arrvalue['code'],

@@ -302,7 +302,7 @@
 
 <script>
     import axios from 'axios';
-    import { needFormatDate } from '~/utils/dates';
+    // import { needFormatDate } from '~/utils/dates';
     import { mapGetters } from 'vuex';
 
     export default {
@@ -310,9 +310,6 @@
         filters: {
             convertBoolToAirOrCar (value) {
                 return value ? 'Авиа' : 'Машина';
-            },
-            convertCommonItems (value) {
-                return value ? 'ДА' : 'НЕТ';
             },
         },
         components: {

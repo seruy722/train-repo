@@ -348,6 +348,11 @@
                                                     counter
                                                     autofocus
                                                 ></v-text-field>
+
+                                                <v-checkbox
+                                                    v-model="props.item.changeValues.for_kg"
+                                                    label="Заменить"
+                                                ></v-checkbox>
                                             </template>
 
                                         </v-edit-dialog>
@@ -379,6 +384,11 @@
                                                     counter
                                                     autofocus
                                                 ></v-text-field>
+
+                                                <v-checkbox
+                                                    v-model="props.item.changeValues.for_place"
+                                                    label="Заменить"
+                                                ></v-checkbox>
                                             </template>
 
                                         </v-edit-dialog>
@@ -422,7 +432,7 @@
 
                                             @close="close"
                                         >
-                                            <div>{{ props.item.brand }}</div>
+                                            <div>{{ props.item.brand | convertCommonItems }}</div>
 
                                             <template v-slot:input>
                                                 <div class="mt-3 title">Бренд</div>
@@ -431,7 +441,9 @@
                                             <template v-slot:input>
                                                 <v-select
                                                     v-model.number="props.item.brand"
-                                                    :items="brandSelectItems"
+                                                    :items="commonItems"
+                                                    item-text="title"
+                                                    item-value="id"
                                                     type="number"
                                                     label="Бренд"
                                                 ></v-select>
@@ -738,12 +750,22 @@
             ];
 
             return {
+                checkbox: false,
                 // faxNames: [],
                 selectLoading: true,
                 dialog: false,
                 counter: 6,
                 isLoadedDataToMainTable: false,
-                brandSelectItems: [0, 1],
+                brandSelectItems: [
+                    {
+                        title: 'Да',
+                        value: 1,
+                    },
+                    {
+                        title: 'Нет',
+                        value: 0,
+                    },
+                ],
                 tableCategoriesItems: [],
                 differenceTotalSum: {
                     sum: 0,
@@ -772,6 +794,7 @@
                 getCategoriesNames: 'fax/getCategoriesNames',
                 getFaxData: 'fax/getFaxData',
                 getFaxesNames: 'fax/getFaxesNames',
+                commonItems: 'settings/commonItems',
             }),
             getFaxName () {
                 return Cookies.get('faxName');
@@ -796,6 +819,7 @@
                 this.setFaxData();
                 this.calcSumClientInFaxData(this.faxData);
                 this.callStackForCategoriesTable();
+                this.setChangeValues(this.faxData);
                 // console.log('DAATARW', this.faxData);
             },
             getTableCategoriesData () {
@@ -810,10 +834,10 @@
 
             try {
                 if (_.isEmpty(store.getters['fax/getFaxData']) || faxDataID !== paramsID) {
-                    console.log('Запрос данных по факсу');
                     // Запрос данных по факсу
                     const { data: faxInfoData } = await axios.post('faxes/faxData', { faxID });
                     const { groupedData = [] } = faxInfoData;
+                    // console.log('Запрос данных по факсу', groupedData);
 
                     store.dispatch('fax/setGroupedData', groupedData);
                 }
@@ -839,21 +863,31 @@
             this.callStackForCategoriesTable();
             this.setCookies(this.$route.params);
             this.setSelectedColumn(this.$_mainTableHeaders);
+            this.setChangeValues(this.faxData);
         },
         methods: {
+            setChangeValues (data) {
+                console.log('DDT', data);
+                _.forEach(data, elem => {
+                    _.forEach(_.get(elem, 'clientItemsArray'), item => _.set(item, 'changeValues', {
+                        for_kg: false,
+                        for_place: false,
+                    }));
+                });
+            },
             key () {
                 return 58;
             },
             startCounter () {
-                const counterUndo = setInterval(() => {
-                    this.counter = this.counter - 1;
-                    console.log('counterUndo', this.counter);
-                }, 1000);
-
-                setTimeout(function () {
-                    clearInterval(counterUndo);
-                }, 6000);
-                this.counter = 6;
+                // const counterUndo = setInterval(() => {
+                //     this.counter = this.counter - 1;
+                //     console.log('counterUndo', this.counter);
+                // }, 1000);
+                //
+                // setTimeout(function () {
+                //     clearInterval(counterUndo);
+                // }, 6000);
+                // this.counter = 6;
             },
             setFaxData () {
                 this.faxData = _.cloneDeep(this.getFaxData);
@@ -873,7 +907,7 @@
             },
 
             async updateFaxData () {
-                // console.log('sendData', this.sendDataToUpdate);
+                console.log('sendData_UP', this.sendDataToUpdate);
                 try {
                     const { data } = await axios.post('faxes/updateData', this.sendDataToUpdate);
 
@@ -939,25 +973,6 @@
                 return data.sort((a, b) => a[field] - b[field]);
             },
 
-            getBrandClientNames (data) {
-                // console.log('DATA', this.faxData);
-                // const arrNames = [];
-                // _.forEach(data, (item) => {
-                //     const obj = {};
-                //     if (item.brand) {
-                //         obj.name = item.name;
-                //         obj.kg = item.kg;
-                //         obj.place = item.place;
-                //
-                //         arrNames.push(obj);
-                //     }
-                // });
-                //
-                // return arrNames;
-
-                // return _.get(data, '[0].fax_id')
-            },
-
             selectMenuItem (item) {
                 switch (item.id) {
                     // Скачивание файла оригинала факса
@@ -994,7 +1009,6 @@
                     case 1:
                         // console.log('H', this.headersForExport(this.$_mainTableHeaders, this.selectedColumn));
                         console.log('FFX', this.headersForExport(this.$_mainTableHeaders, this.selectedColumn));
-                        console.log('BRANDS', this.getBrandClientNames(this.faxData));
                         console.log('tableCategoriesItems', this.tableCategoriesItems);
                         if (_.isEmpty(this.selectedColumn)) {
                             this.$snotify.warning('Выберите столбцы для експорта', {
