@@ -80,7 +80,7 @@
                             </router-link>
                         </td>
                         <td class="text-xs-center">{{ props.item.date_departure | formatDate }}</td>
-                        <td :class="props.item.uploaded_to_table_cargos_date ? 'tr_yellow__bg' : ''" class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
+                        <td :class="props.item.uploaded_to_table_cargos_date ? 'tr_yellow__bg' : 'tr_red__bg'" class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
                         </td>
                         <td class="text-xs-center">{{ props.item.air_or_car | convertBoolToAirOrCar }}</td>
                         <td class="text-xs-center">{{ props.item.paid | convertCommonItems}}</td>
