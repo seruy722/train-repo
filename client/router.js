@@ -76,6 +76,11 @@ const routes = [
                 name: 'home-faxes-info',
             },
             {
+                path: 'sending',
+                component: () => import('~/pages/Sending').then(m => m.default || m),
+                name: 'home-sending',
+            },
+            {
                 path: 'mailing',
                 component: () => import('~/pages/Mailing').then(m => m.default || m),
                 name: 'home-mailing',

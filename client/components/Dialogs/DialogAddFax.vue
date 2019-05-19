@@ -179,7 +179,7 @@
                 dialog: false,
                 validSensor: false,
                 faxData: {
-                    faxName: '',
+                    faxName: 'Факс ',
                     fileInfo: '',
                     errorDate: '',
                     selectedTransportItem: NaN,

@@ -845,7 +845,7 @@
                 if (_.isEmpty(store.getters['fax/getTableCategoriesData']) || tableCategoriesDataID !== paramsID) {
                     // Запрос данных категорий по факсу
                     const { data: faxCategoriesData } = await axios.post('faxes/categoriesData', { faxID });
-                    console.log('faxCategoriesData', faxCategoriesData);
+                    // console.log('faxCategoriesData', faxCategoriesData);
                     const { tableCategoriesData = [] } = faxCategoriesData;
 
                     store.dispatch('fax/setTableCategoriesData', tableCategoriesData);
@@ -867,7 +867,7 @@
         },
         methods: {
             setChangeValues (data) {
-                console.log('DDT', data);
+                // console.log('DDT', data);
                 _.forEach(data, elem => {
                     _.forEach(_.get(elem, 'clientItemsArray'), item => _.set(item, 'changeValues', {
                         for_kg: false,
@@ -1060,20 +1060,22 @@
                 _.set(val, 'selected', !val.selected);
             },
 
-            async sendingMessagesData (arr) {
-                console.log('ARR', arr);
-                const func = data => _.reduce(data, (result, item) => {
+            // ОТПРАВКА ДАННЫХ НА РАССЫЛКУ СООБЩЕНИЙ
+            sendingMessagesData (arr) {
+                // console.log('ARR', arr);
+                const message = this.$store.getters['sending/message'];
+                const data = _.map(arr, (item) => {
                     const obj = {};
-                    const { name, sum, client_id} = item;
+                    const { name, sum, client_id } = item;
                     obj.name = name;
                     obj.sum = sum;
+                    obj.message = message;
                     obj.client_id = client_id;
-                    result.push(obj);
-                    return result;
-                }, []);
+                    return obj;
+                });
 
-                const { data } = await axios.post('users/sendData', func(arr));
-                console.log('RS_AX', data);
+                // console.log('RS_AX', func(arr));
+                this.$router.push({ name: 'home-sending', params: { sendingData: data } });
             },
 
             setCookies (params) {
