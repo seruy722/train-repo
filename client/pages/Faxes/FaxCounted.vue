@@ -77,7 +77,7 @@
                         :class="{['table__tr-bold_text table__tr-bg_color']: props.item.brand}"
                         :active="props.selected"
                         class="table__tr_show_hide_tr_control_panel"
-                        @click="openCloseExpandedPanel(props)"
+                        @click="openCloseExpandedPanel(props, $event)"
                     >
                         <td
                             :class="{'table__td-hide': !selectedColumn.includes('Клиент')}"
@@ -562,9 +562,9 @@
 
                         <v-snackbar v-model.lazy="snack" :timeout="6000" :color="snackColor">
                             <!--<v-badge left color="purple">-->
-                                <!--<template v-slot:badge>-->
-                                    <!--<span>{{ counter }}</span>-->
-                                <!--</template>-->
+                            <!--<template v-slot:badge>-->
+                            <!--<span>{{ counter }}</span>-->
+                            <!--</template>-->
                             <!--</v-badge>-->
 
                             <v-btn
@@ -585,7 +585,7 @@
 
         <!--Таблица сводки по категориям-->
         <!--<div class="table_categories">-->
-            <v-flex xs12 sm8 md6 class="table_categories">
+        <v-flex xs12 sm8 md6 class="table_categories">
             <v-data-table
                 :headers="$_tableCategoriesHeaders"
                 :items="tableCategoriesItems"
@@ -650,8 +650,8 @@
             >
                 Сохранить
             </v-btn>
-            </v-flex>
-        </div>
+        </v-flex>
+    </div>
     <!--</div>-->
 
 </template>
@@ -1055,9 +1055,13 @@
                 }
             },
 
-            openCloseExpandedPanel (val) {
-                _.set(val, 'expanded', !val.expanded);
-                _.set(val, 'selected', !val.selected);
+            openCloseExpandedPanel (val, event) {
+                // ОБРАБОТКА НАЖАТИЯ НА ДИАЛОГ РЕДАКТИРОВАНИЯ ДАННЫХ
+                if (_.get(event, 'target.tagName') !== 'DIV') {
+                    _.set(val, 'expanded', !val.expanded);
+                    _.set(val, 'selected', !val.selected);
+                }
+
             },
 
             // ОТПРАВКА ДАННЫХ НА РАССЫЛКУ СООБЩЕНИЙ

@@ -7,6 +7,7 @@ export const state = () => ({
     removedEtries: [],
     faxesNames: [],
     faxes: [],
+    searchValue: '',
 });
 
 export const getters = {
@@ -17,9 +18,14 @@ export const getters = {
     getFaxData: state => state.faxData,
     getFaxesNames: state => state.faxesNames,
     getFaxes: state => state.faxes,
+    getSearchValue: state => state.searchValue,
 };
 
 export const mutations = {
+    SET_SEARCH_VALUE (state, value) {
+        state.searchValue = value;
+    },
+
     SET_GROUPED_DATA (state, groupedData) {
         state.groupedData = groupedData;
     },
@@ -151,5 +157,8 @@ export const actions = {
 
     destroyFaxes ({ commit }, data) {
         commit('DESTROY_FAXES', data);
+    },
+    setSearchValue ({ commit }, value) {
+        commit('SET_SEARCH_VALUE', value);
     },
 };

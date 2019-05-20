@@ -199,7 +199,7 @@ class FaxesMoreInfosController extends Controller
 
 
             if ($client) {
-                $clientID = (int)$arrvalue['client_id'];
+                $clientID = $client->id;
             } else {
                 $client = User::firstOrCreate(['name' => $arrvalue['name']], ['password' => 'default']);
                 $clientID = $client->id;

@@ -374,6 +374,7 @@
                 getFaxes: 'fax/getFaxes',
                 transportItems: 'settings/transportItems',
                 commonItems: 'settings/commonItems',
+                searchValue: 'fax/getSearchValue',
             }),
         },
         watch: {
@@ -382,6 +383,9 @@
             },
             getFaxes () {
                 this.cloneFaxData();
+            },
+            search (val) {
+                this.$store.dispatch('fax/setSearchValue', val);
             },
         },
         async fetch ({ store }) {
@@ -404,6 +408,7 @@
         },
         created () {
             this.cloneFaxData();
+            this.search = this.searchValue;
         },
         methods: {
             async updateFaxDataOnServer () {
