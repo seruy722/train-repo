@@ -81,6 +81,11 @@ const routes = [
                 name: 'home-sending',
             },
             {
+                path: 'prices',
+                component: () => import('~/pages/Prices').then(m => m.default || m),
+                name: 'home-prices',
+            },
+            {
                 path: 'mailing',
                 component: () => import('~/pages/Mailing').then(m => m.default || m),
                 name: 'home-mailing',

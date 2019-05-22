@@ -144,6 +144,7 @@
                     children: [
                         { icon: 'home', text: 'Карго', path: '/cargo' },
                         { icon: 'home', text: 'Факсы', path: '/faxes' },
+                        { icon: 'home', text: 'Цены', path: '/prices' },
                     ],
                 },
                 {

@@ -93,3 +93,10 @@ export function numberUnformat (number) {
 export function isClient (array, clientObj) {
     return _.find(array, clientObj);
 }
+
+export function universalSort (array) {
+    return array.sort((a, b) => a.name.localeCompare(b.name, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+    }));
+}

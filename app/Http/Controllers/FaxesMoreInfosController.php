@@ -118,7 +118,6 @@ class FaxesMoreInfosController extends Controller
                     }
 
                     $client = User::firstOrCreate(['name' => $userName], ['password' => 'default']);
-                    $prices = Price::where('client_id', $client->id)->first();
 //                    return response()->json(['status' => true, 'elem'=>$prices]);
 //                    $category = Price::where('category_name', $client->id)->first();
 
@@ -128,17 +127,21 @@ class FaxesMoreInfosController extends Controller
                     $brandInCategory = $cleanedElem[8] ? stripos($cleanedElem[8], 'Бренд') !== false : false;
                     $brand = $brandInNotation || $brandInCategory;
 
+                    $prices = Price::where('client_id', $client->id)->where('category_id', $category->id)->first();
 
-                    if ($brand && $prices) {
-                        $forKg = $prices->for_kg_brand;
-                        $forPlace = $prices->for_place_brand;
-                    } else if (!$brand && $prices) {
-                        $forKg = $prices->for_kg;
-                        $forPlace = $prices->for_place;
+                    if ($prices) {
+                        if ($brand) {
+                            $forKg = $prices->for_kg_brand;
+                            $forPlace = $prices->for_place_brand;
+                        } else if (!$brand) {
+                            $forKg = $prices->for_kg;
+                            $forPlace = $prices->for_place;
+                        }
                     } else {
                         $forKg = 0;
                         $forPlace = 0;
                     }
+
 //                    return response()->json(['status' => false, 'elem7'=> stripos($cleanedElem[8], 'Бренд') !== false]);
                     try {
                         FaxesMoreInfos::create([
@@ -194,18 +197,20 @@ class FaxesMoreInfosController extends Controller
 //        return response()->json(['status' => false, 'ARR'=>$data]);
         foreach ($data as $value) {
             $arrvalue = (array)$value;
-            $client = User::where('id', $arrvalue['client_id'])->where('name', $arrvalue['name'])->first();
+//            $client = User::where('id', $arrvalue['client_id'])->where('name', $arrvalue['name'])->first();
+            $client = User::firstOrCreate(['name' => $arrvalue['name']], ['password' => 'default']);
             $category = Category::firstOrCreate(['category_name' => $arrvalue['category_name']]);
+            $clientID = $client->id;
 
+//            if ($client) {
+//                $clientID = $client->id;
+//            } else {
+//                $client = User::firstOrCreate(['name' => $arrvalue['name']], ['password' => 'default']);
+//                $clientID = $client->id;
+//            }
 
-            if ($client) {
-                $clientID = $client->id;
-            } else {
-                $client = User::firstOrCreate(['name' => $arrvalue['name']], ['password' => 'default']);
-                $clientID = $client->id;
-            }
-
-            $prices = Price::firstOrCreate(['client_id' => $clientID]);
+            $prices = Price::firstOrCreate(['client_id' => $clientID, 'category_id' => $category->id], ['category_id' => $category->id]);
+            $prices->category_id = $category->id;
 //            return response()->json(['status' => false, 'ARR'=>$prices]);
             $brand = (boolean)$arrvalue['brand'];
 

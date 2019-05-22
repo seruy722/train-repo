@@ -75,6 +75,9 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // TRANSPORTERS
     Route::get('transporters/all', 'TransportersController@index');
+
+    // PRICES
+    Route::get('prices/all', 'PriceController@index');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {
