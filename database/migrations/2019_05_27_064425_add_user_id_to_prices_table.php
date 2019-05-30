@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddFieldCategoryIdToTablePrices extends Migration
+class AddUserIdToPricesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddFieldCategoryIdToTablePrices extends Migration
     public function up()
     {
         Schema::table('prices', function (Blueprint $table) {
-            $table->integer('category_id')->default(0)->unsigned()->after('client_id');
+            $table->integer('user_id')->default(0)->unsigned()->after('category_id');
         });
     }
 
@@ -26,7 +26,7 @@ class AddFieldCategoryIdToTablePrices extends Migration
     public function down()
     {
         Schema::table('prices', function (Blueprint $table) {
-            $table->dropColumn('category_id');
+            $table->dropColumn('user_id');
         });
     }
 }

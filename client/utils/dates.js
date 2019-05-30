@@ -65,6 +65,7 @@ export const notFormatedToday = () => {
  * @return {*}
  */
 export const needFormatDate = date => isDate(date) ? new Date(date).toLocaleDateString().replace(/\./g, '-') : date;
+export const needFormatDateWithTime = date => isDate(date) ? moment(date).format('DD-MM-YYYY HH:mm:ss') : date;
 
 /**
  * Проверяет, что это дата

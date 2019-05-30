@@ -80,8 +80,8 @@
                         v-if="showAdminData"
                         @click.stop="drawer = !drawer"
                     ></v-toolbar-side-icon>
-                    <span class="mr-2 ml-2 hidden-sm-and-down"><v-icon medium color="black">people</v-icon></span>
-                    <span class="hidden-sm-and-down">Черный список клиентов</span>
+                    <span class="hidden-sm-and-down"><v-icon medium color="green">{{ pageSettings.icon }}</v-icon></span>
+                    <span class="hidden-sm-and-down">{{ pageSettings.title }}</span>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-avatar>
@@ -125,11 +125,11 @@
     import logout from '~/mixins/logout';
 
     export default {
-        mixins: [navClickMixin, logout],
         components: {
             HomeNav, // Меню навигации
             // Connectivity,
         },
+        mixins: [navClickMixin, logout],
         middleware: 'auth',
         showAdminData: false,
         data: () => ({
@@ -161,24 +161,26 @@
                 { icon: 'exit_to_app', text: 'Выход', path: '/logout' },
             ],
         }),
-        created () {
-            this.checkAdminRole();
-        },
         computed: {
             ...mapGetters({
                 profileImage: 'auth/userProfileImg',
                 defaultFoto: 'settings/defaultFoto',
                 imageUrl: 'settings/imageUrl',
                 role: 'auth/role',
-                adminRole: 'settings/adminRole'
-            })
+                adminRole: 'settings/adminRole',
+                pageSettings: 'settings/pageSettings',
+            }),
+        },
+        created () {
+            this.checkAdminRole();
+            this.$store.dispatch('settings/setPageSettings', { title: 'Главная', icon: 'home' });
         },
         methods: {
             checkAdminRole () {
                 if (this.role === this.adminRole) {
                     this.showAdminData = true;
                 }
-            }
-        }
-    }
+            },
+        },
+    };
 </script>

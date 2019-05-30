@@ -244,20 +244,23 @@
                                             @close="close"
                                             @open="openClientsNamesEditDialog"
                                         >
-                                            <div>{{ props.item.name | clientFormat }}</div>
+                                            <div>{{ props.item.name }}</div>
                                             <template v-slot:input>
                                                 <div class="mt-3 title">Клиент</div>
                                             </template>
 
                                             <template v-slot:input>
-                                                <v-combobox
-                                                    v-model="props.item.name"
-                                                    :items="getClientsNames"
+                                                <v-autocomplete
+                                                    v-model.number="props.item.client_id"
+                                                    :items="getClients"
                                                     :rules="[v => !!v || 'Обьязательное поле.']"
-                                                    :loading="selectLoading"
+                                                    :loading="selectLoadingClients"
+                                                    item-text="name"
+                                                    item-value="id"
                                                     label="Клиент"
                                                     hide-selected
-                                                ></v-combobox>
+                                                    @change="changeClient(props.item)"
+                                                ></v-autocomplete>
                                             </template>
 
                                         </v-edit-dialog>
@@ -411,14 +414,16 @@
                                             </template>
 
                                             <template v-slot:input>
-                                                <v-select
-                                                    v-model="props.item.category_name"
-                                                    :items="getCategoriesNames"
-                                                    :loading="selectLoading"
+                                                <v-autocomplete
+                                                    v-model.number="props.item.category_id"
+                                                    :items="getCategories"
+                                                    :loading="selectLoadingCategories"
+                                                    item-text="category_name"
+                                                    item-value="id"
                                                     label="Категория"
-                                                ></v-select>
+                                                    @change="changeCategory(props.item)"
+                                                ></v-autocomplete>
                                             </template>
-
                                         </v-edit-dialog>
                                     </td>
                                     <td class="text-xs-center">
@@ -652,8 +657,6 @@
             </v-btn>
         </v-flex>
     </div>
-    <!--</div>-->
-
 </template>
 
 <script>
@@ -752,7 +755,8 @@
             return {
                 checkbox: false,
                 // faxNames: [],
-                selectLoading: true,
+                selectLoadingCategories: true,
+                selectLoadingClients: true,
                 dialog: false,
                 counter: 6,
                 isLoadedDataToMainTable: false,
@@ -790,8 +794,8 @@
             ...mapGetters({
                 getGroupedData: 'fax/getGroupedData',
                 getTableCategoriesData: 'fax/getTableCategoriesData',
-                getClientsNames: 'fax/getClientsNames',
-                getCategoriesNames: 'fax/getCategoriesNames',
+                getClients: 'fax/getClients',
+                getCategories: 'fax/getCategories',
                 getFaxData: 'fax/getFaxData',
                 getFaxesNames: 'fax/getFaxesNames',
                 commonItems: 'settings/commonItems',
@@ -866,6 +870,18 @@
             this.setChangeValues(this.faxData);
         },
         methods: {
+            changeCategory (item) {
+                const category = _.find(this.getCategories, { id: item.category_id });
+                if (category) {
+                    _.set(item, 'category_name', category.category_name);
+                }
+            },
+            changeClient (item) {
+                const client = _.find(this.getClients, { id: item.client_id });
+                if (client) {
+                    _.set(item, 'name', client.name);
+                }
+            },
             setChangeValues (data) {
                 // console.log('DDT', data);
                 _.forEach(data, elem => {
@@ -1127,37 +1143,13 @@
                     console.log('A request has been made to update the fax category table data.');
                 }
             },
-            async openClientsNamesEditDialog () {
-                if (_.isEmpty(this.$store.getters['fax/getClientsNames'])) {
-                    try {
-                        // Запрос данных по клиентам
-                        const { data: clientsData } = await axios.get('clients/clientsNames');
-                        const { clientsNames = [] } = clientsData;
-                        // console.log('clientsData', clientsNames);
-                        this.$store.dispatch('fax/setClientsNames', clientsNames);
-                    } catch (e) {
-                        console.error(`Произошла ошибка при запросе данных о клиентах - ${e}`);
-                    } finally {
-                        this.selectLoading = false;
-                        console.log('Completed request for get clients names.');
-                    }
-                }
+            openClientsNamesEditDialog () {
+                this.$store.dispatch('fax/getClients');
+                this.selectLoadingClients = false;
             },
-            async openCategoriesNamesEditDialog () {
-                if (_.isEmpty(this.$store.getters['fax/getCategoriesNames'])) {
-                    try {
-                        // Запрос данных по категория
-                        const { data: categoriesData } = await axios.get('faxes/categoriesNames');
-                        const { categoriesNames = [] } = categoriesData;
-
-                        this.$store.dispatch('fax/setCategoriesNames', categoriesNames);
-                    } catch (e) {
-                        console.error(`Произошла ошибка при запросе данных о категория факса - ${e}`);
-                    } finally {
-                        this.selectLoading = false;
-                        console.log('Completed request for get fax categories.');
-                    }
-                }
+            openCategoriesNamesEditDialog () {
+                this.$store.dispatch('fax/getCategories');
+                this.selectLoadingCategories = false;
             },
             changeItemInFaxDataTeble (item) {
                 console.log('item', item);

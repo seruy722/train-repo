@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 class FaxCategoriesController extends Controller
 {
     public function index(){
-        $faxCategoriesNames = Category::pluck('category_name');
+        $faxCategoriesNames = Category::all('category_name', 'id');
 
-        return response()->json(['status' => true, 'categoriesNames' => $faxCategoriesNames]);
+        return response()->json(['status' => true, 'categories' => $faxCategoriesNames]);
     }
 }

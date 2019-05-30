@@ -40,7 +40,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     // USERS
     Route::get('users', 'UserController@index');
     Route::get('clients', 'UserController@getClients');
-    Route::get('clients/clientsNames', 'UserController@getClientsNames');
+    Route::get('users/clients', 'UserController@getUsersClients');
     Route::post('users/saveUpdate', 'UserController@store');
     Route::post('users/delete', 'UserController@destroy');
     Route::post('users/deleteFoto', 'UserController@deleteFoto');
@@ -71,13 +71,16 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('faxes/load', 'FaxesController@downloadOriginalFax');
     Route::post('fax/download', 'FaxesMoreInfosController@export');
     // CATEGORIES
-    Route::get('faxes/categoriesNames', 'FaxCategoriesController@index');
+    Route::get('faxes/categories', 'FaxCategoriesController@index');
 
     // TRANSPORTERS
     Route::get('transporters/all', 'TransportersController@index');
 
     // PRICES
     Route::get('prices/all', 'PriceController@index');
+    Route::post('price/delete', 'PriceController@destroyPrice');
+    Route::post('prices/update', 'PriceController@updatePriceData');
+    Route::post('price/add', 'PriceController@addPriceData');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

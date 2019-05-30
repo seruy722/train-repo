@@ -1,8 +1,10 @@
+import axios from 'axios';
+
 export const state = () => ({
     groupedData: {},
     tableCategoriesData: [],
-    clientsNames: [],
-    categoriesNames: [],
+    clients: [],
+    categories: [],
     faxData: [],
     removedEtries: [],
     faxesNames: [],
@@ -13,8 +15,8 @@ export const state = () => ({
 export const getters = {
     getGroupedData: state => state.groupedData,
     getTableCategoriesData: state => state.tableCategoriesData,
-    getClientsNames: state => state.clientsNames,
-    getCategoriesNames: state => state.categoriesNames,
+    getClients: state => state.clients,
+    getCategories: state => state.categories,
     getFaxData: state => state.faxData,
     getFaxesNames: state => state.faxesNames,
     getFaxes: state => state.faxes,
@@ -34,12 +36,12 @@ export const mutations = {
         state.tableCategoriesData = tableCategoriesData;
     },
 
-    SET_CLIENTS_NAMES (state, clientsNames) {
-        state.clientsNames = clientsNames;
+    SET_CLIENTS_NAMES (state, clients) {
+        state.clients = clients;
     },
 
-    SET_CATEGORIES_NAMES (state, categoriesNames) {
-        state.categoriesNames = categoriesNames;
+    SET_CATEGORIES (state, categories) {
+        state.categories = categories;
     },
 
     SET_FAX_DATA (state, faxData) {
@@ -131,8 +133,8 @@ export const actions = {
         commit('SET_CLIENTS_NAMES', data);
     },
 
-    setCategoriesNames ({ commit }, data) {
-        commit('SET_CATEGORIES_NAMES', data);
+    setCategories ({ commit }, data) {
+        commit('SET_CATEGORIES', data);
     },
 
     setFaxData ({ commit }, data) {
@@ -160,5 +162,36 @@ export const actions = {
     },
     setSearchValue ({ commit }, value) {
         commit('SET_SEARCH_VALUE', value);
+    },
+    async getCategories ({ dispatch, state }) {
+        if (_.isEmpty(state.categories)) {
+            try {
+                // Запрос данных по категория
+                const { data: categoriesData } = await axios.get('faxes/categories');
+                const { categories = [] } = categoriesData;
+                // console.log('Categories', categories);
+
+                dispatch('setCategories', categories);
+            } catch (e) {
+                console.error(`Произошла ошибка при запросе данных о категория факса - ${e}`);
+            } finally {
+                console.log('Completed request for get fax categories.');
+            }
+        }
+    },
+    async getClients ({ dispatch, state }) {
+        if (_.isEmpty(state.clients)) {
+            try {
+                // Запрос данных по клиентам
+                const { data: clientsData } = await axios.get('users/clients');
+                const { clients = [] } = clientsData;
+                // console.log('clientsData', clients);
+                dispatch('setClientsNames', clients);
+            } catch (e) {
+                console.error(`Произошла ошибка при запросе данных о клиентах - ${e}`);
+            } finally {
+                console.log('Completed request for get clients names.');
+            }
+        }
     },
 };

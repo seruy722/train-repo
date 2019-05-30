@@ -409,6 +409,7 @@
         created () {
             this.cloneFaxData();
             this.search = this.searchValue;
+            this.$store.dispatch('settings/setPageSettings', { title: 'Факсы', icon: 'domain' });
         },
         methods: {
             async updateFaxDataOnServer () {

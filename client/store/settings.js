@@ -68,6 +68,10 @@ export const state = () => ({
             title: 'ДА',
         },
     ],
+    pageSettings: {
+        title: 'Главная',
+        icon: 'home',
+    },
 });
 
 // getters
@@ -80,4 +84,17 @@ export const getters = {
     selectDatesItems: state => state.selectDatesItems,
     transportItems: state => state.transportItems,
     commonItems: state => state.commonItems,
+    pageSettings: state => state.pageSettings,
+};
+
+export const mutations = {
+    SET_PAGE_SETTINGS (state, settings) {
+        state.pageSettings = settings;
+    },
+};
+
+export const actions = {
+    setPageSettings ({ commit }, settings) {
+        commit('SET_PAGE_SETTINGS', settings);
+    },
 };

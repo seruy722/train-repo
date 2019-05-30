@@ -4,16 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Exports\Fax\FaxesDataExport;
-use App\Exports\RSS\RssExport;
 use App\FaxPriceForCategory;
 use App\File;
 use App\Price;
 use App\PriceForTransporter;
-use App\Transporter;
 use Illuminate\Http\Request;
 use App\Imports\FaxesImport;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\FaxesMoreInfos;
@@ -25,7 +22,6 @@ use App\Traits\FormatDate;
 class FaxesMoreInfosController extends Controller
 {
     use CleanData, FormatDate;
-    protected $emptyField = '(пусто)';
 
     public function dataForFaxCounted(Request $request)
     {
@@ -81,7 +77,7 @@ class FaxesMoreInfosController extends Controller
 
         // Запись цен по категория за факс
         $transporterPrice = PriceForTransporter::where('transporter_id', (int)$cleanedData['transporterID'])->get();
-        if($transporterPrice->isNotEmpty()){
+        if ($transporterPrice->isNotEmpty()) {
             foreach ($transporterPrice->toArray() as $item) {
                 FaxPriceForCategory::create(['fax_id' => $fax->id, 'category_id' => $item['category_id'], 'category_price' => $item['for_kg']]);
             }
@@ -130,13 +126,8 @@ class FaxesMoreInfosController extends Controller
                     $prices = Price::where('client_id', $client->id)->where('category_id', $category->id)->first();
 
                     if ($prices) {
-                        if ($brand) {
-                            $forKg = $prices->for_kg_brand;
-                            $forPlace = $prices->for_place_brand;
-                        } else if (!$brand) {
-                            $forKg = $prices->for_kg;
-                            $forPlace = $prices->for_place;
-                        }
+                        $forKg = $prices->for_kg;
+                        $forPlace = $prices->for_place;
                     } else {
                         $forKg = 0;
                         $forPlace = 0;
@@ -192,60 +183,38 @@ class FaxesMoreInfosController extends Controller
         ]);
 
         $data = $request->all();
+        $user = $request->user();
         $faxID = $data[0]['fax_id'];
 
 //        return response()->json(['status' => false, 'ARR'=>$data]);
         foreach ($data as $value) {
             $arrvalue = (array)$value;
 //            $client = User::where('id', $arrvalue['client_id'])->where('name', $arrvalue['name'])->first();
-            $client = User::firstOrCreate(['name' => $arrvalue['name']], ['password' => 'default']);
-            $category = Category::firstOrCreate(['category_name' => $arrvalue['category_name']]);
+            $client = User::firstOrCreate(['name' => $arrvalue['name'], 'id' => $arrvalue['client_id']], ['password' => 'default']);
+            $category = Category::firstOrCreate(['category_name' => $arrvalue['category_name'], 'id' => $arrvalue['category_id']]);
             $clientID = $client->id;
 
-//            if ($client) {
-//                $clientID = $client->id;
-//            } else {
-//                $client = User::firstOrCreate(['name' => $arrvalue['name']], ['password' => 'default']);
-//                $clientID = $client->id;
-//            }
-
-            $prices = Price::firstOrCreate(['client_id' => $clientID, 'category_id' => $category->id], ['category_id' => $category->id]);
+            $prices = Price::firstOrCreate(['client_id' => $clientID, 'category_id' => $category->id], ['category_id' => $category->id, 'user_id' => $user->id]);
             $prices->category_id = $category->id;
 //            return response()->json(['status' => false, 'ARR'=>$prices]);
             $brand = (boolean)$arrvalue['brand'];
 
-            if ($arrvalue['for_kg']) {
-                if ($brand && !$prices->for_kg_brand) {
-                    $prices->for_kg_brand = (float)$arrvalue['for_kg'];
-                } elseif (!$brand && !$prices->for_kg) {
-                    $prices->for_kg = (float)$arrvalue['for_kg'];
-                }
+            if ($arrvalue['for_kg'] && !$prices->for_kg) {
+                $prices->for_kg = (float)$arrvalue['for_kg'];
             }
 
-            if ($arrvalue['for_place']) {
-                if ($brand && !$prices->for_place_brand) {
-                    $prices->for_place_brand = (float)$arrvalue['for_place'];
-                } elseif (!$brand && !$prices->for_place) {
-                    $prices->for_place = (float)$arrvalue['for_place'];
-                }
+            if ($arrvalue['for_place'] && !$prices->for_place) {
+                $prices->for_place = (float)$arrvalue['for_place'];
             }
 
             $changePrices = $arrvalue['changeValues'];
 
             if ($changePrices['for_kg']) {
-                if ($brand) {
-                    $prices->for_kg_brand = (float)$arrvalue['for_kg'];
-                } else {
-                    $prices->for_kg = (float)$arrvalue['for_kg'];
-                }
+                $prices->for_kg = (float)$arrvalue['for_kg'];
             }
 
             if ($changePrices['for_place']) {
-                if ($brand) {
-                    $prices->for_place_brand = (float)$arrvalue['for_place'];
-                } else {
-                    $prices->for_place = (float)$arrvalue['for_place'];
-                }
+                $prices->for_place = (float)$arrvalue['for_place'];
             }
 
 

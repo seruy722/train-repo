@@ -151,22 +151,24 @@ class UserController extends Controller
         return response()->json(['status' => true, 'clientsNames' => $clientsNames]);
     }
 
-    public function getClientsNames()
+    public function getUsersClients()
     {
-        $clientsNames = User::pluck('name');
-        $newClientsArr = array_map(function (string $value) {
-            $startPos = stripos($value, '007/');
-            if (is_numeric($startPos)) {
-                return substr($value, $startPos + 4);
-            }
+//        $clientsNames = User::pluck('name');
+//        $newClientsArr = array_map(function (string $value) {
+//            $startPos = stripos($value, '007/');
+//            if (is_numeric($startPos)) {
+//                return substr($value, $startPos + 4);
+//            }
+//
+//            return $value;
+//
+//        }, $clientsNames->all());
+//
+//        sort($newClientsArr, SORT_NATURAL);
 
-            return $value;
+        $clients = User::where('role', 'user')->orderBy('name')->get(['id', 'name']);
 
-        }, $clientsNames->all());
-
-        sort($newClientsArr, SORT_NATURAL);
-
-        return response()->json(['status' => true, 'clientsNames' => $newClientsArr]);
+        return response()->json(['status' => true, 'clients' => $clients]);
     }
 
     /**
