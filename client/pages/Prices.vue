@@ -4,90 +4,89 @@
         class="main"
     >
         <Search :value.sync="search" class="mb-3"/>
-        <v-expansion-panel>
-            <v-expansion-panel-content
-                v-for="(item, i) in items"
-                :key="i"
-                ripple
+        <template>
+            <v-data-table
+                :headers="$_headers2"
+                :items="items"
+                :expand="expand"
+                :search="search"
+                item-key="name"
+                hide-headers
+                :custom-sort="sort"
             >
-                <template v-slot:actions>
-                    <v-tooltip top>
-                        <template v-slot:activator="{ on }">
-                            <v-icon
-                                v-on="on"
-                                color="primary"
-                                @click.stop="checkAddItem(item)"
-                                class="mr-5"
-                            >
-                                add_circle
-                            </v-icon>
-                        </template>
-                        <span>Добавить запись</span>
-                    </v-tooltip>
-                    <v-icon color="teal">done</v-icon>
-                </template>
-                <template v-slot:header>
-                    <div>
-                        {{ item.name }}
-                    </div>
-                </template>
-                <v-data-table
-                    :headers="$_headers"
-                    :items="item.children"
-                    class="elevation-1"
-                    hide-actions
-                >
-                    <template v-slot:headers="props">
-                        <tr class="table_thead_tr">
-                            <th
-                                v-for="header in props.headers"
-                                :key="header.text"
-                                class="text-xs-center"
-                            >
-                                {{ header.text }}
-                            </th>
-                        </tr>
-                    </template>
-                    <template v-slot:items="props">
-                        <td class="text-xs-center">
+                <template v-slot:items="props">
+                    <tr @click="props.expanded = !props.expanded">
+                        <td class="text-xs-left">{{ props.item.name }}</td>
+                        <td class="text-xs-left">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" flat icon color="red lighten-2">
-                                        <v-icon
-                                            color="teal"
-                                            @click="editItem(props.item)"
-                                        >
-                                            edit
-                                        </v-icon>
-                                    </v-btn>
+                                    <v-icon
+                                        color="primary"
+                                        v-on="on"
+                                        @click.stop="checkAddItem(props.item)"
+                                    >
+                                        add_circle
+                                    </v-icon>
                                 </template>
-                                <span>Редактировать</span>
-                            </v-tooltip>
-
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn v-on="on" flat icon color="red lighten-2">
-                                        <v-icon
-                                            color="red"
-                                            @click="deleteItem(props.item)"
-                                        >
-                                            delete
-                                        </v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Удалить</span>
+                                <span>Добавить запись</span>
                             </v-tooltip>
                         </td>
-                        <td class="text-xs-center">{{ props.item.category_id | categoryName(getCategories) }}</td>
-                        <td class="text-xs-center">{{ props.item.for_kg }}</td>
-                        <td class="text-xs-center">{{ props.item.for_place }}</td>
-                        <td class="text-xs-center">{{ props.item.user_id }}</td>
-                        <td class="text-xs-center">{{ props.item.updated_at | formatDateWithTime }}</td>
-                    </template>
-                </v-data-table>
-            </v-expansion-panel-content>
-        </v-expansion-panel>
-        <!--<DialogEditPrice :open="openDialog" :item="currentItem"/>-->
+                    </tr>
+                </template>
+                <template v-slot:expand="props">
+                    <v-data-table
+                        :headers="$_headers"
+                        :items="props.item.children"
+                        class="elevation-1"
+                        hide-actions
+                    >
+                        <template v-slot:items="props">
+                            <td class="text-xs-center">
+                                <v-tooltip top>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn v-on="on" flat icon color="red lighten-2">
+                                            <v-icon
+                                                color="teal"
+                                                @click="editItem(props.item)"
+                                            >
+                                                edit
+                                            </v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Редактировать</span>
+                                </v-tooltip>
+
+                                <v-tooltip top>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn v-on="on" flat icon color="red lighten-2">
+                                            <v-icon
+                                                color="red"
+                                                @click="deleteItem(props.item)"
+                                            >
+                                                delete
+                                            </v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>Удалить</span>
+                                </v-tooltip>
+                            </td>
+                            <td class="text-xs-center">{{ props.item.category_id | categoryName(getCategories) }}
+                            </td>
+                            <td class="text-xs-center">{{ props.item.for_kg }}</td>
+                            <td class="text-xs-center">{{ props.item.for_place }}</td>
+                            <td class="text-xs-center">{{ props.item.user_id }}</td>
+                            <td class="text-xs-center">{{ props.item.updated_at | formatDateWithTime }}</td>
+                        </template>
+                    </v-data-table>
+                </template>
+
+                <template v-slot:no-results>
+                    <v-alert :value="true" color="error" icon="warning">
+                        Поиск по "{{ search }}" не дал результатов.
+                    </v-alert>
+                </template>
+            </v-data-table>
+        </template>
 
         <!--ДИАЛОГ РЕДАКТИРОВАНИЯ-->
         <template>
@@ -174,6 +173,9 @@
                 { text: 'Пользователь', align: 'center', sortable: false, value: 'user_id' },
                 { text: 'Дата редактирования', align: 'center', sortable: false, value: 'updated_at' },
             ];
+            this.$_headers2 = [
+                { text: '', align: 'center', value: 'name', sortable: false },
+            ];
 
             this.prices = [];
             this.$_duplicateCurrentItem = {};
@@ -188,6 +190,7 @@
                 overlay: false,
                 dialogTitle: '',
                 operation: 1,
+                expand: false,
             };
         },
         computed: {
@@ -196,35 +199,24 @@
                 getPrices: 'price/getPrices',
             }),
         },
-        watch: {
-            search (val) {
-                this.overlay = true;
-                this.filter(this.getPrices, val);
-                this.overlay = false;
-            },
-        },
         async asyncData ({ store }) {
-            console.log('asyncData');
+            // console.log('asyncData');
             if (_.isEmpty(store.getters['price/getPrices'])) {
-                console.log('ENTER');
+                // console.log('ENTER');
                 const { data } = await axios.get('prices/all');
-                const func = ((data) => {
-                    const arr = [];
-                    _.forEach(data, (value, key) => {
-                        const id = _.get(_.first(value), 'client_id');
-                        arr.push({
-                            name: key,
-                            children: value,
-                            client_id: id,
-                        });
+                const { priceData = [] } = data;
+                const transformData = _.transform(priceData, (result, value, key) => {
+                    const id = _.get(_.first(value), 'client_id');
+                    result.push({
+                        name: key,
+                        children: value,
+                        client_id: id,
                     });
-                    return universalSort(arr);
-                });
-
-                const res = func(data.priceData);
-                // console.log('RES', res);
-                store.dispatch('price/setPrices', _.cloneDeep(res));
-                return { items: res };
+                    return result;
+                }, []);
+                // console.log('prData', tr);
+                store.dispatch('price/setPrices', _.cloneDeep(transformData));
+                return { items: transformData };
             }
             return { items: store.getters['price/getPrices'] };
         },
@@ -236,6 +228,9 @@
             this.$store.dispatch('settings/setPageSettings', { title: 'Цены', icon: 'attach_money' });
         },
         methods: {
+            sort (data) {
+                return universalSort(data);
+            },
             saveUpdate (item) {
                 if (this.operation) {
                     this.addItem(this.currentItem);
@@ -410,21 +405,7 @@
                     }
                 }
             },
-            filter: _.debounce(function (data, search) {
-                // console.log('SEAR');
-                if (!search) {
-                    this.items = _.cloneDeep(data);
-                } else {
-                    const searchItems = _.filter(data, item => _.includes(_.toLower(item.name), search));
-                    this.items = _.cloneDeep(searchItems);
-                }
-            }, 300),
         },
     };
 </script>
 
-<style lang="scss" scoped>
-    table.v-datatable thead {
-        background-color: blue !important;
-    }
-</style>
