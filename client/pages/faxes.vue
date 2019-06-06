@@ -6,7 +6,7 @@
         <v-container fluid>
 
             <v-toolbar>
-                <v-toolbar-title class="text-xs-center title blue--text"> Факсы</v-toolbar-title>
+                <v-toolbar-title class="text-xs-center title blue--text hidden-sm-and-down"> Факсы</v-toolbar-title>
 
                 <v-spacer></v-spacer>
 
@@ -307,6 +307,11 @@
 
     export default {
         name: 'Faxes',
+        head () {
+            return {
+                title: 'Факсы',
+            };
+        },
         filters: {
             convertBoolToAirOrCar (value) {
                 return value ? 'Авиа' : 'Машина';

@@ -32,7 +32,7 @@ const routes = [
         children: [
             {
                 path: '/',
-                component: () => import('~/pages/blacklist/blacklist').then(m => m.default || m),
+                component: () => import('~/pages/StartPage').then(m => m.default || m),
                 name: 'home-blacklist',
             },
             {

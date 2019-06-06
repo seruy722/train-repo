@@ -2,11 +2,13 @@
 export default {
     methods: {
         navClick (item) {
-            if (item.path === '/logout') {
+            const { path } = item;
+            console.log('PATH', path);
+            if (path === '/logout') {
                 this.logout();
-            } else {
-                this.$router.push(item.path);
+            } else if (path) {
+                this.$router.push(path);
             }
         },
-    }
-}
+    },
+};

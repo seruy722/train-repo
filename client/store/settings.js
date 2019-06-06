@@ -72,6 +72,33 @@ export const state = () => ({
         title: 'Главная',
         icon: 'home',
     },
+    menuMain: [
+        { icon: 'home', text: 'Главная', path: '/', role: 'admin, user, moder' },
+        { icon: 'people_outline', text: 'Пользователи', path: '/users', role: 'admin' },
+        {
+            icon: 'business',
+            text: 'Карго Долги',
+            model: false,
+            children: [
+                { icon: 'home', text: 'Карго', path: '/cargo', role: 'admin' },
+                { icon: 'home', text: 'Факсы', path: '/faxes', role: 'admin' },
+                { icon: 'home', text: 'Цены', path: '/prices', role: 'admin, moder' },
+            ],
+        },
+        // {
+        //     icon: 'people',
+        //     text: 'Чорный список',
+        //     model: false,
+        //     children: [
+        //         { icon: 'home', text: 'Чорный список', path: '/black', role: 'admin' },
+        //         { icon: 'list', text: 'Логи', path: '/logs', role: 'admin' },
+        //     ],
+        // },
+        { icon: 'email', text: 'Email доступы', path: '/emails', role: 'admin' },
+        { icon: 'send', text: 'Рассылка', path: '/mailing', role: 'admin' },
+        { icon: 'how_to_reg', path: '/profile', text: 'Профиль', role: 'admin, user, moder' },
+        { icon: 'exit_to_app', text: 'Выход', path: '/logout', role: 'admin, moder' },
+    ],
 });
 
 // getters
@@ -85,6 +112,7 @@ export const getters = {
     transportItems: state => state.transportItems,
     commonItems: state => state.commonItems,
     pageSettings: state => state.pageSettings,
+    menuMain: state => state.menuMain,
 };
 
 export const mutations = {

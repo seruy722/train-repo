@@ -1,5 +1,4 @@
 <template>
-
     <div
         class="main"
         data-vue-component-name="FaxCounted"
@@ -24,9 +23,11 @@
 
             <v-toolbar>
                 <v-toolbar-title>
-                    <span class="font-weight-bold">{{ getFaxName }}</span>
+                    <span class="font-weight-bold hidden-sm-and-down">{{ getFaxName }}</span>
                 </v-toolbar-title>
-
+                <v-spacer></v-spacer>
+                <!--ПОИСК-->
+                <search :value.sync="search"></search>
                 <v-spacer></v-spacer>
 
                 <v-toolbar-items>
@@ -68,6 +69,7 @@
                 :items="faxData"
                 :expand="expand"
                 :loading="isLoadedDataToMainTable"
+                :search="search"
                 item-key="name"
                 class="elevation-1"
             >
@@ -135,6 +137,11 @@
                                         counter
                                         autofocus
                                     ></v-text-field>
+
+                                    <v-checkbox
+                                        v-model.number="props.item.clientItemsArray[0].changeValues.for_kg"
+                                        label="Заменить"
+                                    ></v-checkbox>
                                 </template>
 
                             </v-edit-dialog>
@@ -169,6 +176,11 @@
                                         counter
                                         autofocus
                                     ></v-text-field>
+
+                                    <v-checkbox
+                                        v-model.number="props.item.clientItemsArray[0].changeValues.for_place"
+                                        label="Заменить"
+                                    ></v-checkbox>
                                 </template>
 
                             </v-edit-dialog>
@@ -669,6 +681,7 @@
         name: 'FaxCounted',
         components: {
             ControlPanelFaxEntries: () => import('~/components/Table/ControlPanelFaxEntries'),
+            Search: () => import('~/components/Search'),
         },
         filters: {
             numFormat (val) {
@@ -754,6 +767,7 @@
 
             return {
                 checkbox: false,
+                search: '',
                 // faxNames: [],
                 selectLoadingCategories: true,
                 selectLoadingClients: true,
