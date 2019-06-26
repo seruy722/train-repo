@@ -69,6 +69,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('faxes/categoriesData', 'FaxPriceCategoriesData@getFaxCategoriesData');
     Route::post('faxes/download', 'FaxesController@downloadOriginalFax');
     Route::post('faxes/load', 'FaxesController@downloadOriginalFax');
+    Route::post('faxes/join', 'FaxesController@joinFaxes');
     Route::post('fax/download', 'FaxesMoreInfosController@export');
     // CATEGORIES
     Route::get('faxes/categories', 'FaxCategoriesController@index');

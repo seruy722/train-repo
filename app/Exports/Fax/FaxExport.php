@@ -49,6 +49,10 @@ class FaxExport implements FromArray, WithHeadings, WithEvents, ShouldAutoSize, 
 //        $this->categories = $this->getCategoriesFromDB();
         $this->categories = $this->countCategoryKg($categories);
         $this->totalCategoriesSum = $this->count($this->categories, 'sum');
+        if (count($this->categories) === 0) {
+            array_splice($this->headers, 3, 2);
+            array_splice($this->sequence, 3, 2);
+        }
     }
 
     public function countCategoryKg(array $categories)
@@ -186,6 +190,7 @@ class FaxExport implements FromArray, WithHeadings, WithEvents, ShouldAutoSize, 
                     $event->sheet->getDelegate()->getStyle($cellForCountKg)->getFont()->setBold(500)->getColor()->applyFromArray(array('rgb' => $this->red));
                 }
 
+
                 $event->sheet->getDelegate()->getStyle($cellRangeHeaders)->getFont()->setBold(500);
                 $event->sheet->getDelegate()->getStyle($cellRangeCounts)->getFont()->setBold(500);
                 $event->sheet->getDelegate()->getStyle($cellRange)->getAlignment()->applyFromArray(array('horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER));
@@ -205,60 +210,66 @@ class FaxExport implements FromArray, WithHeadings, WithEvents, ShouldAutoSize, 
                     array_unshift($arrCat, array(''), array(''), array(''));
                     $event->sheet->appendRows($arrCat, $event);
                     $event->sheet->getDelegate()->getCell($cellForTotalCategoriesSum)->setValue($this->totalCategoriesSum);
-                    $event->sheet->getDelegate()->getCell($totalSumDifference)->setValue($this->countSum - $this->totalCategoriesSum);
-                    $event->sheet->getDelegate()->getStyle($totalSumDifference)->getFont()->setBold(500)->setSize(14);
-                    $event->sheet->getDelegate()->getStyle($totalSumDifference)->getBorders()->getAllBorders()->applyFromArray(array('borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN));
-                    $event->sheet->getDelegate()->getStyle($totalSumDifference)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB($this->green);
-                    $event->sheet->getDelegate()->getStyle($totalSumDifference)->getAlignment()->applyFromArray(array('horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER));
+                    if (count($this->categories) !== 0) {
+                        $event->sheet->getDelegate()->getCell($totalSumDifference)->setValue($this->countSum - $this->totalCategoriesSum);
+                        $event->sheet->getDelegate()->getStyle($totalSumDifference)->getFont()->setBold(500)->setSize(14);
+                        $event->sheet->getDelegate()->getStyle($totalSumDifference)->getBorders()->getAllBorders()->applyFromArray(array('borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN));
+                        $event->sheet->getDelegate()->getStyle($totalSumDifference)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB($this->green);
+                        $event->sheet->getDelegate()->getStyle($totalSumDifference)->getAlignment()->applyFromArray(array('horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER));
+                        $event->sheet->getDelegate()->getCell($cellForTotalCategoriesSumUnderTotalSum)->setValue($this->totalCategoriesSum);
+                        $event->sheet->getDelegate()->getStyle($cellForTotalCategoriesSumUnderTotalSum)->getFont()->setBold(500)->setSize(14);
+                        $event->sheet->getDelegate()->getStyle($cellForTotalCategoriesSumUnderTotalSum)->getBorders()->getAllBorders()->applyFromArray(array('borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN));
+                        $event->sheet->getDelegate()->getStyle($cellForTotalCategoriesSumUnderTotalSum)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB($this->yellow);
+                        $event->sheet->getDelegate()->getStyle($cellForTotalCategoriesSumUnderTotalSum)->getAlignment()->applyFromArray(array('horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER));
 
-                    $event->sheet->getDelegate()->getCell($cellForTotalCategoriesSumUnderTotalSum)->setValue($this->totalCategoriesSum);
-                    $event->sheet->getDelegate()->getStyle($cellForTotalCategoriesSumUnderTotalSum)->getFont()->setBold(500)->setSize(14);
-                    $event->sheet->getDelegate()->getStyle($cellForTotalCategoriesSumUnderTotalSum)->getBorders()->getAllBorders()->applyFromArray(array('borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN));
-                    $event->sheet->getDelegate()->getStyle($cellForTotalCategoriesSumUnderTotalSum)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                        ->getStartColor()->setARGB($this->yellow);
-                    $event->sheet->getDelegate()->getStyle($cellForTotalCategoriesSumUnderTotalSum)->getAlignment()->applyFromArray(array('horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER));
+
+                        $event->sheet->getDelegate()->getCell($cellForKgCategories)->setValue($this->countKg);
+                        $event->sheet->getDelegate()->getCell($cellForPlaceCategories)->setValue($this->countPlaces);
+                        $event->sheet->getDelegate()->getStyle($cellRangeFooter)->getFont()->setBold(500);
+                        $event->sheet->getDelegate()->getStyle($cellRangeForBorders)->getBorders()->getAllBorders()->applyFromArray(array('borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN));
+                    }
 
 
-                    $event->sheet->getDelegate()->getCell($cellForKgCategories)->setValue($this->countKg);
-                    $event->sheet->getDelegate()->getCell($cellForPlaceCategories)->setValue($this->countPlaces);
-                    $event->sheet->getDelegate()->getStyle($cellRangeFooter)->getFont()->setBold(500);
-                    $event->sheet->getDelegate()->getStyle($cellRangeForBorders)->getBorders()->getAllBorders()->applyFromArray(array('borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN));
                 }
 
                 // TABLE WITHOUT FOR_KG AND FOR_PLACE FIELDS
-                $cellRangeHeaders2 = 'A' . (count($this->categories) + $this->countEntries + 8) . ':N' . (count($this->categories) + $this->countEntries + 8);
-                $cellForCountPlaces2 = $this->alphabet[$keyPlace] . ($this->countEntries + count($this->categories) + 7 + $this->countEntries);
-                $cellForCountKg2 = $this->alphabet[$keyKg] . ($this->countEntries + count($this->categories) + 7 + $this->countEntries);
-                $cellRange2 = 'A' . (count($this->categories) + $this->countEntries + 8) . ':D' . ($this->countEntries + count($this->categories) + 7 + $this->countEntries);
-                $data = $this->data;
-                $newData = [];
-                foreach ($data as $item) {
-                    $arr = [];
-                    foreach ($this->sequence as $key => $elem) {
-                        if ($key === 'for_kg' || $key === 'for_place') {
-                            continue;
+                if (count($this->categories) !== 0) {
+                    $cellRangeHeaders2 = 'A' . (count($this->categories) + $this->countEntries + 8) . ':N' . (count($this->categories) + $this->countEntries + 8);
+                    $cellForCountPlaces2 = $this->alphabet[$keyPlace] . ($this->countEntries + count($this->categories) + 7 + $this->countEntries);
+                    $cellForCountKg2 = $this->alphabet[$keyKg] . ($this->countEntries + count($this->categories) + 7 + $this->countEntries);
+                    $cellRange2 = 'A' . (count($this->categories) + $this->countEntries + 8) . ':D' . ($this->countEntries + count($this->categories) + 7 + $this->countEntries);
+                    $data = $this->data;
+                    $newData = [];
+                    foreach ($data as $item) {
+                        $arr = [];
+                        foreach ($this->sequence as $key => $elem) {
+                            if ($key === 'for_kg' || $key === 'for_place') {
+                                continue;
+                            }
+                            array_push($arr, $item[$key]);
                         }
-                        array_push($arr, $item[$key]);
+                        array_push($newData, $arr);
                     }
-                    array_push($newData, $arr);
-                }
-                unset($this->sequence['for_kg'], $this->sequence['for_place']);
-                array_unshift($newData, array(''), array(''), array(''), $this->sequence);
-                $event->sheet->appendRows($newData, $event);
+                    unset($this->sequence['for_kg'], $this->sequence['for_place']);
+                    array_unshift($newData, array(''), array(''), array(''), $this->sequence);
+                    $event->sheet->appendRows($newData, $event);
 
-                $cellForSum2 = $this->alphabet[$this->countHeaders($this->sequence) - 1] . ($this->countEntries + count($this->categories) + 7 + $this->countEntries);
-                $cellRangeFooter = 'A' . (count($this->categories) + $this->countEntries + 7 + $this->countEntries) . ':' . $cellForSum2;
-                $event->sheet->getDelegate()->getStyle($cellRangeHeaders2)->getFont()->setBold(500);
-                $event->sheet->getDelegate()->getStyle($cellRangeFooter)->getFont()->setBold(500);
-                $event->sheet->getDelegate()->getCell($cellForCountPlaces2)->setValue($this->countPlaces);
-                $event->sheet->getDelegate()->getCell($cellForCountKg2)->setValue($this->countKg);
-                $event->sheet->getDelegate()->getStyle($cellForSum2)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB($this->yellow);
-                $event->sheet->getDelegate()->getCell($cellForSum2)->setValue($this->countSum);
-                $event->sheet->getDelegate()->getStyle($cellRange2)->getBorders()->getAllBorders()->applyFromArray(array('borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN));
-                $event->sheet->getDelegate()->getStyle($cellRange2)->getAlignment()->applyFromArray(array('horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER));
-                $event->sheet->getDelegate()->getStyle($cellRange2)->getFont()->setSize(14);
+                    $cellForSum2 = $this->alphabet[$this->countHeaders($this->sequence) - 1] . ($this->countEntries + count($this->categories) + 7 + $this->countEntries);
+                    $cellRangeFooter = 'A' . (count($this->categories) + $this->countEntries + 7 + $this->countEntries) . ':' . $cellForSum2;
+                    $event->sheet->getDelegate()->getStyle($cellRangeHeaders2)->getFont()->setBold(500);
+                    $event->sheet->getDelegate()->getStyle($cellRangeFooter)->getFont()->setBold(500);
+                    $event->sheet->getDelegate()->getCell($cellForCountPlaces2)->setValue($this->countPlaces);
+                    $event->sheet->getDelegate()->getCell($cellForCountKg2)->setValue($this->countKg);
+                    $event->sheet->getDelegate()->getStyle($cellForSum2)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB($this->yellow);
+                    $event->sheet->getDelegate()->getCell($cellForSum2)->setValue($this->countSum);
+                    $event->sheet->getDelegate()->getStyle($cellRange2)->getBorders()->getAllBorders()->applyFromArray(array('borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN));
+                    $event->sheet->getDelegate()->getStyle($cellRange2)->getAlignment()->applyFromArray(array('horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER));
+                    $event->sheet->getDelegate()->getStyle($cellRange2)->getFont()->setSize(14);
+                }
+
 
                 // Выделение брендовых клиетов жирным шрифтом
                 if (count($this->brands) > 0) {

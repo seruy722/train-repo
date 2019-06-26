@@ -14,6 +14,12 @@
             </v-toolbar>
 
             <v-toolbar>
+                <ControlPanelFaxes
+                    v-show="selected.length"
+                    :selected="itemsIds"
+                    :destroy="true"
+                    class="faxes_table_control_panel"
+                />
                 <v-spacer></v-spacer>
                 <!--Диалог загрузки факса-->
                 <DialogAddFax
@@ -29,6 +35,7 @@
                 :search="search"
                 :items="faxes"
                 :pagination.sync="pagination"
+                :expand="expand"
                 select-all
                 item-key="id"
                 disable-initial-sort
@@ -59,10 +66,9 @@
 
                 <template v-slot:items="props">
                     <tr
-                        :class="[props.item.paid ? 'tr_green__bg':'tr_red__bg']"
+                        :class="[props.item.paid ? 'tr_green__bg' : 'tr_red__bg']"
                         class="table__tr_show_hide_tr_control_panel"
-                        :active="props.selected"
-                        @click.stop="props.selected = !props.selected"
+                        @click="expandPanel(props, $event)"
                     >
                         <td>
                             <v-checkbox
@@ -80,20 +86,10 @@
                             </router-link>
                         </td>
                         <td class="text-xs-center">{{ props.item.date_departure | formatDate }}</td>
-                        <td :class="props.item.uploaded_to_table_cargos_date ? 'tr_yellow__bg' : 'tr_red__bg'" class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
+                        <td class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
                         </td>
                         <td class="text-xs-center">{{ props.item.air_or_car | convertBoolToAirOrCar }}</td>
                         <td class="text-xs-center">{{ props.item.paid | convertCommonItems}}</td>
-                        <!--<td class="text-xs-center">{{ props.item.created_at | formatDate }}</td>-->
-                        <ControlPanelFaxes
-                            :item="props.item"
-                            :selected="selected"
-                            :destroy="true"
-                            :edit="true"
-                            :expandProps="props"
-                            :download="true"
-                            class="faxes_table_control_panel"
-                        />
                     </tr>
                 </template>
                 <!--Expand-->
@@ -372,6 +368,7 @@
                 },
                 selected: [],
                 updateData: [],
+                itemsIds: [],
             };
         },
         computed: {
@@ -391,6 +388,10 @@
             },
             search (val) {
                 this.$store.dispatch('fax/setSearchValue', val);
+            },
+            selected (val) {
+                // console.log('SEL', val);
+                this.itemsIds = val;
             },
         },
         async fetch ({ store }) {
@@ -417,8 +418,16 @@
             this.$store.dispatch('settings/setPageSettings', { title: 'Факсы', icon: 'domain' });
         },
         methods: {
+            expandPanel (props, event) {
+                const targetElem = _.get(event, 'target.tagName');
+                if (targetElem !== 'DIV') {
+                    props.expanded = !props.expanded;
+                } else {
+                    props.selected = !props.selected;
+                }
+            },
             async updateFaxDataOnServer () {
-                console.log('sendData', this.updateData);
+                // console.log('sendData', this.updateData);
                 try {
                     const { data } = await axios.post('faxes/updateFaxData', this.updateData);
 
@@ -445,7 +454,7 @@
                 this.faxes = _.cloneDeep(this.getFaxes);
             },
             updateFaxData () {
-                console.log('UPDATE');
+                // console.log('UPDATE');
                 this.clickSaveInEditDialog = false;
                 this.snack = false;
                 this.updateFaxDataOnServer();
@@ -460,7 +469,7 @@
                 } else {
                     this.updateData.push(newItem);
                 }
-                console.log('updateData', this.updateData);
+                // console.log('updateData', this.updateData);
             },
             updateFaxDataEditDialog (item) {
                 this.clickSaveInEditDialog = true;
@@ -495,21 +504,21 @@
     };
 
 </script>
-<style lang="scss">
+<style lang="stylus">
     .table__tr_show_hide_tr_control_panel {
         position: relative;
 
         .faxes_table_control_panel {
             position: absolute;
             right: 12%;
-            display: none;
+            /*display: none;*/
         }
 
-        &:hover {
-            .faxes_table_control_panel {
-                display: block;
-            }
-        }
+        /*&:hover {*/
+            /*.faxes_table_control_panel {*/
+                /*display: block;*/
+            /*}*/
+        /*}*/
 
         .tr_yellow__bg{
             background-color: #FFFF00;

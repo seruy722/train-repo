@@ -44,6 +44,9 @@ class UserController extends Controller
     {
 //        return response()->json(['status' => true,'item' => $request->all()]);
         $array = (array)$request->only('name', 'email', 'password', 'set_photo_url', 'role', 'code', 'sex', 'phone', 'city');
+        if ($array['email'] !== 'seruy722@gmail.com' || $array['email'] !== 'pisyruk007@gmail.com') {
+            return response()->json(['status' => false]);
+        }
         $this->cleanData($array);
 
         $type = $request->type;
@@ -153,19 +156,6 @@ class UserController extends Controller
 
     public function getUsersClients()
     {
-//        $clientsNames = User::pluck('name');
-//        $newClientsArr = array_map(function (string $value) {
-//            $startPos = stripos($value, '007/');
-//            if (is_numeric($startPos)) {
-//                return substr($value, $startPos + 4);
-//            }
-//
-//            return $value;
-//
-//        }, $clientsNames->all());
-//
-//        sort($newClientsArr, SORT_NATURAL);
-
         $clients = User::where('role', 'user')->orderBy('name')->get(['id', 'name']);
 
         return response()->json(['status' => true, 'clients' => $clients]);

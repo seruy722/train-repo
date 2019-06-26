@@ -14,7 +14,7 @@ class AddFieldCategoryIdToTablePrices extends Migration
     public function up()
     {
         Schema::table('prices', function (Blueprint $table) {
-            $table->integer('category_id')->default(0)->unsigned()->after('client_id');
+            $table->integer('category_id')->unsigned()->after('client_id');
         });
     }
 

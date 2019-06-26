@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddCategoryIdToTableFaxesMoreInfo extends Migration
+class AddFieldsForPlaceAndListThingsToFaxesMoreInfoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddCategoryIdToTableFaxesMoreInfo extends Migration
     public function up()
     {
         Schema::table('faxes_more_info', function (Blueprint $table) {
-            $table->integer('category_id')->unsigned()->after('name_of_things');
+            $table->float('for_place', 8, 2)->default(0)->unsigned()->after('for_kg');
+            $table->text('list_things')->nullable()->after('shop');
         });
     }
 
@@ -26,7 +27,7 @@ class AddCategoryIdToTableFaxesMoreInfo extends Migration
     public function down()
     {
         Schema::table('faxes_more_info', function (Blueprint $table) {
-            $table->dropColumn('category_id');
+            $table->dropColumn('for_place', 'list_things');
         });
     }
 }

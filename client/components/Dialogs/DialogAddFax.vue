@@ -5,7 +5,7 @@
         <template>
             <div class="text-xs-center">
                 <RectangleBtn
-                    v-show="!clickSaveInEditDialog"
+                    v-show="!clickSaveInEditDialog && role === 'admin'"
                     :title="'Добавить'"
                     :event="'openCloseAddFaxDialog'"
                     @openCloseAddFaxDialog="openCloseAddFaxDialog(true)"
@@ -192,6 +192,7 @@
             ...mapGetters({
                 transportItems: 'settings/transportItems',
                 transport: 'transporters/transporters',
+                role: 'auth/role',
             }),
         },
         watch: {
@@ -213,7 +214,7 @@
 
                         if (status && !_.isEmpty(transporters)) {
                             this.$store.dispatch('transporters/setTransporters', transporters);
-                            console.log('transporters', transporters);
+                            // console.log('transporters', transporters);
                         }
                     } catch (e) {
                         console.error(`Ошибка при запросе данных о перевозчиках - ${e}`);
@@ -221,14 +222,14 @@
                         console.log('Completed request for get transporters');
                     }
                 }
-                console.log('TTR', this.transport);
+                // console.log('TTR', this.transport);
             },
             async sendFileToServer () {
                 this.loadingDisabledBtn(true);
 
                 if (this.validationData()) {
                     this.addPropsToFormData();
-                    console.log('this.faxData.dateOfDeparture', formatDateToServerDate(this.faxData.dateOfDeparture));
+                    // console.log('this.faxData.dateOfDeparture', formatDateToServerDate(this.faxData.dateOfDeparture));
                     try {
                         const { data } = await axios.post('faxes/storeFax', this.fileForUpload);
                         const { status, fax = [], groupedData = [] } = data;
@@ -266,7 +267,7 @@
                 this.loadingDisabledBtn(false);
             },
             addPropsToFormData () {
-                console.log(this.faxData.dateOfDeparture);
+                // console.log(this.faxData.dateOfDeparture);
                 this.fileForUpload.append('dateOfDeparture', formatDateToServerDate(this.faxData.dateOfDeparture));
                 this.fileForUpload.append('transport', this.faxData.selectedTransportItem);
                 this.fileForUpload.append('faxName', this.faxData.faxName);
@@ -307,7 +308,7 @@
                 } else {
                     delete errorsObj.selectedTransportItem;
                 }
-                console.log(this.faxData);
+                // console.log(this.faxData);
                 this.changeErrors(errorsObj);
 
                 return _.isEmpty(errorsObj);

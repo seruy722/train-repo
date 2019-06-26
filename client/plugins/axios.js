@@ -30,6 +30,7 @@ export default ({ app, store, redirect }) => {
     // Response interceptor
     axios.interceptors.response.use(response => response, (error) => {
         const { status } = error.response || {};
+        console.log('response_status', status);
 
         if (status >= 500) {
             this.$snotify.error('Произошла ошибка при запросе', {

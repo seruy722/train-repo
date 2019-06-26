@@ -2,7 +2,7 @@
     <div class="main_profile_block" data-component-name="Profile">
         <v-container fluid>
             <v-layout row class="mb-3">
-                <v-flex xs12 sm12 xs12 justify-center>
+                <v-flex xs12 sm12 justify-center>
                     <v-toolbar color="white" dark evaluation-1>
                         <v-toolbar-title class="text-xs-center title blue--text">Профиль
                         </v-toolbar-title>
@@ -71,10 +71,11 @@
 
                                     <v-layout row>
                                         <v-text-field
-                                            label="Email"
                                             v-model="data.email"
+                                            label="Email"
                                             :error-messages="checkError('email')"
                                             class="pl-2 pr-2"
+                                            disabled
                                         ></v-text-field>
                                     </v-layout>
 
@@ -240,5 +241,8 @@
 <style scoped>
     .main_profile_block {
         width: 70%;
+    }
+    .profile-image-input {
+        display: none;
     }
 </style>

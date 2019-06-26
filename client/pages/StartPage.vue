@@ -71,7 +71,7 @@
                     if (path && path !== '/' && _.includes(role, userRole)) {
                         this.cards.push(item);
                     } else if (children) {
-                        console.log(userRole);
+                        // console.log(userRole);
                         _.forEach(children, (child) => {
                             const { path, role } = child;
                             if (path && path !== '/' && _.includes(role, userRole)) {

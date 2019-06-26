@@ -101,9 +101,9 @@ class FaxesMoreInfosController extends Controller
                 // Если первые 5 полей пустые - то дописываем к предыдущей записи товары
                 if (!$cleanedElem[0] && !$cleanedElem[1] && !$cleanedElem[2] && !$cleanedElem[3] && !$cleanedElem[4]) {
                     $lastEntry = FaxesMoreInfos::orderBy('id', 'desc')->first();
-                    $things = json_decode($lastEntry->name_of_things);
-                    $things->{$cleanedElem[5]} = $cleanedElem[6];
-                    $lastEntry->name_of_things = json_encode($things);
+                    $things = $lastEntry->list_things;
+//                    $things->{$cleanedElem[5]} = $cleanedElem[6];
+                    $lastEntry->list_things = $things . ',' . $cleanedElem[5] . ':' . $cleanedElem[6];
                     $lastEntry->save();
                 } else {
                     // Обрезаем из имени клиента приставку 007/
@@ -119,8 +119,8 @@ class FaxesMoreInfosController extends Controller
 
                     // Категория
                     $category = Category::firstOrCreate(['category_name' => $cleanedElem[8]]);
-                    $brandInNotation = $cleanedElem[7] ? stripos($cleanedElem[7], 'Бренд') !== false : false;
-                    $brandInCategory = $cleanedElem[8] ? stripos($cleanedElem[8], 'Бренд') !== false : false;
+                    $brandInNotation = stripos($cleanedElem[7], 'Бренд') !== false  || stripos($cleanedElem[7], 'Авиа') !== false;
+                    $brandInCategory = stripos($cleanedElem[8], 'Бренд') !== false  || stripos($cleanedElem[8], 'Авиа') !== false;
                     $brand = $brandInNotation || $brandInCategory;
 
                     $prices = Price::where('client_id', $client->id)->where('category_id', $category->id)->first();
@@ -133,25 +133,28 @@ class FaxesMoreInfosController extends Controller
                         $forPlace = 0;
                     }
 
-//                    return response()->json(['status' => false, 'elem7'=> stripos($cleanedElem[8], 'Бренд') !== false]);
-                    try {
-                        FaxesMoreInfos::create([
-                            'code' => (string)$cleanedElem[0],
-                            'place' => (int)$cleanedElem[2],
-                            'kg' => (float)$cleanedElem[3],
-                            'client_id' => (int)$client->id,
-                            'fax_id' => (int)$fax->id,
-                            'brand' => $brand,
-                            'shop' => (string)$cleanedElem[4],
-                            'for_kg' => (float)$forKg,
-                            'for_place' => (float)$forPlace,
-                            'name_of_things' => json_encode([$cleanedElem[5] => (int)$cleanedElem[6]]),
-                            'notation' => (string)$cleanedElem[7],
-                            'category_id' => (int)$category->id,
-                        ]);
-                    } catch (\Exception $e) {
-                        return response()->json(['status' => false, 'error' => 'Ошибка при записи данных.', 'row' => $cleanedElem, 'exception' => $e]);
+                    $listThings = null;
+
+                    if ($cleanedElem[5]) {
+                        $listThings = $cleanedElem[5] . ':' . $cleanedElem[6];
                     }
+
+//                    return response()->json(['status' => false, 'elem7'=> stripos($cleanedElem[8], 'Бренд') !== false]);
+
+                    FaxesMoreInfos::create([
+                        'code' => (string)$cleanedElem[0],
+                        'place' => (int)$cleanedElem[2],
+                        'kg' => (float)$cleanedElem[3],
+                        'client_id' => (int)$client->id,
+                        'fax_id' => (int)$fax->id,
+                        'brand' => $brand,
+                        'shop' => (string)$cleanedElem[4],
+                        'for_kg' => (float)$forKg,
+                        'for_place' => (float)$forPlace,
+                        'list_things' => $listThings,
+                        'notation' => (string)$cleanedElem[7],
+                        'category_id' => (int)$category->id,
+                    ]);
                 }
             }
         }
@@ -175,7 +178,6 @@ class FaxesMoreInfosController extends Controller
             '*.place' => 'required|numeric',
             '*.kg' => 'required|numeric',
             '*.shop' => 'max:255',
-            '*.name_of_things' => 'required|json',
             '*.brand' => 'required|boolean',
             '*.for_kg' => 'required|numeric',
             '*.for_place' => 'required|numeric',
@@ -232,7 +234,7 @@ class FaxesMoreInfosController extends Controller
                 'shop' => (string)$arrvalue['shop'],
                 'for_kg' => (float)$arrvalue['for_kg'],
                 'for_place' => (float)$arrvalue['for_place'],
-                'name_of_things' => $arrvalue['name_of_things'],
+                'list_things' => $arrvalue['list_things'],
                 'notation' => (string)$arrvalue['notation']
             ]);
         }

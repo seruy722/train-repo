@@ -33,7 +33,7 @@ class FaxesMoreInfoSeeder extends Seeder
                 'place' => $faker->numberBetween($min = 1, $max = 100),
                 'kg' => $faker->numberBetween($min = 1, $max = 1000),
                 'brand' => $faker->randomElement($brand),
-                'name_of_things' => json_encode($arr),
+                'list_things' => json_encode($arr),
                 'shop' => $faker->randomElement($brand),
                 'notation' => $faker->sentence($nbWords = 3, $variableNbWords = true),
             ]);

@@ -55,7 +55,7 @@ class FaxCommonData implements FromCollection, WithTitle, WithHeadings, ShouldAu
             ->where('fax_id', $this->faxID)
             ->join('users', 'faxes_more_info.client_id', '=', 'users.id')
             ->join('categories', 'faxes_more_info.category_id', '=', 'categories.id')
-            ->select('faxes_more_info.code', 'users.name', 'faxes_more_info.place', 'faxes_more_info.kg', 'faxes_more_info.shop', 'categories.category_name', 'faxes_more_info.notation', 'faxes_more_info.name_of_things')
+            ->select('faxes_more_info.code', 'users.name', 'faxes_more_info.place', 'faxes_more_info.kg', 'faxes_more_info.shop', 'categories.category_name', 'faxes_more_info.notation', 'faxes_more_info.list_things')
             ->get();
         $sorted = $dataTable->sortBy('name');
 

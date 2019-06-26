@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddFieldBrandToCargosTable extends Migration
+class DestroyFieldNameOfThingsAndForPlaceFromFaxesMoreInfoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddFieldBrandToCargosTable extends Migration
      */
     public function up()
     {
-        Schema::table('cargos', function (Blueprint $table) {
-            $table->boolean('brand')->default(false)->after('kg');
+        Schema::table('faxes_more_info', function (Blueprint $table) {
+            $table->dropColumn('name_of_things', 'for_place');
         });
     }
 
@@ -25,8 +25,8 @@ class AddFieldBrandToCargosTable extends Migration
      */
     public function down()
     {
-        Schema::table('cargos', function (Blueprint $table) {
-            $table->dropColumn('brand');
+        Schema::table('faxes_more_info', function (Blueprint $table) {
+            //
         });
     }
 }

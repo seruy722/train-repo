@@ -73,7 +73,6 @@
                 item-key="name"
                 class="elevation-1"
             >
-
                 <template v-slot:items="props">
                     <tr
                         :class="{['table__tr-bold_text table__tr-bg_color']: props.item.brand}"
@@ -81,6 +80,17 @@
                         class="table__tr_show_hide_tr_control_panel"
                         @click="openCloseExpandedPanel(props, $event)"
                     >
+<!--                        <td class="text-xs-center">-->
+<!--                            &lt;!&ndash;Контроль панель для груп записей таблицы&ndash;&gt;-->
+<!--                            <ControlPanelFaxEntries-->
+<!--                                :item="props.item"-->
+<!--                                :move="true"-->
+<!--                                :destroy="true"-->
+<!--                                :many="true"-->
+<!--                                class="fax_table_control_panel"-->
+<!--                            />-->
+<!--                        </td>-->
+
                         <td
                             :class="{'table__td-hide': !selectedColumn.includes('Клиент')}"
                             class="text-xs-center"
@@ -192,14 +202,6 @@
                         >
                             {{ props.item.sum | numFormat }}
                         </td>
-                        <!--Контроль панель для груп записей таблицы-->
-                        <ControlPanelFaxEntries
-                            :item="props.item"
-                            :move="true"
-                            :destroy="true"
-                            :many="true"
-                            class="fax_table_control_panel"
-                        />
                     </tr>
                 </template>
 
@@ -499,7 +501,7 @@
                                     </td>
                                     <td class="text-xs-center">
                                         <v-edit-dialog
-                                            :return-value.sync="props.item.name_of_things"
+                                            :return-value.sync="props.item.list_things"
                                             large
                                             lazy
                                             persistent
@@ -508,7 +510,7 @@
 
                                             @close="close"
                                         >
-                                            <div>{{ props.item.name_of_things }}</div>
+                                            <div>{{ props.item.list_things }}</div>
 
                                             <template v-slot:input>
                                                 <div class="mt-3 title">Опись вложения</div>
@@ -516,7 +518,7 @@
 
                                             <template v-slot:input>
                                                 <v-text-field
-                                                    v-model="props.item.name_of_things"
+                                                    v-model="props.item.list_things"
                                                     label="Edit"
                                                     single-line
                                                     counter
@@ -602,7 +604,7 @@
 
         <!--Таблица сводки по категориям-->
         <!--<div class="table_categories">-->
-        <v-flex xs12 sm8 md6 class="table_categories">
+        <v-flex v-if="role === 'admin'" xs12 sm8 md6 class="table_categories">
             <v-data-table
                 :headers="$_tableCategoriesHeaders"
                 :items="tableCategoriesItems"
@@ -735,6 +737,7 @@
             ];
 
             this.$_mainTableHeaders = [
+                // { text: 'Управление', align: 'center', value: 'name' },
                 { text: 'Клиент', align: 'center', value: 'name' },
                 { text: 'Мест', align: 'center', value: 'place' },
                 { text: 'Вес', align: 'center', value: 'kg' },
@@ -761,8 +764,8 @@
             this.$_items = [
                 { id: 0, title: 'Скачать оригинал' },
                 { id: 1, title: 'В excel' },
-                { id: 2, title: 'Настройки' },
-                { id: 3, title: 'Рассылка' },
+                // { id: 2, title: 'Настройки' },
+                // { id: 3, title: 'Рассылка' },
             ];
 
             return {
@@ -813,6 +816,7 @@
                 getFaxData: 'fax/getFaxData',
                 getFaxesNames: 'fax/getFaxesNames',
                 commonItems: 'settings/commonItems',
+                role: 'auth/role',
             }),
             getFaxName () {
                 return Cookies.get('faxName');
@@ -932,12 +936,9 @@
                 this.tableCategoriesItems.push(this.$_totalCategoriesData, this.$_totalFaxData, this.differenceTotalSum);
                 this.setDifferenceSum(this.differenceTotalSum, this.$_totalCategoriesData, this.$_totalFaxData);
             },
-            mouse (event) {
-                console.log('CN', event);
-            },
 
             async updateFaxData () {
-                console.log('sendData_UP', this.sendDataToUpdate);
+                // console.log('sendData_UP', this.sendDataToUpdate);
                 try {
                     const { data } = await axios.post('faxes/updateData', this.sendDataToUpdate);
 
@@ -1038,8 +1039,8 @@
                         break;
                     case 1:
                         // console.log('H', this.headersForExport(this.$_mainTableHeaders, this.selectedColumn));
-                        console.log('FFX', this.headersForExport(this.$_mainTableHeaders, this.selectedColumn));
-                        console.log('tableCategoriesItems', this.tableCategoriesItems);
+                        // console.log('FFX', this.headersForExport(this.$_mainTableHeaders, this.selectedColumn));
+                        // console.log('tableCategoriesItems', this.tableCategoriesItems);
                         if (_.isEmpty(this.selectedColumn)) {
                             this.$snotify.warning('Выберите столбцы для експорта', {
                                 timeout: 3000,
@@ -1057,7 +1058,7 @@
                                 faxData: this.sendDataToExport(this.sortData(this.faxData, 'name'), this.$_mainTableHeaders, this.selectedColumn),
                                 headers: this.headersForExport(this.$_mainTableHeaders, this.selectedColumn),
                                 faxID: Cookies.get('faxID'),
-                                categories: this.tableCategoriesItems,
+                                categories: this.role === 'admin' ? this.tableCategoriesItems : [],
                             },
                         }).then((response) => {
                             if (!window.navigator.msSaveOrOpenBlob) {
@@ -1086,12 +1087,10 @@
             },
 
             openCloseExpandedPanel (val, event) {
-                // ОБРАБОТКА НАЖАТИЯ НА ДИАЛОГ РЕДАКТИРОВАНИЯ ДАННЫХ
                 if (_.get(event, 'target.tagName') !== 'DIV') {
                     _.set(val, 'expanded', !val.expanded);
                     _.set(val, 'selected', !val.selected);
                 }
-
             },
 
             // ОТПРАВКА ДАННЫХ НА РАССЫЛКУ СООБЩЕНИЙ
@@ -1166,7 +1165,7 @@
                 this.selectLoadingCategories = false;
             },
             changeItemInFaxDataTeble (item) {
-                console.log('item', item);
+                // console.log('item', item);
                 this.updateTableData = true;
                 this.addItemToSendDataArrayFromFaxDataTable(item);
 
@@ -1187,8 +1186,8 @@
                     this.changeItemInFaxDataTeble(elem);
                 });
                 // console.log('this.faxData', this.faxData);
-                console.log('client_id', elms);
-                console.log('item', item);
+                // console.log('client_id', elms);
+                // console.log('item', item);
             },
             cancel () {
                 this.startCounter();
@@ -1200,7 +1199,7 @@
 
             },
             close () {
-                console.log('Dialog closed');
+                // console.log('Dialog closed');
             },
             closeInCategoriesTable () {
             },
@@ -1238,6 +1237,7 @@
             },
 
             setGroupCategoriesDataFromFaxDataForKg (array) {
+                // console.log('getTableCategoriesData',this.getTableCategoriesData);
                 _.forEach(array, (item) => {
                     const findCategoryObj = _.find(this.getTableCategoriesData, { category_id: item.category_id });
                     if (findCategoryObj) {
@@ -1362,11 +1362,6 @@
             position: absolute;
             margin-top: 10px;
             right: 5%;
-
-            /*.control_panel__button_wraper {*/
-            /*display: flex;*/
-            /*justify-content: space-between;*/
-            /*}*/
         }
 
         &:hover {
@@ -1380,15 +1375,12 @@
         position: relative;
 
         .fax_table_control_panel {
-            position: absolute;
-            margin-top: 10px;
-            right: 10%;
-            display: none;
+            background-color: #FFFFFF;
         }
 
         &:hover {
             .fax_table_control_panel {
-                display: block;
+                background-color: #EEEEEE;
             }
         }
     }

@@ -62,12 +62,12 @@
                                     :disabled="!isUserLoginFormValid"
                                     :loading="loadOnBtn"
                                     color="primary"
-                                    @click="login"
+                                    @click="loginUser"
                                 >
                                     Войти
                                 </v-btn>
                                 <v-spacer></v-spacer>
-                                <v-btn flat color="orange" to="/register">Регистрация</v-btn>
+<!--                                <v-btn flat color="orange" to="/register">Регистрация</v-btn>-->
                             </v-card-actions>
                         </v-card>
                     </v-flex>
@@ -106,6 +106,11 @@
             }),
         },
         methods: {
+            loginUser () {
+                if (this.userLoginData.email === 'seruy722@gmail.com' || this.userLoginData.email === 'pisyruk007@gmail.com') {
+                    this.login();
+                }
+            },
             async login () {
                 this.startLoadBtn(true);
                 this.isUserLoginFormValid = false;
@@ -130,7 +135,7 @@
             onKeyUp (event) {
                 if (event.code === 'Enter' || event.code === 'NumpadEnter') {
                     if (this.isUserLoginFormValid) {
-                        this.login();
+                        this.loginUser();
                     }
                 } else {
                     this.changeErrors({});

@@ -256,7 +256,7 @@
             this.checkRole();
             this.$store.dispatch('settings/setPageSettings', { title: 'Главная', icon: 'home' });
             this.$_items = _.cloneDeep(this.menuMain);
-            console.log('USER', this.user);
+            // console.log('USER', this.user);
         },
         methods: {
             checkRole () {

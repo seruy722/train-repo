@@ -4,16 +4,28 @@
         class="faxes_control_panel"
     >
         <div class="faxes_control_panel__button_wraper">
-            <div v-if="edit" class="faxes_control_panel__button">
-                <v-tooltip bottom>
+            <!--<div v-if="edit" class="faxes_control_panel__button">-->
+            <!--<v-tooltip bottom>-->
 
+            <!--<template v-slot:activator="{ on }">-->
+            <!--<v-btn v-on="on" flat icon color="cyan" @click.stop="openCloseFaxesExpandPanel">-->
+            <!--<v-icon>edit</v-icon>-->
+            <!--</v-btn>-->
+            <!--</template>-->
+
+            <!--<span>Редактировать</span>-->
+            <!--</v-tooltip>-->
+            <!--</div>-->
+
+            <div v-if="selected.length > 1" class="faxes_control_panel__button">
+                <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                        <v-btn v-on="on" flat icon color="cyan" @click.stop="openCloseFaxesExpandPanel">
-                            <v-icon>edit</v-icon>
+                        <v-btn v-on="on" flat icon color="primary" @click.stop="joinFaxes(selected)">
+                            <v-icon>games</v-icon>
                         </v-btn>
                     </template>
 
-                    <span>Редактировать</span>
+                    <span>Соединить</span>
                 </v-tooltip>
             </div>
 
@@ -33,7 +45,7 @@
                 <v-tooltip bottom>
 
                     <template v-slot:activator="{ on }">
-                        <v-btn v-on="on" flat icon color="red" @click.stop="destroyEntries">
+                        <v-btn v-on="on" flat icon color="red" @click.stop="destroyEntries(selected)">
                             <v-icon>delete</v-icon>
                         </v-btn>
                     </template>
@@ -55,10 +67,10 @@
                 type: Boolean,
                 default: false,
             },
-            edit: {
-                type: Boolean,
-                default: false,
-            },
+            // edit: {
+            //     type: Boolean,
+            //     default: false,
+            // },
             expandProps: {
                 type: Object,
                 default: () => ({}),
@@ -102,18 +114,53 @@
                     }
                 });
             },
-            destroyEntries () {
-                console.log('DES', this.item);
-                console.log('selected', this.selected);
-                let faxNames = [];
-                let itemsID = [];
-                if (!_.isEmpty(this.selected)) {
-                    itemsID = _.map(this.selected, item => item.id);
-                    faxNames = _.map(this.selected, item => item.fax_name);
-                } else if (!_.isEmpty(this.item)) {
-                    itemsID.push(this.item.id);
-                    faxNames.push(this.item.fax_name);
+            async joinFaxes (selected) {
+                console.log('Sel', selected);
+                return;
+                const ids = _.uniqBy(selected, 'transporter');
+
+                if (!_.isEmpty(selected) && ids.length === 1) {
+                    try {
+                        const { data } = await axios.post('faxes/join', selected);
+                        const { fax = {} } = data;
+                        this.$store.dispatch('fax/addFax', fax);
+
+                        this.$snotify.success('Факсы успешно обьединены.', {
+                            timeout: 3000,
+                            showProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                        });
+                    } catch (e) {
+                        console.error(`Ошибка при обьединении факсов! - ${e}`);
+                    } finally {
+                        console.log('Completed request join faxes');
+                    }
+                } else {
+                    this.$snotify.confirm('Вы выбрали факсы разных перевозчиков!', {
+                        timeout: 5000,
+                        showProgressBar: true,
+                        closeOnClick: false,
+                        pauseOnHover: true,
+                        buttons: [
+                            {
+                                text: 'Продолжить', action: (toast) => {
+                                    this.$snotify.remove(toast.id);
+                                    // this.destroyFaxEntries(itemsID, faxNames);
+                                },
+                            },
+                            {
+                                text: 'Отмена', action: (toast) => {
+                                    this.$snotify.remove(toast.id);
+                                },
+                            },
+                        ],
+                    });
                 }
+            },
+            destroyEntries (selected) {
+                const faxNames = _.map(selected, 'fax_name');
+                const itemsID = _.map(selected, 'id');
 
                 this.$snotify.confirm(`Удалить факсы - "${faxNames}"`, {
                     timeout: 5000,
@@ -125,26 +172,29 @@
                             text: 'Yes', action: (toast) => {
                                 this.$snotify.remove(toast.id);
                                 this.destroyFaxEntries(itemsID, faxNames);
-                            }
+                            },
                         },
                         {
                             text: 'No', action: (toast) => {
                                 this.$snotify.remove(toast.id);
-                            }
+                            },
                         },
                     ],
                 });
             },
             async destroyFaxEntries (faxesIDS, faxNames) {
+                // console.log('faxesIDS', faxesIDS);
+                // console.log('faxNames', faxNames);
+                // return;
                 try {
                     const { data } = await axios.post('faxes/delete', { faxesIDS });
                     const { status } = data;
-                    console.log('faxesIDS', faxesIDS);
+                    // console.log('faxesIDS', faxesIDS);
 
                     if (status) {
                         this.$store.dispatch('fax/destroyFaxes', faxesIDS);
 
-                        this.$snotify.success(`Факсы < ${faxNames} > успешно удалены.`, {
+                        this.$snotify.success(`${faxesIDS > 1 ? 'Факсы' : 'Факс'} < ${faxNames} > успешно ${faxesIDS > 1 ? 'удалены' : 'удален'}.`, {
                             timeout: 3000,
                             showProgressBar: true,
                             closeOnClick: true,
@@ -167,6 +217,7 @@
 
         .faxes_control_panel__button_wraper {
             display: flex;
+            /*flex-direction: column;*/
             justify-content: space-around;
         }
     }

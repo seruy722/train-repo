@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\FaxesMoreInfos;
 use App\FaxPriceForCategory;
+use App\PriceForTransporter;
 use App\File;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Fax;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +18,7 @@ use App\Traits\CleanData;
 class FaxesController extends Controller
 {
     use FormatDate, CleanData;
+    protected $joinFax;
 
     public function index()
     {
@@ -26,19 +27,15 @@ class FaxesController extends Controller
             ->join('files', 'faxes.file_id', '=', 'files.id')
             ->select('faxes.*', 'files.file_ext')
             ->get();
-//        $faxesData = DB::table('faxes')->orderBy('date_departure', "DESC")->get();
-        $arr = $faxesData->toArray();
-        foreach ($arr as $item) {
+
+        $faxesData->each(function ($item) {
             $item->date_departure = $this->formatDateWithServerTimezone($item->date_departure);
             $item->created_at = $this->formatDateWithServerTimezone($item->created_at);
             $item->updated_at = $this->formatDateWithServerTimezone($item->updated_at);
             $item->uploaded_to_table_cargos_date = $this->formatDateWithServerTimezone($item->uploaded_to_table_cargos_date);
-        }
-
-//        $DT = Carbon::now();
-
-        return response()->json(['status' => true, 'faxesData' => $arr, 'date' => (Carbon::createFromTimestamp(strtotime("2019-04-05T20:11:06.306Z")))->format('Y-m-d\TH:i:sP')]);
-//        'date' => date("Y-m-d H:i:s", strtotime('2019-04-02T13:38:49+00:00')) (new \DateTime("2019-04-05T22:50:15.728Z"))->format("Y-m-d H:i:s") Carbon::createFromTimestamp(strtotime("2019-04-05T20:11:06.306Z")))->format('Y-m-d\TH:i:sP')
+        });
+//        'date' => (Carbon::createFromTimestamp(strtotime("2019-04-05T20:11:06.306Z")))->format('Y-m-d\TH:i:sP')
+        return response()->json(['status' => true, 'faxesData' => $faxesData]);
     }
 
     public function updateData(Request $request)
@@ -101,5 +98,44 @@ class FaxesController extends Controller
         Fax::destroy($faxesIDS);
 
         return response()->json(['status' => true]);
+    }
+    // Обьеденение факсов
+    public function joinFaxes(Request $request)
+    {
+        $items = $request->all();
+        $firstElem = current($items);
+        $file = File::create([
+            'file_name'=>'JOIN',
+            'file_hash_name'=>'JOIN',
+            'file_size'=>'JOIN',
+            'file_ext'=>'JOIN',
+            'url'=>'JOIN',
+        ]);
+        // Добавление факса
+        $this->joinFax = Fax::create([
+            'fax_name' => 'JOIN_FAX',
+            'date_departure' => date("Y-m-d H:i:s"),
+            'paid' => $firstElem['paid'],
+            'air_or_car' => $firstElem['air_or_car'],
+            'transporter' => $firstElem['transporter'],
+            'file_id' => $file->id,
+        ]);
+        // Добавление цен по категориям в зависимости от факса
+        $transporterPrice = PriceForTransporter::where('transporter_id', $firstElem['transporter'])->get();
+        if ($transporterPrice->isNotEmpty()) {
+            $transporterPrice->each(function ($item) {
+                FaxPriceForCategory::create(['fax_id' => $this->joinFax->id, 'category_id' => $item->category_id, 'category_price' => $item->for_kg]);
+            });
+        }
+        // Запись данных новому факсу
+        $fData = null;
+        foreach ($items as $item) {
+            $fData = FaxesMoreInfos::where('fax_id', $item['id'])->get();
+            $fData->each(function ($item) {
+                $item->fax_id = $this->joinFax->id;
+                FaxesMoreInfos::create($item->toArray());
+            });
+        }
+        return response()->json(['fax' => $this->joinFax]);
     }
 }
