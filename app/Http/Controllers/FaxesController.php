@@ -6,6 +6,7 @@ use App\FaxesMoreInfos;
 use App\FaxPriceForCategory;
 use App\PriceForTransporter;
 use App\File;
+use App\Transporter;
 use Illuminate\Http\Request;
 use App\Fax;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,7 @@ class FaxesController extends Controller
     public function index()
     {
         $faxesData = DB::table('faxes')
-            ->orderBy('date_departure', 'DESC')
+            ->orderBy('created_at', 'DESC')
             ->join('files', 'faxes.file_id', '=', 'files.id')
             ->select('faxes.*', 'files.file_ext')
             ->get();
@@ -43,7 +44,7 @@ class FaxesController extends Controller
         $data = $request->all();
         foreach ($data as $item) {
             $arrValue = (object)$item;
-            $arrForCreateFax = ['fax_name' => $arrValue->{'fax_name'}, 'date_departure' => $this->formatDateToMySqlDate($arrValue->{'date_departure'}), 'air_or_car' => !!$arrValue->{'air_or_car'}, 'uploaded_to_table_cargos_date' => $this->formatDateToMySqlDate($arrValue->{'uploaded_to_table_cargos_date'}), 'paid' => $arrValue->{'paid'}];
+            $arrForCreateFax = ['fax_name' => $arrValue->{'fax_name'}, 'date_departure' => $this->formatDateToMySqlDate($arrValue->{'date_departure'}), 'transport' => !!$arrValue->{'transport'}, 'uploaded_to_table_cargos_date' => $this->formatDateToMySqlDate($arrValue->{'uploaded_to_table_cargos_date'}), 'paid' => $arrValue->{'paid'}];
             Fax::where('id', $arrValue->{'id'})->update($arrForCreateFax);
         }
         return response()->json(['status' => true]);
@@ -91,7 +92,14 @@ class FaxesController extends Controller
             if ($fax) {
                 $d2 = FaxesMoreInfos::where('fax_id', $id)->delete();
                 $d1 = FaxPriceForCategory::where('fax_id', $id)->delete();
-                $d3 = File::where('id', $fax->file_id)->delete();
+                $file = File::find($fax->file_id);
+
+                if ($file) {
+                    if (Storage::disk('local')->exists('faxes/' . $file->file_hash_name)) {
+                        Storage::disk('local')->delete('faxes/' . $file->file_hash_name);
+                    }
+                }
+                $file->delete();
             }
         }
 
@@ -111,12 +119,13 @@ class FaxesController extends Controller
             'file_ext'=>'JOIN',
             'url'=>'JOIN',
         ]);
+
         // Добавление факса
         $this->joinFax = Fax::create([
-            'fax_name' => 'JOIN_FAX',
+            'fax_name' => 'JOIN_Факс ',
             'date_departure' => date("Y-m-d H:i:s"),
             'paid' => $firstElem['paid'],
-            'air_or_car' => $firstElem['air_or_car'],
+            'transport' => $firstElem['transport'],
             'transporter' => $firstElem['transporter'],
             'file_id' => $file->id,
         ]);
@@ -129,13 +138,22 @@ class FaxesController extends Controller
         }
         // Запись данных новому факсу
         $fData = null;
+        $kg = 0;
+        $place = 0;
         foreach ($items as $item) {
             $fData = FaxesMoreInfos::where('fax_id', $item['id'])->get();
+            $kg += $fData->sum('kg');
+            $place += $fData->sum('place');
             $fData->each(function ($item) {
                 $item->fax_id = $this->joinFax->id;
                 FaxesMoreInfos::create($item->toArray());
             });
         }
+
+        $transporter = Transporter::find($firstElem['transporter']);
+        $this->joinFax->fax_name = 'JOIN_Факс ' . $transporter->name . ' ' . $place . 'м_' . $kg . 'кг';
+        $this->joinFax->save();
+
         return response()->json(['fax' => $this->joinFax]);
     }
 }

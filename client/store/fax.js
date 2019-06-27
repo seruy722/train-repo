@@ -52,7 +52,7 @@ export const mutations = {
         if (state.groupedData[objData.clientID]) {
             const removedEtries = _.remove(state.groupedData[objData.clientID], item => _.includes(objData.entriesID, item.id));
             state.removedEtries.push(...removedEtries);
-            console.log('removedEtry', removedEtries);
+            // console.log('removedEtry', removedEtries);
         }
     },
 
@@ -83,7 +83,7 @@ export const actions = {
     },
 
     async dataAggregation ({ dispatch }, data) {
-        console.log('AGGR');
+        // console.log('AGGR');
         const result = [];
 
         const arrayForGroupItem = (data) => {

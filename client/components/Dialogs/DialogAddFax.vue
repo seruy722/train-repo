@@ -5,7 +5,7 @@
         <template>
             <div class="text-xs-center">
                 <RectangleBtn
-                    v-show="!clickSaveInEditDialog && role === 'admin'"
+                    v-show="!clickSaveInEditDialog"
                     :title="'Добавить'"
                     :event="'openCloseAddFaxDialog'"
                     @openCloseAddFaxDialog="openCloseAddFaxDialog(true)"
@@ -202,6 +202,7 @@
         },
 
         created () {
+            // console.log('role', this.role);
             this.getTransporters(this.transport);
         },
 
@@ -225,6 +226,11 @@
                 // console.log('TTR', this.transport);
             },
             async sendFileToServer () {
+                // console.log('Save');
+                // console.log('Save');
+                if (this.role !== 'admin') {
+                    return;
+                }
                 this.loadingDisabledBtn(true);
 
                 if (this.validationData()) {

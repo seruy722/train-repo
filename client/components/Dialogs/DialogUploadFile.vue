@@ -291,7 +291,7 @@
                 } else {
                     delete errorsObj.selectedTransportItem;
                 }
-                console.log(this.faxData);
+                // console.log(this.faxData);
                 this.changeErrors(errorsObj);
 
                 return _.isEmpty(errorsObj);

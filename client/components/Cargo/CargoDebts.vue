@@ -202,7 +202,7 @@
         },
         created () {
             this.addEmptyEntry();
-            console.log('CURCLIENT', this.currentClient);
+            // console.log('CURCLIENT', this.currentClient);
         },
         methods: {
             clearAndCloseComponent () {
@@ -242,9 +242,9 @@
             },
             async save () {
                 const sendData = this.addValuesToEntries(this.dataDebts);
-                console.log('SAVE',sendData);
+                // console.log('SAVE',sendData);
                 return;
-                console.log('SAVE', this.dataDebts);
+                // console.log('SAVE', this.dataDebts);
                 this.changeLoadBtn();
                 this.changeErrors({});
 
@@ -256,7 +256,7 @@
                         let { cargoEntry } = response.data;
                         // Форматируем дату
                         cargoEntry = formatDate(cargoEntry, 'YYYY-MM-DD HH:mm:ss', 'DD-MM-YYYY');
-                        console.log('cargoDebts', cargoEntry);
+                        // console.log('cargoDebts', cargoEntry);
                         _.forEach(cargoEntry, (item) => {
                             this.$store.commit('cargo/ADD_ITEM', item);
 

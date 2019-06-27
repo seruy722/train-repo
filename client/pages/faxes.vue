@@ -88,7 +88,7 @@
                         <td class="text-xs-center">{{ props.item.date_departure | formatDate }}</td>
                         <td class="text-xs-center">{{ props.item.uploaded_to_table_cargos_date | formatDate }}
                         </td>
-                        <td class="text-xs-center">{{ props.item.air_or_car | convertBoolToAirOrCar }}</td>
+                        <td class="text-xs-center">{{ props.item.transport | convertBoolToAirOrCar }}</td>
                         <td class="text-xs-center">{{ props.item.paid | convertCommonItems}}</td>
                     </tr>
                 </template>
@@ -175,7 +175,7 @@
 
                                     <td class="text-xs-center">
                                         <v-edit-dialog
-                                            :return-value.sync="props.item.air_or_car"
+                                            :return-value.sync="props.item.transport"
                                             large
                                             lazy
                                             persistent
@@ -183,13 +183,13 @@
                                             @cancel="cancel"
                                             @close="close"
                                         >
-                                            <div>{{ props.item.air_or_car | convertBoolToAirOrCar }}</div>
+                                            <div>{{ props.item.transport | convertBoolToAirOrCar }}</div>
                                             <template v-slot:input>
                                                 <div class="mt-3 title">Редактирование</div>
                                             </template>
                                             <template v-slot:input>
                                                 <v-select
-                                                    v-model.number="props.item.air_or_car"
+                                                    v-model.number="props.item.transport"
                                                     :items="transportItems"
                                                     item-text="title"
                                                     item-value="id"
@@ -326,21 +326,50 @@
             };
 
             this.expandTableHeaders = [
-                { text: 'Название факса', sortable: false, align: 'center', value: 'fax_name' },
-                { text: 'Дата отправки', sortable: false, align: 'center', value: 'date_departure' },
+                {
+                    text: 'Название факса',
+                    sortable: false,
+                    align: 'center',
+                    value: 'fax_name'
+                },
+                {
+                    text: 'Дата отправки',
+                    sortable: false,
+                    align: 'center',
+                    value: 'date_departure'
+                },
                 {
                     text: 'Дата загрузки в базу',
                     sortable: false,
                     align: 'center',
                     value: 'uploaded_to_table_cargos_date',
                 },
-                { text: 'Транспорт', sortable: false, align: 'center', value: 'air_or_car' },
-                { text: 'Оплачен', sortable: false, align: 'center', value: 'paid' },
-                { text: 'Дата добавления', sortable: false, align: 'center', value: 'created_at' },
+                {
+                    text: 'Транспорт',
+                    sortable: false,
+                    align: 'center',
+                    value: 'transport'
+                },
+                {
+                    text: 'Оплачен',
+                    sortable: false,
+                    align: 'center',
+                    value: 'paid'
+                },
+                {
+                    text: 'Дата добавления',
+                    sortable: false,
+                    align: 'center',
+                    value: 'created_at'
+                },
             ];
 
             this.mainTableHeaders = [
-                { text: 'Название факса', align: 'center', value: 'fax_name' },
+                {
+                    text: 'Название факса',
+                    align: 'center',
+                    value: 'fax_name'
+                },
                 {
                     text: 'Дата отправки',
                     align: 'center',
@@ -351,8 +380,16 @@
                     align: 'center',
                     value: 'uploaded_to_table_cargos_date',
                 },
-                { text: 'Транспорт', align: 'center', value: 'air_or_car' },
-                { text: 'Оплачен', align: 'center', value: 'paid' },
+                {
+                    text: 'Транспорт',
+                    align: 'center',
+                    value: 'transport'
+                },
+                {
+                    text: 'Оплачен',
+                    align: 'center',
+                    value: 'paid'
+                },
             ];
 
             return {
@@ -401,8 +438,8 @@
                     const { data } = await axios.get('faxes');
                     const { faxesData = [], date = [] } = data;
 
-                    console.log('date', date);
-                    console.log('faxesData', faxesData);
+                    // console.log('date', date);
+                    // console.log('faxesData', faxesData);
 
                     store.dispatch('fax/setFaxes', faxesData);
                 }
@@ -415,7 +452,10 @@
         created () {
             this.cloneFaxData();
             this.search = this.searchValue;
-            this.$store.dispatch('settings/setPageSettings', { title: 'Факсы', icon: 'domain' });
+            this.$store.dispatch('settings/setPageSettings', {
+                title: 'Факсы',
+                icon: 'domain'
+            });
         },
         methods: {
             expandPanel (props, event) {
@@ -515,12 +555,12 @@
         }
 
         /*&:hover {*/
-            /*.faxes_table_control_panel {*/
-                /*display: block;*/
-            /*}*/
+        /*.faxes_table_control_panel {*/
+        /*display: block;*/
+        /*}*/
         /*}*/
 
-        .tr_yellow__bg{
+        .tr_yellow__bg {
             background-color: #FFFF00;
         }
     }

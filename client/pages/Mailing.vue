@@ -42,7 +42,7 @@
                 try {
                     const { data } = await axios.post('faxes/storeFax', this.fileForUpload);
                     const { status, fax = [], groupedData = [], elem = [] } = data;
-                    console.log('ELEM', elem);
+                    // console.log('ELEM', elem);
                     axios({
                         url: 'fax/download',
                         method: 'POST',

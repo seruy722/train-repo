@@ -72,7 +72,7 @@ class FaxesMoreInfosController extends Controller
         }
 //        return response()->json(['status' => true, 'elem' => $cleanedData['transporterID']]);
         // Добавление факса
-        $arrForCreateFax = ['transporter' => (int)$cleanedData['transporterID'], 'file_id' => $savedFileData->id, 'fax_name' => $request->faxName, 'date_departure' => $this->formatDateToMySqlDate($cleanedData['dateOfDeparture']), 'air_or_car' => !!$cleanedData['transport']];
+        $arrForCreateFax = ['transporter' => (int)$cleanedData['transporterID'], 'file_id' => $savedFileData->id, 'fax_name' => $request->faxName, 'date_departure' => $this->formatDateToMySqlDate($cleanedData['dateOfDeparture']), 'transport' => !!$cleanedData['transport']];
         $fax = Fax::create($arrForCreateFax);
 
         // Запись цен по категория за факс

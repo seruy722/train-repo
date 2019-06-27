@@ -89,10 +89,10 @@
             },
         },
         methods: {
-            openCloseFaxesExpandPanel () {
-                _.set(this.expandProps, 'expanded', !this.expandProps.expanded);
-                _.set(this.expandProps, 'selected', !this.expandProps.selected);
-            },
+            // openCloseFaxesExpandPanel () {
+            //     _.set(this.expandProps, 'expanded', !this.expandProps.expanded);
+            //     _.set(this.expandProps, 'selected', !this.expandProps.selected);
+            // },
             downloadExcle () {
                 // axios.get('fax/download');
                 axios({
@@ -115,8 +115,7 @@
                 });
             },
             async joinFaxes (selected) {
-                console.log('Sel', selected);
-                return;
+                // console.log('Sel', selected);
                 const ids = _.uniqBy(selected, 'transporter');
 
                 if (!_.isEmpty(selected) && ids.length === 1) {
@@ -137,24 +136,11 @@
                         console.log('Completed request join faxes');
                     }
                 } else {
-                    this.$snotify.confirm('Вы выбрали факсы разных перевозчиков!', {
-                        timeout: 5000,
+                    this.$snotify.warning('Вы выбрали факсы разных перевозчиков!', {
+                        timeout: 3000,
                         showProgressBar: true,
-                        closeOnClick: false,
+                        closeOnClick: true,
                         pauseOnHover: true,
-                        buttons: [
-                            {
-                                text: 'Продолжить', action: (toast) => {
-                                    this.$snotify.remove(toast.id);
-                                    // this.destroyFaxEntries(itemsID, faxNames);
-                                },
-                            },
-                            {
-                                text: 'Отмена', action: (toast) => {
-                                    this.$snotify.remove(toast.id);
-                                },
-                            },
-                        ],
                     });
                 }
             },

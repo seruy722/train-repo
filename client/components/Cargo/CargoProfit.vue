@@ -188,7 +188,7 @@
             },
             async save () {
                 const sendData = this.addValuesToEntries(this.dataProfit);
-                console.log('sendData', sendData);
+                // console.log('sendData', sendData);
                 return;
                 this.changeLoadBtn();
                 this.changeErrors({});
@@ -202,7 +202,7 @@
                     }
                 });
 
-                console.log(clearDataProfit);
+                // console.log(clearDataProfit);
 
                 await this.saveCargoProfitToServer(clearDataProfit).then((response) => {
                     const { status } = response.data;

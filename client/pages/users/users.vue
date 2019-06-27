@@ -505,7 +505,7 @@
             return { userList: users };
         },
         created () {
-            console.log('LIST_USERS', this.userList);
+            // console.log('LIST_USERS', this.userList);
         },
         methods: {
             editUser (item) {

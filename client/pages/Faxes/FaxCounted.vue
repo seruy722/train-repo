@@ -984,8 +984,8 @@
                     });
                 });
                 // _.forEach(cloneData, item => delete item.clientItemsArray);
-                console.log('cloneData', cloneData);
-                console.log('mainTableHeadersValues', mainTableHeadersValues);
+                // console.log('cloneData', cloneData);
+                // console.log('mainTableHeadersValues', mainTableHeadersValues);
 
                 return cloneData;
             },
