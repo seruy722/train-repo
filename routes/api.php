@@ -45,6 +45,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('users/delete', 'UserController@destroy');
     Route::post('users/deleteFoto', 'UserController@deleteFoto');
     Route::post('users/sendData', 'UserController@getUsersNumberForSendingMessages');
+    Route::post('users/freecodes', 'UserController@getFreeCodes');
+    Route::post('users/add', 'UserController@addClient');
     // EMAILS
     Route::get('emails', 'EmailsController@index');
     Route::post('email/saveUpdate', 'EmailsController@store');

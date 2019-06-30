@@ -146,8 +146,8 @@
 
 <script>
     import axios from 'axios';
-    import { universalSort } from '~/utils';
     import { mapGetters } from 'vuex';
+    import { universalSort } from '~/utils';
     import checkErrorMixin from '~/mixins/checkError';
 
     export default {

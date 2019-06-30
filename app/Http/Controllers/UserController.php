@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Cargo;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -229,5 +230,50 @@ class UserController extends Controller
 
         }
         return response()->json(['status' => true, 'data' => $newArr]);
+    }
+
+    public function getFreeCodes(Request $request)
+    {
+        $to = range(0, $request->to);
+        $clients = User::all(['name'])->toArray();
+        $newArr = [];
+        foreach ($clients as $client) {
+            if (is_numeric($client['name'])) {
+                array_push($newArr, (int)$client['name']);
+            }
+        }
+        $arr = array_unique($newArr, SORT_NUMERIC);
+        $arr = array_values($arr);
+        $newCodes = [];
+
+        foreach ($to as $item) {
+            if (!in_array($item, $arr)) {
+                array_push($newCodes, $item);
+            }
+        }
+        sort($newArr, SORT_NUMERIC);
+
+        return response()->json(['items' => $newCodes]);
+    }
+
+    public function addClient(Request $request)
+    {
+        $this->validate($request, [
+            'clientCode' => 'required|max:50',
+        ]);
+
+        $clientCode = $request->clientCode;
+        $client = User::where('name', $clientCode)->first();
+//        User::destroy(689);
+        if (!$client) {
+            $newClient = User::create([
+                'name' => $clientCode,
+                'password' => 'default'
+            ]);
+
+            return response()->json(['client' => $newClient->name]);
+        }
+
+        return response()->json(['client' => null]);
     }
 }

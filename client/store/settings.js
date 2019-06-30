@@ -83,6 +83,7 @@ export const state = () => ({
                 { icon: 'home', text: 'Карго', path: '/cargo', role: 'admin' },
                 { icon: 'home', text: 'Факсы', path: '/faxes', role: 'admin, moder' },
                 { icon: 'home', text: 'Цены', path: '/prices', role: 'admin, moder' },
+                { icon: 'home', text: 'Свободные кода', path: '/codes', role: 'admin, moder' },
             ],
         },
         // {
