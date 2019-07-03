@@ -80,10 +80,11 @@ export const state = () => ({
             text: 'Карго Долги',
             model: false,
             children: [
-                { icon: 'home', text: 'Карго', path: '/cargo', role: 'admin' },
-                { icon: 'home', text: 'Факсы', path: '/faxes', role: 'admin, moder' },
-                { icon: 'home', text: 'Цены', path: '/prices', role: 'admin, moder' },
-                { icon: 'home', text: 'Свободные кода', path: '/codes', role: 'admin, moder' },
+                { icon: 'local_shipping', text: 'Карго', path: '/cargo', role: 'admin' },
+                { icon: 'domain', text: 'Факсы', path: '/faxes', role: 'admin, moder' },
+                { icon: 'attach_money', text: 'Цены', path: '/prices', role: 'admin, moder' },
+                { icon: 'code', text: 'Свободные кода', path: '/codes', role: 'admin, moder' },
+                { icon: 'toc', text: 'База клиентов', path: '/baza', role: 'admin, moder' },
             ],
         },
         // {

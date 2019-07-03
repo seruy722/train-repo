@@ -91,6 +91,11 @@ const routes = [
                 name: 'home-codes',
             },
             {
+                path: 'baza',
+                component: () => import('~/pages/Baza').then(m => m.default || m),
+                name: 'home-baza',
+            },
+            {
                 path: 'mailing',
                 component: () => import('~/pages/Mailing').then(m => m.default || m),
                 name: 'home-mailing',

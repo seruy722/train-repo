@@ -84,6 +84,11 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('price/delete', 'PriceController@destroyPrice');
     Route::post('prices/update', 'PriceController@updatePriceData');
     Route::post('price/add', 'PriceController@addPriceData');
+
+    // BAZA
+    Route::get('baza/all', 'BazaController@index');
+    Route::post('baza/update', 'BazaController@updateData');
+    Route::post('baza/destroy', 'BazaController@destroyData');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {
