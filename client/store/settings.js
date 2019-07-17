@@ -101,6 +101,15 @@ export const state = () => ({
         { icon: 'how_to_reg', path: '/profile', text: 'Профиль', role: 'admin, user, moder' },
         { icon: 'exit_to_app', text: 'Выход', path: '/logout', role: 'admin, moder' },
     ],
+    sex: [
+        {
+            id: 0,
+            title: 'Женский',
+        }, {
+            id: 1,
+            title: 'Мужской',
+        },
+    ],
 });
 
 // getters
@@ -115,6 +124,7 @@ export const getters = {
     commonItems: state => state.commonItems,
     pageSettings: state => state.pageSettings,
     menuMain: state => state.menuMain,
+    sex: state => state.sex,
 };
 
 export const mutations = {

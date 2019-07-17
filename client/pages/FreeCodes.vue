@@ -23,31 +23,19 @@
                                 ></v-text-field>
                             </v-flex>
                             <v-flex xs6 sm4 md3 class="ml-3">
-                                <v-btn color="success" @click="getFreeCodes">Показать</v-btn>
+                                <v-btn color="success" @click="checkTo">Показать</v-btn>
                             </v-flex>
                         </v-layout>
                     </v-card-actions>
                 </v-card>
 
                 <v-card>
-                    <v-card-title primary-title>
-                        <div>
-                            <h3>Введите код клиента и нажмите кнопку добавить</h3>
-                        </div>
-                    </v-card-title>
-
                     <v-card-actions>
                         <v-layout row wrap>
-                            <v-flex xs6 sm4 md3>
-                                <v-text-field
-                                    v-model="clientCode"
-                                    :error-messages="checkError('clientCode')"
-                                    label="Код"
-                                ></v-text-field>
-                            </v-flex>
                             <v-flex xs6 sm4 md3 class="ml-3">
-                                <v-btn color="success" @click="addClient(clientCode)">Добавить</v-btn>
+                                <v-btn color="success" @click="openDialog">Добавить клиента</v-btn>
                             </v-flex>
+                            <DialogAddClient :open.sync="openDialogAddClient"/>
                         </v-layout>
                     </v-card-actions>
                 </v-card>
@@ -66,21 +54,33 @@
 
 <script>
     import axios from 'axios';
-    import checkErrorMixin from '~/mixins/checkError';
 
     export default {
         name: 'FreeCodes',
-        mixins: [checkErrorMixin],
+        components: {
+            DialogAddClient: () => import('~/components/Dialogs/DialogAddClient'),
+        },
         data () {
             return {
                 to: 0,
                 items: [],
                 limit: 3000,
-                clientCode: '',
-                er: {},
+                openDialogAddClient: false,
             };
         },
         methods: {
+            checkTo () {
+                if (!this.to) {
+                    this.$snotify.warning('Введите число!', {
+                        timeout: 3000,
+                        showProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                    });
+                } else {
+                    this.getFreeCodes();
+                }
+            },
             async getFreeCodes () {
                 try {
                     const { data } = await axios.post('users/freecodes', { to: this.to });
@@ -101,36 +101,8 @@
                     console.error('Ошибка при получении кодов');
                 }
             },
-            async addClient (code) {
-                this.changeErrors({});
-                const clientCode = _.trim(code);
-                if (clientCode) {
-                    try {
-                        const { data } = await axios.post('users/add', { clientCode });
-                        const { client = null } = data;
-
-                        if (client) {
-                            this.$snotify.success(`Клиент: ${client} успешно добавлен`, {
-                                timeout: 3000,
-                                showProgressBar: true,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                            });
-
-                            this.clientCode = '';
-                        } else {
-                            this.$snotify.warning(`Клиент: ${clientCode} уже есть в базе`, {
-                                timeout: 3000,
-                                showProgressBar: true,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                            });
-                        }
-                    } catch (errors) {
-                        this.changeErrors(errors.response.data.errors);
-                        console.error(`Ошибка при добавлении клиента - ${errors.response.data.errors}`);
-                    }
-                }
+            openDialog () {
+                this.openDialogAddClient = true;
             },
         },
     };

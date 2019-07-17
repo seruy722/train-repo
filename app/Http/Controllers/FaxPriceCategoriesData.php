@@ -40,7 +40,7 @@ class FaxPriceCategoriesData extends Controller
             $arrvalue = (array)$item;
             $category = Category::firstOrCreate(['category_name' => $arrvalue['category_name']]);
             FaxPriceForCategory::updateOrCreate(['fax_id' => $arrvalue['fax_id'], 'category_id' => $category->id], ['category_id' => $category->id, 'fax_id' => $arrvalue['fax_id'], 'category_price' => $arrvalue['for_kg']]);
-            PriceForTransporter::updateOrCreate(['for_kg' => $arrvalue['for_kg'], 'category_id' => $category->id, 'transporter_id'=>$transporterID]);
+            PriceForTransporter::updateOrCreate(['category_id' => $category->id, 'transporter_id'=>$transporterID], ['for_kg' => $arrvalue['for_kg'], 'category_id' => $category->id, 'transporter_id'=>$transporterID]);
         }
 
         $faxCategoriesData = FaxPriceForCategory::where('fax_id', $faxID)->get();
