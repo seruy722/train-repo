@@ -116,7 +116,7 @@ class FaxesController extends Controller
             'file_name'=>'JOIN',
             'file_hash_name'=>'JOIN',
             'file_size'=>'JOIN',
-            'file_ext'=>'JOIN',
+            'file_ext'=>'xlsx',
             'url'=>'JOIN',
         ]);
 
