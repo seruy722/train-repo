@@ -263,7 +263,7 @@ class UserController extends Controller
             'name' => 'required|min:2|max:100',
             'city' => 'required|min:3|max:100',
             'sex' => 'required|boolean',
-            'phone' => 'max:20',
+            'phone' => 'min:13|unique:bazas|max:20',
         ]);
         $all = $request->all();
 
