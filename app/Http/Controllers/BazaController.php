@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Baza;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\Baza\BazaExport;
 
 class BazaController extends Controller
 {
@@ -42,5 +44,10 @@ class BazaController extends Controller
         $data = $request->toArray();
         Baza::destroy($data);
         return response()->json(['status' => true]);
+    }
+
+    public function exportData(Request $request)
+    {
+        return Excel::download(new BazaExport($request->itemIds), 'baza.xlsx');
     }
 }

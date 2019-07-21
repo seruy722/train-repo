@@ -4,11 +4,11 @@
         class="main"
     >
         <v-container>
-            <v-layout row wrap >
+            <v-layout row wrap>
                 <v-flex xs12 sm6 md6 class="flex justify-center">
                     <Search :value.sync="search"/>
                 </v-flex>
-                <v-flex xs12 sm3 md3 class="flex justify-center">
+                <v-flex xs12 sm6 md6 class="flex justify-center">
                     <v-btn
                         v-show="itemsForUpdate.length"
                         color="success"
@@ -16,14 +16,19 @@
                     >
                         Сохранить
                     </v-btn>
-                </v-flex>
-                <v-flex xs12 sm3 md3 class="flex justify-center">
                     <v-btn
                         v-show="selected.length"
                         color="error"
                         @click="destroyData(selected)"
                     >
                         Удалить
+                    </v-btn>
+                    <v-btn
+                        v-show="selected.length"
+                        color="primary"
+                        @click="exportData(selected)"
+                    >
+                        Export
                     </v-btn>
                 </v-flex>
             </v-layout>
@@ -225,7 +230,7 @@
         },
         methods: {
             addToUpdateArray (item) {
-                console.log('item', item);
+                // console.log('item', item);
                 const finded = _.find(this.itemsForUpdate, { id: item.id });
                 if (finded) {
                     const findedIndex = _.findIndex(this.itemsForUpdate, { id: item.id });
@@ -275,6 +280,33 @@
                         console.error(`Ошибка при удалении записи базы данных - ${e}`);
                     }
                 }
+            },
+            exportData (items) {
+                axios({
+                    url: 'baza/export',
+                    method: 'POST',
+                    responseType: 'blob', // important
+                    data: {
+                        itemIds: _.map(items, 'id'),
+                    },
+                })
+                    .then((response) => {
+                        const fileName = 'clients.xlsx';
+                        if (!window.navigator.msSaveOrOpenBlob) {
+                            // BLOB NAVIGATOR
+                            const url = window.URL.createObjectURL(new Blob([response.data]));
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', fileName);
+                            document.body.appendChild(link);
+                            link.click();
+                            this.selected = [];
+                        } else {
+                            // BLOB FOR EXPLORER 11
+                            window.navigator.msSaveOrOpenBlob(new Blob([response.data]), fileName);
+                            this.selected = [];
+                        }
+                    });
             },
         },
     };
